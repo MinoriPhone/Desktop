@@ -30,6 +30,10 @@ public class Main extends JFrame {
 
         // Center the window
         this.setLocation(x, y);
+
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            System.out.println(info.getClassName() + "");
+        }
     }
 
     /* Do not touch */
@@ -84,7 +88,7 @@ public class Main extends JFrame {
         // Mac OS X look and feel
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Mac OS X".equals(info.getName())) {
+                if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
