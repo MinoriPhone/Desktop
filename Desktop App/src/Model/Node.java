@@ -11,18 +11,37 @@ public class Node {
     private Double latitude;
 
     /**
+     * Constructor
+     */
+    public Node() {
+    }
+
+    /**
+     * Overload Constructor
+     *
+     * @param id int
+     * @param longitude Double
+     * @param latitude Double
+     */
+    public Node(int id, Double longitude, Double latitude) {
+        this.id = id;
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
+
+    /**
      * Get the id of a Node
      *
-     * @return int Id
+     * @return int id
      */
     public int getId() {
         return id;
     }
 
     /**
-     * Set the id of a Node
+     * Set the id of the Node
      *
-     * @param id The id for the Node
+     * @param id int The id of the Node
      */
     public void setId(int id) {
         this.id = id;
@@ -40,7 +59,7 @@ public class Node {
     /**
      * Set the longitude for the Node.
      *
-     * @param Double longitude
+     * @param longitude Double longitude
      */
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
@@ -48,7 +67,7 @@ public class Node {
 
     /**
      * Get the latitude from the Node.
-     * 
+     *
      * @return Double longitude
      */
     public Double getLatitude() {
@@ -56,9 +75,9 @@ public class Node {
     }
 
     /**
-     * Set the latitude for the Node. 
-     * 
-     * @param Double latitude 
+     * Set the latitude for the Node.
+     *
+     * @param latitude Double latitude
      */
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
