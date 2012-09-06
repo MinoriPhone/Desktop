@@ -6,6 +6,8 @@ package Model;
 public class Link {
     
     // Variables
+    private Node p1;
+    private Node p1;
     
     /**
      * Constructor
