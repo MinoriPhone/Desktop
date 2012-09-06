@@ -1,32 +1,43 @@
 package Model;
 
-import java.util.ArrayList;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * A Link between two Nodes. A Route consists of multiple Links.
  */
-public class Link {
+public class Link extends DefaultMutableTreeNode {
 
     // Variables
+    private String name;
     private Node p1;
     private Node p2;
-    private ArrayList<Link> nextLinks;
     // private Video video
 
     /**
-     * Constructor
+     *
+     * @param name
+     * @param o
+     * @param p1
+     * @param p2
      */
-    public Link() {
+    public Link(String name, DefaultMutableTreeNode startLink, Node p1, Node p2 /*,video*/) {
+        super(startLink, true);
+        this.name = name;
+        this.p1 = p1;
+        this.p2 = p2;
     }
 
     /**
-     * Overload Constructor
+     *
+     * @param name
+     * @param o
+     * @param p1
+     * @param p2
      */
-    public Link(Node p1, Node p2, ArrayList<Link> nextLinks /*,video*/) {
+    public Link(String name, Node p1, Node p2) {
+        this.name = name;
         this.p1 = p1;
         this.p2 = p2;
-        this.nextLinks = nextLinks;
-        //this.video = video;
     }
 
     /**
@@ -63,5 +74,14 @@ public class Link {
      */
     public void setP2(Node p2) {
         this.p2 = p2;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public String toString() {
+        return name;
     }
 }

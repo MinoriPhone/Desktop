@@ -9,7 +9,7 @@ public class Controller {
     private static Controller controller = null;
 
     /**
-     * Overload the public constructor
+     * Overload the public Constructor
      */
     private Controller() {
     }

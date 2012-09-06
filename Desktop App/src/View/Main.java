@@ -1,10 +1,13 @@
 package View;
 
 import Model.Application;
+import Model.Link;
+import Model.Route;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * The Main screen of the application
@@ -30,6 +33,20 @@ public class Main extends JFrame {
 
         // Center the window
         this.setLocation(x, y);
+        
+        String startpunt = "Timmehh";
+        DefaultMutableTreeNode startLink = new DefaultMutableTreeNode(startpunt, true);
+        Link start = new Link("Start", startLink, null, null);
+        Route route = new Route(startpunt, start);
+        
+        Link link2 = new Link("A", null, null);
+        startLink.add(link2);
+        
+        Link link3 = new Link("B", null, null);
+        link2.add(link3);
+        
+        
+        route.getPath();
     }
 
     /* Do not touch */
