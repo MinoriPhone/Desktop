@@ -46,7 +46,7 @@ public class Main extends JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLversion.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
+        jLversion.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         jLversion.setText("version");
 
         org.jdesktop.layout.GroupLayout jPmainLayout = new org.jdesktop.layout.GroupLayout(jPmain);
@@ -61,7 +61,7 @@ public class Main extends JFrame {
         jPmainLayout.setVerticalGroup(
             jPmainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPmainLayout.createSequentialGroup()
-                .addContainerGap(605, Short.MAX_VALUE)
+                .addContainerGap(617, Short.MAX_VALUE)
                 .add(jLversion)
                 .addContainerGap())
         );
