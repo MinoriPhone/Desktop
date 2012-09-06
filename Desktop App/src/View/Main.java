@@ -30,10 +30,6 @@ public class Main extends JFrame {
 
         // Center the window
         this.setLocation(x, y);
-
-        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-            System.out.println(info.getClassName() + "");
-        }
     }
 
     /* Do not touch */
@@ -61,7 +57,7 @@ public class Main extends JFrame {
         jPmainLayout.setVerticalGroup(
             jPmainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPmainLayout.createSequentialGroup()
-                .addContainerGap(617, Short.MAX_VALUE)
+                .addContainerGap(604, Short.MAX_VALUE)
                 .add(jLversion)
                 .addContainerGap())
         );
@@ -85,7 +81,7 @@ public class Main extends JFrame {
      */
     public static void main(String args[]) {
 
-        // Mac OS X look and feel
+        // Nimbus look and feel
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {

@@ -5,4 +5,12 @@ package Model;
  */
 public class Route {
     
+    // Variables
+    
+    /**
+     * Constructor
+     */
+    public Route() {
+        
+    }
 }

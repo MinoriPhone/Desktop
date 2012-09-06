@@ -7,4 +7,10 @@ public class Story {
     
     // Variables
     
+    /**
+     * Constructor
+     */
+    public Story() {
+        
+    }
 }
