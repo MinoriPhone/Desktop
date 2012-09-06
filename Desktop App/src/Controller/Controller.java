@@ -1,7 +1,7 @@
 package Controller;
 
 /**
- * The controller mediates input and converting it to commands for the Model or View
+ * The Controller mediates input and converting it to commands for the Model or View
  */
 public class Controller {
 
