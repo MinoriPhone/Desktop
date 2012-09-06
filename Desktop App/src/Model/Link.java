@@ -7,7 +7,7 @@ public class Link {
     
     // Variables
     private Node p1;
-    private Node p1;
+    private Node p2;
     
     /**
      * Constructor
