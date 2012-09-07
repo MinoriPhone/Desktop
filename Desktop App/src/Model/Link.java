@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.ArrayList;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -11,6 +12,7 @@ public class Link extends DefaultMutableTreeNode {
     private String name;
     private Node p1;
     private Node p2;
+    private ArrayList<Link> links;
     // private Video video
 
     /**
@@ -38,6 +40,7 @@ public class Link extends DefaultMutableTreeNode {
         this.name = name;
         this.p1 = p1;
         this.p2 = p2;
+        this.links = new ArrayList<Link>();
     }
 
     /**
@@ -76,6 +79,10 @@ public class Link extends DefaultMutableTreeNode {
         this.p2 = p2;
     }
 
+    public void addLink(Link link) {
+        this.links.add(link);
+    }
+    
     /**
      *
      * @return
@@ -83,5 +90,18 @@ public class Link extends DefaultMutableTreeNode {
     @Override
     public String toString() {
         return name;
+    }
+    
+    public void print(int i) {
+        String spaties = "";
+        for(int a = 0; a < i; a++)
+        {
+            spaties += "   ";
+        }
+        i++;
+        System.out.println(spaties+"--->"+this.toString());
+        for (Link link : this.links) {
+            link.print(i);
+        }
     }
 }

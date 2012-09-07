@@ -36,17 +36,29 @@ public class Main extends JFrame {
         
         String startpunt = "Timmehh";
         DefaultMutableTreeNode startLink = new DefaultMutableTreeNode(startpunt, true);
-        Link start = new Link("Start", startLink, null, null);
+        Link start = new Link("Start", null, null);
         Route route = new Route(startpunt, start);
         
         Link link2 = new Link("A", null, null);
-        startLink.add(link2);
+        start.addLink(link2);
         
-        Link link3 = new Link("B", null, null);
-        link2.add(link3);
+        Link link3 = new Link("A", null, null);
+        link2.addLink(link3);
+        
+        Link link4 = new Link("AA", null, null);
+        link3.addLink(link4);
+        
+        Link link5 = new Link("AA", null, null);
+        link4.addLink(link5);
+        
+        Link link6 = new Link("AB", null, null);
+        link2.addLink(link6);
+        
+        Link link7 = new Link("AB", null, null);
+        link6.addLink(link7);
         
         
-        route.getPath();
+        route.print();
     }
 
     /* Do not touch */

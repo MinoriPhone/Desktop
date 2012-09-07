@@ -34,4 +34,14 @@ public class Route {
        
         System.out.println(tim);
     }
+    
+    /**
+     *
+     * @return
+     */
+    public void print() {
+        System.out.println(this.name);
+       
+        this.startLink.print(0);
+    }
 }
