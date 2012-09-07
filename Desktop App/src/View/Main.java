@@ -9,15 +9,15 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.jdesktop.swingx.JXMapViewer;
-import org.jdesktop.swingx.OSMTileFactoryInfo;
-import org.jdesktop.swingx.input.CenterMapListener;
-import org.jdesktop.swingx.input.PanKeyListener;
-import org.jdesktop.swingx.input.PanMouseInputListener;
-import org.jdesktop.swingx.input.ZoomMouseWheelListenerCenter;
-import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
-import org.jdesktop.swingx.mapviewer.GeoPosition;
-import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
+import Plugins.jxmap.swingx.JXMapViewer;
+import Plugins.jxmap.swingx.OSMTileFactoryInfo;
+import Plugins.jxmap.swingx.input.CenterMapListener;
+import Plugins.jxmap.swingx.input.PanKeyListener;
+import Plugins.jxmap.swingx.input.PanMouseInputListener;
+import Plugins.jxmap.swingx.input.ZoomMouseWheelListenerCenter;
+import Plugins.jxmap.swingx.mapviewer.DefaultTileFactory;
+import Plugins.jxmap.swingx.mapviewer.GeoPosition;
+import Plugins.jxmap.swingx.mapviewer.TileFactoryInfo;
 
 /**
  * The Main screen of the application
