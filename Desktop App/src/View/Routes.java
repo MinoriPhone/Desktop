@@ -11,15 +11,16 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 
+
 /**
  *
  */
-public class Route extends JPanel {
+public class Routes extends JPanel {
 
     /**
-     * Creates new form Route
+     * Creates new form Routes
      */
-    public Route() {
+    public Routes() {
         initComponents();
 
 
@@ -73,7 +74,6 @@ public class Route extends JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }
-
 /**
  * Represents items in the JList that can be selected
  */

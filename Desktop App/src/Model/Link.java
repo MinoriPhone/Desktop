@@ -13,7 +13,6 @@ public class Link extends DefaultMutableTreeNode {
     private Node p1;
     private Node p2;
     private ArrayList<Link> links;
-    // private Video video
 
     /**
      *
@@ -22,7 +21,7 @@ public class Link extends DefaultMutableTreeNode {
      * @param p1
      * @param p2
      */
-    public Link(String name, DefaultMutableTreeNode startLink, Node p1, Node p2 /*,video*/) {
+    public Link(String name, DefaultMutableTreeNode startLink, Node p1, Node p2) {
         super(startLink, true);
         this.name = name;
         this.p1 = p1;
@@ -78,7 +77,12 @@ public class Link extends DefaultMutableTreeNode {
     public void setP2(Node p2) {
         this.p2 = p2;
     }
-
+    
+    /**
+     * Add a link to the consisting links
+     * 
+     * @param link The new link
+     */
     public void addLink(Link link) {
         this.links.add(link);
     }

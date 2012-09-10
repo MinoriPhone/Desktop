@@ -1,21 +1,15 @@
 package View;
 
-import Model.Link;
-import Model.Route;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.JCheckBox;
-import javax.swing.JList;
+import java.awt.Button;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
 
 /**
  * The Main screen of the application
@@ -43,19 +37,13 @@ public class Main extends JFrame {
         pMain.add(map, BorderLayout.CENTER);
         
         // Add Routes
-        JPanel route = new View.Route();
+        JPanel route = new Routes();
         pMenu.add(route, BorderLayout.CENTER);
-
-
-
-
-
-
 
 //
 //        String startpunt = "Timmehh";
 //        Link start = new Link("Start", null, null);
-//        Route route = new Route(startpunt, start);
+//        Routes route = new Routes(startpunt, start);
 //
 //        Link link2 = new Link("A", null, null);
 //        start.addLink(link2);
@@ -97,7 +85,6 @@ public class Main extends JFrame {
         bNode = new javax.swing.JButton();
         bLink = new javax.swing.JButton();
         bStart = new javax.swing.JButton();
-        pMenuRoutes = new javax.swing.JPanel();
         mbMenubar = new javax.swing.JMenuBar();
         mFile = new javax.swing.JMenu();
         miNew = new javax.swing.JMenuItem();
@@ -143,7 +130,7 @@ public class Main extends JFrame {
                 .addContainerGap()
                 .add(pMenuButtonsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, bLink, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
                     .add(bStart, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -160,9 +147,6 @@ public class Main extends JFrame {
         );
 
         pMenu.add(pMenuButtons, java.awt.BorderLayout.PAGE_START);
-
-        pMenuRoutes.setLayout(new java.awt.BorderLayout());
-        pMenu.add(pMenuRoutes, java.awt.BorderLayout.CENTER);
 
         pMain.add(pMenu, java.awt.BorderLayout.LINE_START);
 
@@ -283,7 +267,6 @@ public class Main extends JFrame {
     private javax.swing.JPanel pMain;
     private javax.swing.JPanel pMenu;
     private javax.swing.JPanel pMenuButtons;
-    private javax.swing.JPanel pMenuRoutes;
     private javax.swing.JPopupMenu.Separator sepFile;
     // End of variables declaration//GEN-END:variables
 }
