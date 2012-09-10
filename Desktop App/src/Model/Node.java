@@ -1,70 +1,54 @@
 package Model;
 
+import Plugins.jxmap.swingx.mapviewer.DefaultWaypoint;
+import Plugins.jxmap.swingx.mapviewer.GeoPosition;
+
 /**
- * The node is a spot which can be placed on a map. You can say that a spot
- * represents a location.
+ * The node is a spot which can be placed on a map. You can say that a spot represents a location.
  */
-public class Node {
-
-    // Variables
-    private double longitude;  // horizontal coördinaat
-    private double latitude;   // vertical coordinaat
+public class Node extends DefaultWaypoint {
 
     /**
-     * Overload Constructor
-     *
-     * @param longitude double
+     * Constructor with doubles
+     * 
      * @param latitude double
+     * @param longitude double     * 
      */
-    public Node(double longitude, double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
+    public Node(double latitude, double longitude) {
+        super(new GeoPosition(latitude, longitude)); // Creates a waypoint with the geoposition        
     }
 
     /**
-     * Get the longitude from the Node. If no longitude is set, null will be
-     * returned.
+     * Constructor with geolocation
      *
-     * @return double longitude
+     * @param geoposition The jxMapView geoposition
      */
-    public double getLongitude() {
-        return longitude;
+    public Node(GeoPosition geoposition) {
+        super(geoposition); // Creates a waypoint with the geoposition        
     }
-
+    
     /**
-     * Set the longitude for the Node.
-     *
-     * @param longitude double longitude
+     * 
+     * @return 
      */
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public GeoPosition getGeoposition() {
+        return super.getPosition();
     }
-
+    
     /**
-     * Get the latitude from the Node.
-     *
-     * @return double longitude
+     * 
+     * @param geoposition 
      */
-    public double getLatitude() {
-        return latitude;
+    public void setGeoposition(GeoPosition geoposition) {
+        super.setPosition(geoposition);
     }
-
+    
     /**
-     * Set the latitude for the Node.
-     *
-     * @param latitude double latitude
-     */
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    /**
-     * Print the GPS coördinates of the Node
-     *
-     * @return String
+     * 
+     * @return 
      */
     @Override
     public String toString() {
-        return "" + this.longitude + " : " + this.latitude;
+        return  super.getPosition().getLatitude()+ " : " + super.getPosition().getLongitude();
     }
 }
