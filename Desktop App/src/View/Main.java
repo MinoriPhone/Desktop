@@ -1,16 +1,22 @@
 package View;
 
+import Model.Node;
+import Model.Story;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 /**
  * The Main screen of the application
  */
 public class Main extends JFrame {
+
+    // Variables
+    private Map map;
+    private Story story;
+    private Routes routes;
 
     /**
      * Creates new form Main
@@ -30,44 +36,14 @@ public class Main extends JFrame {
         this.setLocation(x, y);
 
         // Add Map
-        JPanel map = new Map();
-        pMain.add(map, BorderLayout.CENTER);
+        this.map = new Map();
+        pMain.add(this.map, BorderLayout.CENTER);
 
         // Add Routes
-        JPanel route = new Routes();
-        pMenu.add(route, BorderLayout.CENTER);
+        this.routes = new Routes();
+        pMenu.add(routes, BorderLayout.CENTER);
 
-//
-//        String startpunt = "Timmehh";
-//        Link start = new Link("Start", null, null);
-//        Routes route = new Routes(startpunt, start);
-//
-//        Link link2 = new Link("A", null, null);
-//        start.addLink(link2);
-//
-//        Link link3 = new Link("A", null, null);
-//        link2.addLink(link3);
-//
-//        Link link4 = new Link("AA", null, null);
-//        link3.addLink(link4);
-//
-//        Link link5 = new Link("AA", null, null);
-//        link4.addLink(link5);
-//
-//        Link link6 = new Link("AB", null, null);
-//        link2.addLink(link6);
-//
-//        Link link7 = new Link("AB", null, null);
-//        link6.addLink(link7);
-//
-//        route.print();
-
-
-
-
-
-
-
+        // Revalidate JPanels
         this.pack();
     }
 
@@ -110,6 +86,11 @@ public class Main extends JFrame {
         bNode.setText("Node");
         bNode.setToolTipText("");
         bNode.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        bNode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bNodeActionPerformed(evt);
+            }
+        });
 
         bLink.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/link.png"))); // NOI18N
         bLink.setText("Link");
@@ -214,13 +195,19 @@ public class Main extends JFrame {
         About about = new About();
         about.setVisible(true);
     }//GEN-LAST:event_miAboutActionPerformed
+    private void bNodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bNodeActionPerformed
+        // Add Node to the mapViewer
+        this.map.addNode(new Node(50.000000, 4.000000));
+    }//GEN-LAST:event_bNodeActionPerformed
 
     /**
+     * Run Main window
+     * 
      * @param args the command line arguments
      */
     public static void main(String args[]) {
 
-        // Nimbus look and feel
+        // Set Nimbus look and feel
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
