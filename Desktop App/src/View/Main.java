@@ -1,14 +1,10 @@
 package View;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import javax.swing.JPanel;
 
 /**
@@ -23,7 +19,8 @@ public class Main extends JFrame {
         initComponents();
 
         // Get the size of the screen
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension dim = tk.getScreenSize();
 
         // Determine the new location of the window
         int x = (dim.width - (this.getSize().width)) / 2;
@@ -35,7 +32,7 @@ public class Main extends JFrame {
         // Add Map
         JPanel map = new Map();
         pMain.add(map, BorderLayout.CENTER);
-        
+
         // Add Routes
         JPanel route = new Routes();
         pMenu.add(route, BorderLayout.CENTER);
@@ -70,11 +67,11 @@ public class Main extends JFrame {
 
 
 
-        
+
         this.pack();
     }
 
-    /* Do not touch */
+    /* DO NOT TOUCH */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -270,5 +267,3 @@ public class Main extends JFrame {
     private javax.swing.JPopupMenu.Separator sepFile;
     // End of variables declaration//GEN-END:variables
 }
-
-

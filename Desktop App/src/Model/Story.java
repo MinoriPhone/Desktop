@@ -3,7 +3,8 @@ package Model;
 import java.util.ArrayList;
 
 /**
- * A Story that the user is going to watch. This class holds all the different Routes an user can make.
+ * A Story that the user is going to watch. This class holds all the different
+ * Routes an user can make.
  */
 public class Story {
 
@@ -65,35 +66,4 @@ public class Story {
     public void addRoute(Route route) {
         routes.add(route);
     }
-
-    /**
-     * Get a specific Route by name
-     *
-     * @param routeName The name of the Route we want to get
-     * @return
-     */
-//    public Route getRouteByName(String routeName) {
-//        Route result = null;
-//        for (Route route : routes) {
-//            if (route.getName().equals(routeName)) {
-//                result = route;
-//                break;
-//            }
-//        }
-//        return result;
-//    }
-
-    /**
-     * Remove Route from the Routelist by Name
-     *
-     * @param routeName The name of the Route we want to delete
-     */
-//    public void removeRouteByName(String routeName) {
-//        for (Route route : routes) {
-//            if (route.getName().equals(routeName)) {
-//                routes.remove(route);
-//                break;
-//            }
-//        }
-//    }
 }

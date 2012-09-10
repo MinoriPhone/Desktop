@@ -10,16 +10,17 @@ import Plugins.jxmap.swingx.mapviewer.DefaultTileFactory;
 import Plugins.jxmap.swingx.mapviewer.GeoPosition;
 import Plugins.jxmap.swingx.mapviewer.TileFactoryInfo;
 import java.awt.BorderLayout;
+import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
 /**
- *
+ * Panel containing the Map
  */
-public class Map extends javax.swing.JPanel {
+public class Map extends JPanel {
 
     // Variables
     private JXMapViewer mapViewer;
-    
+
     /**
      * Creates new form Map
      */

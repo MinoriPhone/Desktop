@@ -1,12 +1,11 @@
 package Model;
 
 import java.util.ArrayList;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * A Link between two Nodes. A Route consists of multiple Links.
  */
-public class Link extends DefaultMutableTreeNode {
+public class Link {
 
     // Variables
     private String name;
@@ -15,25 +14,11 @@ public class Link extends DefaultMutableTreeNode {
     private ArrayList<Link> links;
 
     /**
+     * Constructor
      *
-     * @param name
-     * @param o
-     * @param p1
-     * @param p2
-     */
-    public Link(String name, DefaultMutableTreeNode startLink, Node p1, Node p2) {
-        super(startLink, true);
-        this.name = name;
-        this.p1 = p1;
-        this.p2 = p2;
-    }
-
-    /**
-     *
-     * @param name
-     * @param o
-     * @param p1
-     * @param p2
+     * @param name String
+     * @param p1 Node
+     * @param p2 Node
      */
     public Link(String name, Node p1, Node p2) {
         this.name = name;
@@ -77,33 +62,62 @@ public class Link extends DefaultMutableTreeNode {
     public void setP2(Node p2) {
         this.p2 = p2;
     }
-    
+
     /**
      * Add a link to the consisting links
-     * 
+     *
      * @param link The new link
      */
     public void addLink(Link link) {
         this.links.add(link);
     }
-    
+
     /**
+     * Get the name of the Link
      *
-     * @return
+     * @return String
      */
-    @Override
-    public String toString() {
+    public String getName() {
         return name;
     }
-    
+
+    /**
+     * Set the name of the Link
+     *
+     * @param name String name of the Link
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Get the next Link(s) of this Link
+     *
+     * @return ArrayList<Link>
+     */
+    public ArrayList<Link> getLinks() {
+        return links;
+    }
+
+    /**
+     * Set the next Link(s) of the Link
+     *
+     * @param links ArrayList<Link> The list with all next Links
+     */
+    public void setLinks(ArrayList<Link> links) {
+        this.links = links;
+    }
+
+    /**
+     * LATER WEGHALEN!!
+     */
     public void print(int i) {
         String spaties = "";
-        for(int a = 0; a < i; a++)
-        {
+        for (int a = 0; a < i; a++) {
             spaties += "   ";
         }
         i++;
-        System.out.println(spaties+"--->"+this.toString());
+        System.out.println(spaties + "--->" + this.toString());
         for (Link link : this.links) {
             link.print(i);
         }

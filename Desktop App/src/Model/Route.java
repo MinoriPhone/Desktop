@@ -1,9 +1,8 @@
 package Model;
 
-import javax.swing.tree.TreeNode;
-
 /**
- * The Route an user is able to make during the Story. A Route holds all the Links between different Nodes (positions).
+ * The Route an user is able to make during the Story. A Route holds all the
+ * Links between different Nodes (positions).
  */
 public class Route {
 
@@ -12,9 +11,10 @@ public class Route {
     private Link startLink;
 
     /**
+     * Constructor
      *
-     * @param name
-     * @param link
+     * @param name String Name of the Route
+     * @param startLink Link Startlink of the Route
      */
     public Route(String name, Link startLink) {
         this.name = name;
@@ -22,22 +22,38 @@ public class Route {
     }
 
     /**
+     * Get the name of the Route
      *
-     * @return
+     * @return String
      */
-    public void getPath() {
-        TreeNode tim = this.startLink.getChildAt(0);
-       
-        System.out.println(tim);
+    public String getName() {
+        return name;
     }
-    
+
     /**
+     * Set the name of the Route
      *
-     * @return
+     * @param name String Name of the route
      */
-    public void print() {
-        System.out.println(this.name);
-       
-        this.startLink.print(0);
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Get the startlink of the Route
+     *
+     * @return Link
+     */
+    public Link getStartLink() {
+        return startLink;
+    }
+
+    /**
+     * Set the startlink of the Route
+     *
+     * @param startLink Link The startlink of the Route
+     */
+    public void setStartLink(Link startLink) {
+        this.startLink = startLink;
     }
 }

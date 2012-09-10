@@ -1,7 +1,8 @@
 package Model;
 
 /**
- * The node is a spot which can be placed on a map. You can say that a spot represents a location.
+ * The node is a spot which can be placed on a map. You can say that a spot
+ * represents a location.
  */
 public class Node {
 
@@ -21,7 +22,8 @@ public class Node {
     }
 
     /**
-     * Get the longitude from the Node. If no longitude is set, null will be returned.
+     * Get the longitude from the Node. If no longitude is set, null will be
+     * returned.
      *
      * @return double longitude
      */
@@ -56,8 +58,13 @@ public class Node {
         this.latitude = latitude;
     }
 
+    /**
+     * Print the GPS coördinates of the Node
+     *
+     * @return String
+     */
     @Override
     public String toString() {
-        return "" + this.latitude + " : " + this.longitude;
+        return "" + this.longitude + " : " + this.latitude;
     }
 }
