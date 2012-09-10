@@ -21,10 +21,6 @@ public class Route {
         this.startLink = startLink;
     }
 
-    public Link getRoute() {
-        return startLink;
-    }
-
     /**
      *
      * @return

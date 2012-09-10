@@ -1,48 +1,32 @@
 package View;
 
-import Model.Application;
 import Model.Link;
 import Model.Route;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
-import javax.swing.event.MouseInputListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import Plugins.jxmap.swingx.JXMapViewer;
-import Plugins.jxmap.swingx.OSMTileFactoryInfo;
-import Plugins.jxmap.swingx.input.CenterMapListener;
-import Plugins.jxmap.swingx.input.PanKeyListener;
-import Plugins.jxmap.swingx.input.PanMouseInputListener;
-import Plugins.jxmap.swingx.input.ZoomMouseWheelListenerCenter;
-import Plugins.jxmap.swingx.mapviewer.DefaultTileFactory;
-import Plugins.jxmap.swingx.mapviewer.GeoPosition;
-import Plugins.jxmap.swingx.mapviewer.TileFactoryInfo;
 import java.awt.BorderLayout;
-import java.awt.Checkbox;
-import java.awt.GridBagConstraints;
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JCheckBox;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 
 /**
  * The Main screen of the application
  */
 public class Main extends JFrame {
 
-    private Application app;
-
     /**
      * Creates new form Main
      */
     public Main() {
         initComponents();
-
-        // Autoscroll and align the checkboxes
-        pMenuScrollPanel.add(new Checkbox("Test"));
-        pMenuScrollPanel.add(new Checkbox("Test1"));
-        pMenuScrollPanel.add(new Checkbox("Test2"));
-        
-        
-        // Set application version
-        app = new Application();
 
         // Get the size of the screen
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -54,56 +38,52 @@ public class Main extends JFrame {
         // Center the window
         this.setLocation(x, y);
 
-        String startpunt = "Timmehh";
-        Link start = new Link("Start", null, null);
-        Route route = new Route(startpunt, start);
-
-        Link link2 = new Link("A", null, null);
-        start.addLink(link2);
-
-        Link link3 = new Link("A", null, null);
-        link2.addLink(link3);
-
-        Link link4 = new Link("AA", null, null);
-        link3.addLink(link4);
-
-        Link link5 = new Link("AA", null, null);
-        link4.addLink(link5);
-
-        Link link6 = new Link("AB", null, null);
-        link2.addLink(link6);
-
-        Link link7 = new Link("AB", null, null);
-        link6.addLink(link7);
+        // Add Map
+        JPanel map = new Map();
+        pMain.add(map, BorderLayout.CENTER);
+        
+        // Add Routes
+        JPanel route = new View.Route();
+        pMenu.add(route, BorderLayout.CENTER);
 
 
-        route.print();
-        JXMapViewer mapViewer = new JXMapViewer();
 
-        // Create a TileFactoryInfo for OpenStreetMap
-        TileFactoryInfo info = new OSMTileFactoryInfo();
-        DefaultTileFactory tileFactory = new DefaultTileFactory(info);
-        mapViewer.setTileFactory(tileFactory);
 
-        // Use 8 threads in parallel to load the tiles
-        tileFactory.setThreadPoolSize(8);
 
-        // Set the focus
-        GeoPosition frankfurt = new GeoPosition(50.11, 8.68);
 
-        mapViewer.setZoom(7);
-        mapViewer.setAddressLocation(frankfurt);
 
-        // Add interactions
-        MouseInputListener mia = new PanMouseInputListener(mapViewer);
-        mapViewer.addMouseListener(mia);
-        mapViewer.addMouseMotionListener(mia);
-        mapViewer.addMouseListener(new CenterMapListener(mapViewer));
-        mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
-        mapViewer.addKeyListener(new PanKeyListener(mapViewer));
+//
+//        String startpunt = "Timmehh";
+//        Link start = new Link("Start", null, null);
+//        Route route = new Route(startpunt, start);
+//
+//        Link link2 = new Link("A", null, null);
+//        start.addLink(link2);
+//
+//        Link link3 = new Link("A", null, null);
+//        link2.addLink(link3);
+//
+//        Link link4 = new Link("AA", null, null);
+//        link3.addLink(link4);
+//
+//        Link link5 = new Link("AA", null, null);
+//        link4.addLink(link5);
+//
+//        Link link6 = new Link("AB", null, null);
+//        link2.addLink(link6);
+//
+//        Link link7 = new Link("AB", null, null);
+//        link6.addLink(link7);
+//
+//        route.print();
 
-        // Display the viewer in pMap
-        pMap.add(mapViewer, BorderLayout.CENTER);
+
+
+
+
+
+        
+        this.pack();
     }
 
     /* Do not touch */
@@ -118,9 +98,6 @@ public class Main extends JFrame {
         bLink = new javax.swing.JButton();
         bStart = new javax.swing.JButton();
         pMenuRoutes = new javax.swing.JPanel();
-        sMenuScrollRoutes = new javax.swing.JScrollPane();
-        pMenuScrollPanel = new javax.swing.JPanel();
-        pMap = new javax.swing.JPanel();
         mbMenubar = new javax.swing.JMenuBar();
         mFile = new javax.swing.JMenu();
         miNew = new javax.swing.JMenuItem();
@@ -166,7 +143,7 @@ public class Main extends JFrame {
                 .addContainerGap()
                 .add(pMenuButtonsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, bLink, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                     .add(bStart, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -184,27 +161,10 @@ public class Main extends JFrame {
 
         pMenu.add(pMenuButtons, java.awt.BorderLayout.PAGE_START);
 
-        pMenuScrollPanel.setLayout(new java.awt.GridBagLayout());
-        sMenuScrollRoutes.setViewportView(pMenuScrollPanel);
-
-        org.jdesktop.layout.GroupLayout pMenuRoutesLayout = new org.jdesktop.layout.GroupLayout(pMenuRoutes);
-        pMenuRoutes.setLayout(pMenuRoutesLayout);
-        pMenuRoutesLayout.setHorizontalGroup(
-            pMenuRoutesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(sMenuScrollRoutes, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-        );
-        pMenuRoutesLayout.setVerticalGroup(
-            pMenuRoutesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(sMenuScrollRoutes, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
-        );
-
+        pMenuRoutes.setLayout(new java.awt.BorderLayout());
         pMenu.add(pMenuRoutes, java.awt.BorderLayout.CENTER);
 
         pMain.add(pMenu, java.awt.BorderLayout.LINE_START);
-
-        pMap.setBackground(new java.awt.Color(255, 255, 255));
-        pMap.setLayout(new java.awt.BorderLayout());
-        pMain.add(pMap, java.awt.BorderLayout.CENTER);
 
         mFile.setText("File");
 
@@ -262,7 +222,7 @@ public class Main extends JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 747, Short.MAX_VALUE)
+            .add(pMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 746, Short.MAX_VALUE)
         );
 
         pack();
@@ -270,7 +230,7 @@ public class Main extends JFrame {
 
     private void miAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAboutActionPerformed
         // Show about window
-        About about = new About(app);
+        About about = new About();
         about.setVisible(true);
     }//GEN-LAST:event_miAboutActionPerformed
 
@@ -321,12 +281,11 @@ public class Main extends JFrame {
     private javax.swing.JMenuItem miOpen;
     private javax.swing.JMenuItem miSave;
     private javax.swing.JPanel pMain;
-    private javax.swing.JPanel pMap;
     private javax.swing.JPanel pMenu;
     private javax.swing.JPanel pMenuButtons;
     private javax.swing.JPanel pMenuRoutes;
-    private javax.swing.JPanel pMenuScrollPanel;
-    private javax.swing.JScrollPane sMenuScrollRoutes;
     private javax.swing.JPopupMenu.Separator sepFile;
     // End of variables declaration//GEN-END:variables
 }
+
+

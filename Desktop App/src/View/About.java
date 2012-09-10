@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package View;
 
 import Model.Application;
@@ -12,11 +8,19 @@ import Model.Application;
  */
 public class About extends javax.swing.JFrame {
 
+    // Variables
+    private Application app;
+    
     /**
      * Creates new form About
      */
-    public About(Application app) {
+    public About() {
         initComponents();
+        
+        // Get Object with all Application mete data
+        app = new Application();
+        
+        // Set meta data application
         lVersionCode.setText(String.valueOf(app.getVersion()));
     }
 
