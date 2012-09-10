@@ -36,11 +36,11 @@ public class Main extends JFrame {
         this.setLocation(x, y);
 
         // Add Map
-        this.map = new Map();
+        map = new Map();
         pMain.add(this.map, BorderLayout.CENTER);
 
         // Add Routes
-        this.routes = new Routes();
+        routes = new Routes();
         pMenu.add(routes, BorderLayout.CENTER);
 
         // Revalidate JPanels

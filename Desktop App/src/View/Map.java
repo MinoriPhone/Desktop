@@ -41,41 +41,41 @@ public class Map extends JPanel {
         initComponents();
 
         // Create a map
-        this.mapViewer = new JXMapViewer();
+        mapViewer = new JXMapViewer();
 
         // Create a TileFactoryInfo for the OpenStreetMap
         TileFactoryInfo info = new OSMTileFactoryInfo();
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
         tileFactory.setThreadPoolSize(8);
-        this.mapViewer.setTileFactory(tileFactory);
+        mapViewer.setTileFactory(tileFactory);
 
         // Set the GEO position + Zoom
         GeoPosition zHHS = new GeoPosition(52.051194, 4.475518);
-        this.mapViewer.setZoom(0);
-        this.mapViewer.setAddressLocation(zHHS);
+        mapViewer.setZoom(0);
+        mapViewer.setAddressLocation(zHHS);
 
         // Create waypoints from the geo-positions
-        this.nodes = new HashSet<Node>();
-        this.nodes.add(new Node(zHHS));
+        nodes = new HashSet<Node>();
+        nodes.add(new Node(zHHS));
 
         // Create a waypoint painter that takes all the waypoints
-        this.waypointPainter = new WaypointPainter<Waypoint>();
-        this.waypointPainter.setWaypoints(nodes);
+        waypointPainter = new WaypointPainter<Waypoint>();
+        waypointPainter.setWaypoints(nodes);
 
         // Add interactions
         MouseInputListener mia = new PanMouseInputListener(mapViewer);
-        this.mapViewer.addMouseListener(mia);
-        this.mapViewer.addMouseMotionListener(mia);
-        this.mapViewer.addMouseListener(new CenterMapListener(mapViewer));
-        this.mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
-        this.mapViewer.addKeyListener(new PanKeyListener(mapViewer));
+        mapViewer.addMouseListener(mia);
+        mapViewer.addMouseMotionListener(mia);
+        mapViewer.addMouseListener(new CenterMapListener(mapViewer));
+        mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
+        mapViewer.addKeyListener(new PanKeyListener(mapViewer));
 
         // Create a compound painter that uses both the route-painter and the waypoint-painter
-        this.painters = new ArrayList<Painter<JXMapViewer>>();
-        this.painters.add(waypointPainter);
+        painters = new ArrayList<Painter<JXMapViewer>>();
+        painters.add(waypointPainter);
 
-        this.painter = new CompoundPainter<JXMapViewer>(painters);
-        this.mapViewer.setOverlayPainter(painter);
+        painter = new CompoundPainter<JXMapViewer>(painters);
+        mapViewer.setOverlayPainter(painter);
 
         // Display the viewer in this Panel
         this.add(mapViewer, BorderLayout.CENTER);
@@ -97,8 +97,8 @@ public class Map extends JPanel {
      * @param node Node The Node we want to add to the mapViewer
      */
     public void addNode(Node node) {
-        this.nodes.add(node);
-        this.waypointPainter.setWaypoints(nodes);
-        this.mapViewer.repaint();
+        nodes.add(node);
+        waypointPainter.setWaypoints(nodes);
+        mapViewer.repaint();
     }
 }
