@@ -38,7 +38,7 @@ public class Main extends JFrame {
         // Add Map
         map = new Map();
         pMain.add(this.map, BorderLayout.CENTER);
-
+        
         // Add Routes
         routes = new Routes();
         pMenu.add(routes, BorderLayout.CENTER);
@@ -196,13 +196,13 @@ public class Main extends JFrame {
         about.setVisible(true);
     }//GEN-LAST:event_miAboutActionPerformed
     private void bNodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bNodeActionPerformed
-        // Add Node to the mapViewer
+        // Add Node to the map
         this.map.addNode(new Node(50.000000, 4.000000));
     }//GEN-LAST:event_bNodeActionPerformed
 
     /**
      * Run Main window
-     * 
+     *
      * @param args the command line arguments
      */
     public static void main(String args[]) {

@@ -1,96 +1,80 @@
-
 package Plugins.jxmap.swingx.input;
 
-import java.awt.Color;
+import Plugins.jxmap.swingx.JXMapViewer;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 
-import Plugins.jxmap.swingx.JXMapViewer;
-import Plugins.jxmap.swingx.mapviewer.GeoPosition;
-import Plugins.jxmap.swingx.mapviewer.WaypointPainter;
-
 /**
  * Used to pan using press and drag mouse gestures
+ *
  * @author joshy
  */
-public class PanMouseInputListener extends MouseInputAdapter
-{
-	private Point prev;
-	private JXMapViewer viewer;
-	
-	/**
-	 * @param viewer the jxmapviewer
-	 */
-	public PanMouseInputListener(JXMapViewer viewer)
-	{
-		this.viewer = viewer;
-	}
+public class PanMouseInputListener extends MouseInputAdapter {
 
-	@Override
-	public void mousePressed(MouseEvent evt)
-	{
-		prev = evt.getPoint();
-	}
+    private Point prev;
+    private JXMapViewer viewer;
 
-	@Override
-	public void mouseDragged(MouseEvent evt)
-	{
-		if (!SwingUtilities.isRightMouseButton(evt))
-			return;
+    /**
+     * @param viewer the jxmapviewer
+     */
+    public PanMouseInputListener(JXMapViewer viewer) {
+        this.viewer = viewer;
+    }
 
-		Point current = evt.getPoint();
-		double x = viewer.getCenter().getX() - (current.x - prev.x);
-		double y = viewer.getCenter().getY() - (current.y - prev.y);
+    @Override
+    public void mousePressed(MouseEvent evt) {
+        prev = evt.getPoint();
+    }
 
-		if (!viewer.isNegativeYAllowed())
-		{
-			if (y < 0)
-			{
-				y = 0;
-			}
-		}
+    @Override
+    public void mouseDragged(MouseEvent evt) {
+        if (!SwingUtilities.isRightMouseButton(evt)) {
+            return;
+        }
 
-		int maxHeight = (int) (viewer.getTileFactory().getMapSize(viewer.getZoom()).getHeight() * viewer
-				.getTileFactory().getTileSize(viewer.getZoom()));
-		if (y > maxHeight)
-		{
-			y = maxHeight;
-		}
+        Point current = evt.getPoint();
+        double x = viewer.getCenter().getX() - (current.x - prev.x);
+        double y = viewer.getCenter().getY() - (current.y - prev.y);
 
-		prev = current;
-		viewer.setCenter(new Point2D.Double(x, y));
-		viewer.repaint();
-		viewer.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-	}
+        if (!viewer.isNegativeYAllowed()) {
+            if (y < 0) {
+                y = 0;
+            }
+        }
 
-	@Override
-	public void mouseReleased(MouseEvent evt)
-	{
-		if (!SwingUtilities.isRightMouseButton(evt))
-			return;
+        int maxHeight = (int) (viewer.getTileFactory().getMapSize(viewer.getZoom()).getHeight() * viewer
+                .getTileFactory().getTileSize(viewer.getZoom()));
+        if (y > maxHeight) {
+            y = maxHeight;
+        }
 
-		prev = null;
-		viewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-	}
+        prev = current;
+        viewer.setCenter(new Point2D.Double(x, y));
+        viewer.repaint();
+        viewer.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+    }
 
-	@Override
-	public void mouseEntered(MouseEvent e)
-	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				viewer.requestFocusInWindow();
-			}
-		});
-	}
+    @Override
+    public void mouseReleased(MouseEvent evt) {
+        if (!SwingUtilities.isRightMouseButton(evt)) {
+            return;
+        }
+
+        prev = null;
+        viewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                viewer.requestFocusInWindow();
+            }
+        });
+    }
 }

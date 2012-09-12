@@ -1,11 +1,14 @@
 package View;
 
 import Model.Application;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import javax.swing.JFrame;
 
 /**
  * Frame containing all meta data of the application
  */
-public class About extends javax.swing.JFrame {
+public class About extends JFrame {
 
     // Variables
     private Application app;
@@ -15,6 +18,17 @@ public class About extends javax.swing.JFrame {
      */
     public About() {
         initComponents();
+
+        // Get the size of the screen
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension dim = tk.getScreenSize();
+
+        // Determine the new location of the window
+        int x = (dim.width - (this.getSize().width)) / 2;
+        int y = (dim.height - (this.getSize().height)) / 2;
+
+        // Center the window
+        this.setLocation(x, y);
 
         // Get Object with all Application mete data
         app = new Application();
