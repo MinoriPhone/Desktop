@@ -161,7 +161,8 @@ public class Map extends JPanel {
         if (nodeClicked) {
             Toolkit tk = Toolkit.getDefaultToolkit();
             try {
-                mapViewer.setCursor(tk.createCustomCursor(ImageIO.read(this.getClass().getResourceAsStream("../View/Images/waypoint_white.png")), new Point(15, 15), "MyCursor"));
+                mapViewer.setCursor(tk.createCustomCursor(ImageIO.read(this.getClass().getResourceAsStream("../View/Images/waypoint_white.png")), new Point(0, 0), "MyCursor"));
+                
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -258,6 +259,8 @@ class MapListeners extends MouseInputAdapter {
                 System.out.println("link voltooien");
                 Link link = linkPainter.getLastLink();
                 link.setP2(clickedNode);
+            }else{
+                linkPainter.removeLastLink();
             }
             map.setLinkOnMouse(false);
             mapViewer.repaint();

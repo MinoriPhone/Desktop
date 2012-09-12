@@ -43,6 +43,10 @@ public class LinkPainter implements Painter<JXMapViewer> {
         return links.get(links.size()-1);
     }
 
+    public void removeLastLink() {
+        links.remove(links.size()-1);
+    }
+
     public Point2D getMousePos() {
         return mousePos;
     }
