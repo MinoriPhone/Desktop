@@ -136,8 +136,7 @@ public final class GeoUtil
 		double wy = pixelCoordinate.getY();
 		// this reverses getBitmapCoordinates
 		double flon = (wx - info.getMapCenterInPixelsAtZoom(zoom).getX()) / info.getLongitudeDegreeWidthInPixels(zoom);
-		double e1 = (wy - info.getMapCenterInPixelsAtZoom(zoom).getY())
-				/ (-1 * info.getLongitudeRadianWidthInPixels(zoom));
+		double e1 = (wy - info.getMapCenterInPixelsAtZoom(zoom).getY()) / (-1 * info.getLongitudeRadianWidthInPixels(zoom));
 		double e2 = (2 * Math.atan(Math.exp(e1)) - Math.PI / 2) / (Math.PI / 180.0);
 		double flat = e2;
 		GeoPosition wc = new GeoPosition(flat, flon);

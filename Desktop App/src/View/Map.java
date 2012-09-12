@@ -11,7 +11,6 @@ import Plugins.jxmap.swingx.mapviewer.GeoPosition;
 import Plugins.jxmap.swingx.mapviewer.TileFactoryInfo;
 import Plugins.jxmap.swingx.mapviewer.Waypoint;
 import Plugins.jxmap.swingx.mapviewer.WaypointPainter;
-import Plugins.jxmap.swingx.mapviewer.util.GeoUtil;
 import Plugins.jxmap.swingx.painter.CompoundPainter;
 import Plugins.jxmap.swingx.painter.Painter;
 import java.awt.BorderLayout;
@@ -69,7 +68,7 @@ public class Map extends JPanel {
         waypointPainter.setWaypoints(nodes);
 
         // Add listeners to the map
-        MouseInputListener mia = new MapListeners(mapViewer);
+        MouseInputListener mia = new MapListeners(mapViewer, this);
         mapViewer.addMouseListener(mia);
         mapViewer.addMouseMotionListener(mia);
         mapViewer.addMouseListener(new CenterMapListener(mapViewer));
@@ -117,15 +116,17 @@ class MapListeners extends MouseInputAdapter {
 
     // Variables
     private Point prev;
-    private JXMapViewer viewer;
+    private JXMapViewer mapViewer;
+    private Map map;
 
     /**
      * Constructor
      *
-     * @param viewer JXMapViewer The map
+     * @param mapViewer JXMapViewer The map
      */
-    public MapListeners(JXMapViewer viewer) {
-        this.viewer = viewer;
+    public MapListeners(JXMapViewer mapViewer, Map map) {
+        this.mapViewer = mapViewer;
+        this.map = map;
     }
 
     /**
@@ -139,11 +140,14 @@ class MapListeners extends MouseInputAdapter {
         // Get mouse clicked coordinates
         Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
         
-        GeoPosition geopos = GeoUtil.getPosition(coord, viewer.getZoom(), viewer.getTileFactory().getInfo());
-        System.out.println(geopos);
+        // Get GEO Position where we want to place the node
+        GeoPosition geopos = mapViewer.convertPointToGeoPosition(coord); 
+        
+        // Add Node to Map
+        map.addNode(new Node(geopos));
         
         // Repaint Map
-        viewer.repaint();
+        mapViewer.repaint();
     }
     
     /**
@@ -168,25 +172,25 @@ class MapListeners extends MouseInputAdapter {
         }
 
         Point current = evt.getPoint();
-        double x = viewer.getCenter().getX() - (current.x - prev.x);
-        double y = viewer.getCenter().getY() - (current.y - prev.y);
+        double x = mapViewer.getCenter().getX() - (current.x - prev.x);
+        double y = mapViewer.getCenter().getY() - (current.y - prev.y);
 
-        if (!viewer.isNegativeYAllowed()) {
+        if (!mapViewer.isNegativeYAllowed()) {
             if (y < 0) {
                 y = 0;
             }
         }
 
-        int maxHeight = (int) (viewer.getTileFactory().getMapSize(viewer.getZoom()).getHeight() * viewer
-                .getTileFactory().getTileSize(viewer.getZoom()));
+        int maxHeight = (int) (mapViewer.getTileFactory().getMapSize(mapViewer.getZoom()).getHeight() * mapViewer
+                .getTileFactory().getTileSize(mapViewer.getZoom()));
         if (y > maxHeight) {
             y = maxHeight;
         }
 
         prev = current;
-        viewer.setCenter(new Point2D.Double(x, y));
-        viewer.repaint();
-        viewer.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+        mapViewer.setCenter(new Point2D.Double(x, y));
+        mapViewer.repaint();
+        mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
     }
 
     /**
@@ -201,7 +205,7 @@ class MapListeners extends MouseInputAdapter {
         }
 
         prev = null;
-        viewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
     /**
@@ -214,7 +218,7 @@ class MapListeners extends MouseInputAdapter {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                viewer.requestFocusInWindow();
+                mapViewer.requestFocusInWindow();
             }
         });
     }
