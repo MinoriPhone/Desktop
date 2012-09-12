@@ -1,6 +1,5 @@
 package View;
 
-import Model.Node;
 import Model.Story;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,15 +16,13 @@ public class Main extends JFrame {
     private Map map;
     private Story story;
     private Routes routes;
-
     /**
      * Creates new form Main
      */
     public Main() {
         initComponents();
-
-        // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
+        // Get the size of the screen
         Dimension dim = tk.getScreenSize();
 
         // Determine the new location of the window
@@ -95,6 +92,11 @@ public class Main extends JFrame {
         bLink.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/link.png"))); // NOI18N
         bLink.setText("Link");
         bLink.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        bLink.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bLinkActionPerformed(evt);
+            }
+        });
 
         bStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/start.png"))); // NOI18N
         bStart.setText("Start");
@@ -197,8 +199,13 @@ public class Main extends JFrame {
     }//GEN-LAST:event_miAboutActionPerformed
     private void bNodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bNodeActionPerformed
         // Add Node to the map
-        this.map.addNode(new Node(50.000000, 4.000000));
+        this.map.setNodeClicked(true);
     }//GEN-LAST:event_bNodeActionPerformed
+
+    private void bLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLinkActionPerformed
+        // Add link to a node
+        this.map.setButtonLinkClicked(true);
+    }//GEN-LAST:event_bLinkActionPerformed
 
     /**
      * Run Main window

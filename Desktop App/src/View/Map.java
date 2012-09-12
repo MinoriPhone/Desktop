@@ -1,5 +1,7 @@
 package View;
 
+import Model.Link;
+import Model.LinkPainter;
 import Model.Node;
 import Plugins.jxmap.swingx.JXMapViewer;
 import Plugins.jxmap.swingx.OSMTileFactoryInfo;
@@ -16,12 +18,18 @@ import Plugins.jxmap.swingx.painter.Painter;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -35,9 +43,13 @@ public class Map extends JPanel {
     // Variables
     private JXMapViewer mapViewer;
     private WaypointPainter<Waypoint> waypointPainter;
+    private LinkPainter linkPainter;
     private List<Painter<JXMapViewer>> painters;
     private CompoundPainter<JXMapViewer> painter;
     private Set<Node> nodes;
+    private boolean nodeClicked;
+    private boolean buttonLinkClicked;
+    private boolean linkOnMouse;
 
     /**
      * Creates new form Map
@@ -56,19 +68,23 @@ public class Map extends JPanel {
 
         // Set the GEO position + Zoom
         GeoPosition zHHS = new GeoPosition(52.051194, 4.475518);
+        GeoPosition zHHS2 = new GeoPosition(53, 5);
         mapViewer.setZoom(0);
         mapViewer.setAddressLocation(zHHS);
 
         // Create waypoint from the geo-positions
         nodes = new HashSet<Node>();
         nodes.add(new Node(zHHS));
+        nodes.add(new Node(zHHS2));
 
         // Create a waypoint painter that paints all the waypoints
         waypointPainter = new WaypointPainter<Waypoint>();
         waypointPainter.setWaypoints(nodes);
 
+        linkPainter = new LinkPainter();
+
         // Add listeners to the map
-        MouseInputListener mia = new MapListeners(mapViewer, this);
+        MouseInputListener mia = new MapListeners(mapViewer, this, linkPainter);
         mapViewer.addMouseListener(mia);
         mapViewer.addMouseMotionListener(mia);
         mapViewer.addMouseListener(new CenterMapListener(mapViewer));
@@ -77,6 +93,7 @@ public class Map extends JPanel {
 
         // Create a compound painter that uses both the route-painter and the waypoint-painter
         painters = new ArrayList<Painter<JXMapViewer>>();
+        painters.add(linkPainter);
         painters.add(waypointPainter);
         painter = new CompoundPainter<JXMapViewer>(painters);
 
@@ -107,6 +124,75 @@ public class Map extends JPanel {
         waypointPainter.setWaypoints(nodes);
         mapViewer.repaint();
     }
+
+    /**
+     * Add Node to the mapViewer
+     *
+     * @param node Node The Node we want to add to the mapViewer
+     */
+    public Node getNodeAtCoord(Point2D point) {
+        for (Node node : nodes) {
+            if ((point.getX() - mapViewer.convertGeoPositionToPoint(node.getGeoposition()).getX()) < 10
+                    && (point.getX() - mapViewer.convertGeoPositionToPoint(node.getGeoposition()).getX()) > -10
+                    && (point.getY() - mapViewer.convertGeoPositionToPoint(node.getGeoposition()).getY()) < 0
+                    && (point.getY() - mapViewer.convertGeoPositionToPoint(node.getGeoposition()).getY()) > -33) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Getter nodeClicked
+     *
+     * @return nodeClicked
+     */
+    public boolean isNodeClicked() {
+        return nodeClicked;
+    }
+
+    /**
+     * Getter nodeClicked
+     *
+     * @return boolean nodeClicked
+     */
+    public void setNodeClicked(boolean nodeClicked) {
+        this.nodeClicked = nodeClicked;
+        if (nodeClicked) {
+            Toolkit tk = Toolkit.getDefaultToolkit();
+            try {
+                mapViewer.setCursor(tk.createCustomCursor(ImageIO.read(this.getClass().getResourceAsStream("../View/Images/waypoint_white.png")), new Point(15, 15), "MyCursor"));
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    /**
+     * Getter buttonLinkClicked
+     *
+     * @return buttonLinkClicked
+     */
+    public boolean isButtonLinkClicked() {
+        return buttonLinkClicked;
+    }
+
+    /**
+     * Getter buttonLinkClicked
+     *
+     * @return boolean buttonLinkClicked
+     */
+    public void setButtonLinkClicked(boolean buttonLinkClicked) {
+        this.buttonLinkClicked = buttonLinkClicked;
+    }
+
+    public boolean isLinkOnMouse() {
+        return linkOnMouse;
+    }
+
+    public void setLinkOnMouse(boolean linkOnMouse) {
+        this.linkOnMouse = linkOnMouse;
+    }
 }
 
 /**
@@ -118,38 +204,66 @@ class MapListeners extends MouseInputAdapter {
     private Point prev;
     private JXMapViewer mapViewer;
     private Map map;
+    private Point2D drawLineFrom;
+    private LinkPainter linkPainter;
 
     /**
      * Constructor
      *
      * @param mapViewer JXMapViewer The map
      */
-    public MapListeners(JXMapViewer mapViewer, Map map) {
+    public MapListeners(JXMapViewer mapViewer, Map map, LinkPainter linkPainter) {
         this.mapViewer = mapViewer;
         this.map = map;
+        this.linkPainter = linkPainter;
     }
 
     /**
      * Mouse clicked event
-     * 
+     *
      * @param evt MouseEvent
      */
     @Override
     public void mouseClicked(MouseEvent evt) {
-        
-        // Get mouse clicked coordinates
-        Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
-        
-        // Get GEO Position where we want to place the node
-        GeoPosition geopos = mapViewer.convertPointToGeoPosition(coord); 
-        
-        // Add Node to Map
-        map.addNode(new Node(geopos));
-        
-        // Repaint Map
-        mapViewer.repaint();
+        if (map.isNodeClicked()) {
+            // Get mouse clicked coordinates
+            Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+
+            // Get GEO Position where we want to place the node
+            GeoPosition geopos = mapViewer.convertPointToGeoPosition(coord);
+
+            // Add Node to Map
+            map.addNode(new Node(geopos));
+
+            // Repaint Map
+            mapViewer.repaint();
+            map.setNodeClicked(false);
+            mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        } else if (map.isButtonLinkClicked()) {
+            // Get mouse clicked coordinates
+            Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            Node clickedNode = map.getNodeAtCoord(coord);
+            if (clickedNode != null) {
+                map.setLinkOnMouse(true);
+                map.setButtonLinkClicked(false);
+                System.out.println("link aan node toevoegen");
+                Link link = new Link("A1",clickedNode,null);
+                linkPainter.addLink(link);
+            }
+        } else if(map.isLinkOnMouse()) {
+            // Get mouse clicked coordinates
+            Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            Node clickedNode = map.getNodeAtCoord(coord);
+            if (clickedNode != null) {
+                System.out.println("link voltooien");
+                Link link = linkPainter.getLastLink();
+                link.setP2(clickedNode);
+            }
+            map.setLinkOnMouse(false);
+            mapViewer.repaint();
+        }
     }
-    
+
     /**
      * Mouse pressed event
      *
@@ -221,5 +335,18 @@ class MapListeners extends MouseInputAdapter {
                 mapViewer.requestFocusInWindow();
             }
         });
+    }
+
+    /**
+     * Mouse moved event
+     *
+     * @param evt MouseEvent
+     */
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        if (map.isLinkOnMouse()) {
+            linkPainter.setMousePos(new Point2D.Double(e.getX(), e.getY()));
+            mapViewer.repaint();
+        }
     }
 }
