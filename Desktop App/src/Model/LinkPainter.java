@@ -92,7 +92,18 @@ public class LinkPainter implements Painter<JXMapViewer> {
             }else if(link.getP2() == null && link.getP1() != null) {
                 pt1 = map.getTileFactory().geoToPixel(link.getP1().getGeoposition(), map.getZoom());
                 pt2 = map.getTileFactory().geoToPixel(map.convertPointToGeoPosition(mousePos), map.getZoom());
+                Point2D midden;
+                if(pt1.getX() == pt2.getX())
+                {
+                    midden = new Point2D.Double(pt1.getX(),(pt1.getY()+pt2.getY())/2);
+                }else if(pt1.getY() == pt2.getY())
+                {
+                    midden = new Point2D.Double((pt1.getX()+pt2.getX())/2,pt1.getY());
+                }else{
+                    midden = new Point2D.Double((pt1.getX()+pt2.getX())/2,(pt1.getY()+pt2.getY())/2);
+                }
                 g.drawLine( (int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
+                //g.drawLine( (int) midden.getX(), (int) midden.getY(), (int) midden.getX()-1, (int) midden.getY()-1);
             }
         }
     }

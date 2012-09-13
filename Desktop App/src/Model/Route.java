@@ -16,9 +16,10 @@ public class Route {
      * @param name String Name of the Route
      * @param startLink Link Startlink of the Route
      */
-    public Route(String name, Link startLink) {
+    public Route(String name, Node startNode) {
         this.name = name;
-        this.startLink = startLink;
+        this.startLink = new Link("Start", null, startNode);
+        startNode.setStart();
     }
 
     /**
@@ -56,4 +57,5 @@ public class Route {
     public void setStartLink(Link startLink) {
         this.startLink = startLink;
     }
+    
 }

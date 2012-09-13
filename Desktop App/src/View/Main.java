@@ -205,15 +205,21 @@ public class Main extends JFrame {
     private void bNodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bNodeActionPerformed
         // Add Node to the map
         this.map.setNodeClicked(true);
+        this.map.setButtonLinkClicked(false);
+        this.map.setButtonStartClicked(false);
     }//GEN-LAST:event_bNodeActionPerformed
 
     private void bLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLinkActionPerformed
         // Add link to a node
+        this.map.setNodeClicked(false);
         this.map.setButtonLinkClicked(true);
+        this.map.setButtonStartClicked(false);
     }//GEN-LAST:event_bLinkActionPerformed
 
     private void bStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bStartActionPerformed
         // Add startlink to node
+        this.map.setNodeClicked(false);
+        this.map.setButtonLinkClicked(false);
         this.map.setButtonStartClicked(true);
     }//GEN-LAST:event_bStartActionPerformed
 

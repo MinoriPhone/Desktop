@@ -4,6 +4,7 @@ import Model.Link;
 import Model.LinkPainter;
 import Model.Node;
 import Model.NodeRenderer;
+import Model.Story;
 import Plugins.jxmap.swingx.JXMapViewer;
 import Plugins.jxmap.swingx.OSMTileFactoryInfo;
 import Plugins.jxmap.swingx.input.CenterMapListener;
@@ -43,6 +44,7 @@ public class Map extends JPanel {
     private List<Painter<JXMapViewer>> painters;
     private CompoundPainter<JXMapViewer> painter;
     private Set<Node> nodes;
+    private Story story;
     private boolean nodeClicked;
     private boolean buttonLinkClicked;
     private boolean buttonStartClicked;
@@ -53,7 +55,10 @@ public class Map extends JPanel {
      */
     public Map() {
         initComponents();
-
+        
+        // Create a story
+        story = new Story("reinier");
+        
         // Create a map
         mapViewer = new JXMapViewer();
 
@@ -140,6 +145,11 @@ public class Map extends JPanel {
         return null;
     }
 
+    public Story getStory() {
+        return story;
+    }
+
+    
     /**
      * Getter nodeClicked
      *
@@ -249,11 +259,16 @@ class MapListeners extends MouseInputAdapter {
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
             if (clickedNode != null) {
-                map.setLinkOnMouse(true);
-                map.setButtonLinkClicked(false);
-                //Add link to first node
-                Link link = new Link("A1",clickedNode,null);
-                linkPainter.addLink(link);
+                if(map.getStory().getLinkForNode(clickedNode) != null)
+                {
+                    map.setLinkOnMouse(true);
+                    map.setButtonLinkClicked(false);
+                    //Add link to first node
+                    Link link = new Link("A1",clickedNode,null);
+                    linkPainter.addLink(link);
+                }else{
+                    System.out.println("No link on this Node");
+                }
             }
         } else if(map.isLinkOnMouse()) {
             // Get mouse clicked coordinates
@@ -264,6 +279,7 @@ class MapListeners extends MouseInputAdapter {
                 Link link = linkPainter.getLastLink();
                 if(!clickedNode.equals(link.getP1())){
                     link.setP2(clickedNode);
+                    map.getStory().getLinkForNode(link.getP1()).addLink(link);
                 }else{
                     linkPainter.removeLastLink();
                 }
@@ -278,9 +294,7 @@ class MapListeners extends MouseInputAdapter {
             Node clickedNode = map.getNodeAtCoord(coord);
             if (clickedNode != null) {
                 //Add second Node to Link
-                Link link = new Link("A1",null,clickedNode);
-                linkPainter.addLink(link);
-                clickedNode.setStart();
+                map.getStory().newRoute(clickedNode);
             }
             map.setButtonStartClicked(false);
             mapViewer.repaint();

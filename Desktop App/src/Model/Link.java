@@ -132,5 +132,21 @@ public class Link {
             link.print(i);
         }
     }
+    
+    public Link getLinkForNode(Node endNode) {
+         if(this.getP2().equals(endNode))
+        {
+            return this;
+        }else{
+            for (Link currentLink : links) {
+                Link link = currentLink.getLinkForNode(endNode);
+                if(link != null)
+                {
+                    return link;
+                }
+            }
+            return null;
+        }
+    }
 }
 

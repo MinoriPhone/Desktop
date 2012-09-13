@@ -59,11 +59,28 @@ public class Story {
     }
 
     /**
-     * Add Route to the Routelist
+     * Create a new Route and add Route to the Routelist
      *
-     * @param route The Route we want to add to the Routelist
+     * @param startNode The Node where the Route starts
      */
-    public void addRoute(Route route) {
+    public void newRoute(Node startNode) {
+        Route route = new Route("",startNode);
         routes.add(route);
+    }
+
+    /**
+     * Get a Link with the correct Endnode
+     *
+     * @param endNode the Node which the Link has as an end
+     */
+    public Link getLinkForNode(Node endNode) {
+        Link currentLink;
+        for (Route route : routes) {
+            currentLink = route.getStartLink().getLinkForNode(endNode);
+            if(currentLink != null) {
+                return currentLink;
+            }
+        }
+        return null;
     }
 }
