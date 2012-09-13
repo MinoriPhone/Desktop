@@ -3,6 +3,7 @@ package View;
 import Model.Link;
 import Model.LinkPainter;
 import Model.Node;
+import Model.NodeRenderer;
 import Plugins.jxmap.swingx.JXMapViewer;
 import Plugins.jxmap.swingx.OSMTileFactoryInfo;
 import Plugins.jxmap.swingx.input.CenterMapListener;
@@ -11,7 +12,6 @@ import Plugins.jxmap.swingx.input.ZoomMouseWheelListenerCenter;
 import Plugins.jxmap.swingx.mapviewer.DefaultTileFactory;
 import Plugins.jxmap.swingx.mapviewer.GeoPosition;
 import Plugins.jxmap.swingx.mapviewer.TileFactoryInfo;
-import Plugins.jxmap.swingx.mapviewer.Waypoint;
 import Plugins.jxmap.swingx.mapviewer.WaypointPainter;
 import Plugins.jxmap.swingx.painter.CompoundPainter;
 import Plugins.jxmap.swingx.painter.Painter;
@@ -21,19 +21,15 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
+
 
 /**
  * Panel containing the Map
@@ -42,13 +38,14 @@ public class Map extends JPanel {
 
     // Variables
     private JXMapViewer mapViewer;
-    private WaypointPainter<Waypoint> waypointPainter;
+    private WaypointPainter<Node> waypointPainter;
     private LinkPainter linkPainter;
     private List<Painter<JXMapViewer>> painters;
     private CompoundPainter<JXMapViewer> painter;
     private Set<Node> nodes;
     private boolean nodeClicked;
     private boolean buttonLinkClicked;
+    private boolean buttonStartClicked;
     private boolean linkOnMouse;
 
     /**
@@ -78,8 +75,9 @@ public class Map extends JPanel {
         nodes.add(new Node(zHHS2));
 
         // Create a waypoint painter that paints all the waypoints
-        waypointPainter = new WaypointPainter<Waypoint>();
+        waypointPainter = new WaypointPainter<Node>();
         waypointPainter.setWaypoints(nodes);
+        waypointPainter.setRenderer(new NodeRenderer());
 
         linkPainter = new LinkPainter();
 
@@ -160,12 +158,12 @@ public class Map extends JPanel {
         this.nodeClicked = nodeClicked;
         if (nodeClicked) {
             Toolkit tk = Toolkit.getDefaultToolkit();
-            try {
+            /*try {
                 mapViewer.setCursor(tk.createCustomCursor(ImageIO.read(this.getClass().getResourceAsStream("../View/Images/waypoint_white.png")), new Point(0, 0), "MyCursor"));
                 
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
         }
     }
 
@@ -187,6 +185,14 @@ public class Map extends JPanel {
         this.buttonLinkClicked = buttonLinkClicked;
     }
 
+    public boolean isButtonStartClicked() {
+        return buttonStartClicked;
+    }
+
+    public void setButtonStartClicked(boolean buttonStartClicked) {
+        this.buttonStartClicked = buttonStartClicked;
+    }
+    
     public boolean isLinkOnMouse() {
         return linkOnMouse;
     }
@@ -195,7 +201,6 @@ public class Map extends JPanel {
         this.linkOnMouse = linkOnMouse;
     }
 }
-
 /**
  * Class containing all listeners for the Map.
  */
@@ -205,7 +210,6 @@ class MapListeners extends MouseInputAdapter {
     private Point prev;
     private JXMapViewer mapViewer;
     private Map map;
-    private Point2D drawLineFrom;
     private LinkPainter linkPainter;
 
     /**
@@ -247,7 +251,7 @@ class MapListeners extends MouseInputAdapter {
             if (clickedNode != null) {
                 map.setLinkOnMouse(true);
                 map.setButtonLinkClicked(false);
-                System.out.println("link aan node toevoegen");
+                //Add link to first node
                 Link link = new Link("A1",clickedNode,null);
                 linkPainter.addLink(link);
             }
@@ -256,13 +260,29 @@ class MapListeners extends MouseInputAdapter {
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
             if (clickedNode != null) {
-                System.out.println("link voltooien");
+                //Add second Node to Link
                 Link link = linkPainter.getLastLink();
-                link.setP2(clickedNode);
+                if(!clickedNode.equals(link.getP1())){
+                    link.setP2(clickedNode);
+                }else{
+                    linkPainter.removeLastLink();
+                }
             }else{
                 linkPainter.removeLastLink();
             }
             map.setLinkOnMouse(false);
+            mapViewer.repaint();
+        } else if(map.isButtonStartClicked()) {
+            // Get mouse clicked coordinates
+            Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            Node clickedNode = map.getNodeAtCoord(coord);
+            if (clickedNode != null) {
+                //Add second Node to Link
+                Link link = new Link("A1",null,clickedNode);
+                linkPainter.addLink(link);
+                clickedNode.setStart();
+            }
+            map.setButtonStartClicked(false);
             mapViewer.repaint();
         }
     }

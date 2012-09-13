@@ -2,12 +2,15 @@ package Model;
 
 import Plugins.jxmap.swingx.mapviewer.DefaultWaypoint;
 import Plugins.jxmap.swingx.mapviewer.GeoPosition;
+import java.awt.Color;
 
 /**
  * The node is a spot which can be placed on a map. You can say that a spot represents a location.
  */
 public class Node extends DefaultWaypoint {
 
+    private Color color = Color.BLUE;
+    private String label;
     /**
      * Constructor with doubles
      * 
@@ -41,6 +44,51 @@ public class Node extends DefaultWaypoint {
      */
     public void setGeoposition(GeoPosition geoposition) {
         super.setPosition(geoposition);
+    }
+
+    /**
+     * 
+     * @return color
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * 
+     * @param label
+     */
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    
+    /**
+     * 
+     * @return color
+     */
+    public Color getColor() {
+        return color;
+    }
+
+    
+    /**
+     * 
+     * @param color 
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+    
+    
+    public void setStart() {
+        this.color = Color.GREEN;
+        this.label = "S";
+    }
+    
+    public void setEnd() {
+        this.color = Color.RED;
+        this.label = "E";
     }
     
     /**

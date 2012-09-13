@@ -68,7 +68,6 @@ public class LinkPainter implements Painter<JXMapViewer> {
         }
 
         // do the drawing
-        g.setColor(color);
         g.setStroke(new BasicStroke(4));
 
         drawLink(g, map);
@@ -82,15 +81,19 @@ public class LinkPainter implements Painter<JXMapViewer> {
      */
     private void drawLink(Graphics2D g, JXMapViewer map) {
         for (Link link : links) {
-            Point2D pt1 = map.getTileFactory().geoToPixel(link.getP1().getGeoposition(), map.getZoom());
+            g.setColor(color);
+            Point2D pt1;
             Point2D pt2;
-            if(link.getP2() != null)
+            if(link.getP2() != null && link.getP1() != null)
             {
+                pt1 = map.getTileFactory().geoToPixel(link.getP1().getGeoposition(), map.getZoom());
                 pt2 = map.getTileFactory().geoToPixel(link.getP2().getGeoposition(), map.getZoom());
-            }else{
+                g.drawLine( (int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
+            }else if(link.getP2() == null && link.getP1() != null) {
+                pt1 = map.getTileFactory().geoToPixel(link.getP1().getGeoposition(), map.getZoom());
                 pt2 = map.getTileFactory().geoToPixel(map.convertPointToGeoPosition(mousePos), map.getZoom());
+                g.drawLine( (int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
             }
-            g.drawLine( (int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
         }
     }
 }

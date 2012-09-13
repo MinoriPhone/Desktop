@@ -101,6 +101,11 @@ public class Main extends JFrame {
         bStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/start.png"))); // NOI18N
         bStart.setText("Start");
         bStart.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        bStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bStartActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout pMenuButtonsLayout = new org.jdesktop.layout.GroupLayout(pMenuButtons);
         pMenuButtons.setLayout(pMenuButtonsLayout);
@@ -206,6 +211,11 @@ public class Main extends JFrame {
         // Add link to a node
         this.map.setButtonLinkClicked(true);
     }//GEN-LAST:event_bLinkActionPerformed
+
+    private void bStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bStartActionPerformed
+        // Add startlink to node
+        this.map.setButtonStartClicked(true);
+    }//GEN-LAST:event_bStartActionPerformed
 
     /**
      * Run Main window
