@@ -1,10 +1,18 @@
 package View;
 
+<<<<<<< HEAD
+=======
+import Model.FileChooser;
+import Model.Node;
+>>>>>>> Drag and Drop + nieuwe klassen (video, text, image, mediaItem)
 import Model.Story;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 /**
@@ -13,6 +21,7 @@ import javax.swing.JFrame;
 public class Main extends JFrame {
 
     // Variables
+    public static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     private Map map;
     private Story story;
     private Routes routes;
@@ -31,7 +40,15 @@ public class Main extends JFrame {
 
         // Center the window
         this.setLocation(x, y);
+<<<<<<< HEAD
         
+=======
+
+        // Add Map
+        map = new Map();
+        pMain.add(this.map, BorderLayout.CENTER);
+
+>>>>>>> Drag and Drop + nieuwe klassen (video, text, image, mediaItem)
         // Add Routes
         routes = new Routes();
         pMenu.add(routes, BorderLayout.CENTER);
@@ -75,7 +92,6 @@ public class Main extends JFrame {
         setTitle("iStory designer");
         setMinimumSize(new java.awt.Dimension(1024, 768));
         setName("fMain"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(1024, 768));
 
         pMain.setLayout(new java.awt.BorderLayout());
 
@@ -118,7 +134,7 @@ public class Main extends JFrame {
                 .addContainerGap()
                 .add(pMenuButtonsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, bLink, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                     .add(bStart, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -212,6 +228,7 @@ public class Main extends JFrame {
         this.map.setButtonStartClicked(false);
     }//GEN-LAST:event_bNodeActionPerformed
 
+<<<<<<< HEAD
     private void bLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLinkActionPerformed
         // Add link to a node
         this.map.setButtonNodeClicked(false);
@@ -224,6 +241,10 @@ public class Main extends JFrame {
         this.map.setButtonNodeClicked(false);
         this.map.setButtonLinkClicked(false);
         this.map.setButtonStartClicked(true);
+=======
+    private void bStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bStartActionPerformed
+
+>>>>>>> Drag and Drop + nieuwe klassen (video, text, image, mediaItem)
     }//GEN-LAST:event_bStartActionPerformed
 
     /**

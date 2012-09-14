@@ -12,6 +12,7 @@ public class Link {
     private Node p1;
     private Node p2;
     private ArrayList<Link> links;
+    private ArrayList<MediaItem> items;
 
     /**
      * Constructor
@@ -25,6 +26,7 @@ public class Link {
         this.p1 = p1;
         this.p2 = p2;
         this.links = new ArrayList<Link>();
+        this.items = new ArrayList<MediaItem>();
     }
 
     /**
