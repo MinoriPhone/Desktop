@@ -1,9 +1,11 @@
 package View;
 
+import Model.Route;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -16,6 +18,8 @@ import javax.swing.ListSelectionModel;
  */
 public class Routes extends JPanel {
 
+    private JList list;
+
     /**
      * Creates new form Routes
      */
@@ -23,13 +27,7 @@ public class Routes extends JPanel {
         initComponents();
 
         // Create a list containing CheckListItem's
-        JList list = new JList(new CheckListItem[]{
-                    new CheckListItem("apple"),
-                    new CheckListItem("orange"),
-                    new CheckListItem("mango"),
-                    new CheckListItem("paw paw"),
-                    new CheckListItem("banana")});
-
+        list = new JList();
         // Use a CheckListRenderer (see below) to renderer list cells
         list.setCellRenderer(new CheckListRenderer());
         list.setSelectionMode(
@@ -56,7 +54,20 @@ public class Routes extends JPanel {
         this.add(new JScrollPane(list), BorderLayout.CENTER);
     }
 
+    public void refreshList(ArrayList<Route> routes) {
+        list.removeAll();
+        CheckListItem[] asd = new CheckListItem[routes.size()];
+        int i = 0;
+        for (Route route : routes) {
+            CheckListItem cli = new CheckListItem(route.getName());
+            asd[i] = cli;
+            cli.setSelected(true);
+            i++;
+        }
+        list.setListData(asd);
+    }
     /* DO NOT TOUCH */
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -86,8 +97,7 @@ class CheckListItem {
     }
 
     /**
-     * Return the state of the CheckListItem (the checkbox) Checked or not
-     * checked
+     * Return the state of the CheckListItem (the checkbox) Checked or not checked
      *
      * @return boolean
      */

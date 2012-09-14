@@ -16,13 +16,5 @@ public class Application {
     public double getVersion() {
         return version;
     }
-
-    /**
-     * Set the current version of this application
-     *
-     * @param version double
-     */
-    public void setVersion(double version) {
-        this.version = version;
-    }
+    
 }

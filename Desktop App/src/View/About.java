@@ -45,24 +45,40 @@ public class About extends JFrame {
         pAbout = new javax.swing.JPanel();
         lVersion = new javax.swing.JLabel();
         lVersionCode = new javax.swing.JLabel();
+        lCreators = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About");
         setName("fAbout"); // NOI18N
+        setResizable(false);
 
+        lVersion.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         lVersion.setText("Version:");
         lVersion.setToolTipText("");
+
+        lVersionCode.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+
+        lCreators.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        lCreators.setText("Developed by:");
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        jLabel1.setText("<html> Reinier van der Hoeven<br /> Tim Klaversma<br />Jeffrey van der Leije<br /> Gido Manders");
 
         javax.swing.GroupLayout pAboutLayout = new javax.swing.GroupLayout(pAbout);
         pAbout.setLayout(pAboutLayout);
         pAboutLayout.setHorizontalGroup(
             pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pAboutLayout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addComponent(lVersion)
+                .addContainerGap()
+                .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lCreators)
+                    .addComponent(lVersion))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lVersionCode, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(268, Short.MAX_VALUE))
+                .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lVersionCode, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(187, Short.MAX_VALUE))
         );
         pAboutLayout.setVerticalGroup(
             pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -71,7 +87,11 @@ public class About extends JFrame {
                 .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lVersion)
                     .addComponent(lVersionCode, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(210, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lCreators)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(138, Short.MAX_VALUE))
         );
 
         getContentPane().add(pAbout, java.awt.BorderLayout.CENTER);
@@ -79,6 +99,8 @@ public class About extends JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel lCreators;
     private javax.swing.JLabel lVersion;
     private javax.swing.JLabel lVersionCode;
     private javax.swing.JPanel pAbout;

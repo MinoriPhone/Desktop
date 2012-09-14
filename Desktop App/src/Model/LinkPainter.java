@@ -85,47 +85,49 @@ public class LinkPainter implements Painter<JXMapViewer> {
             Point2D pt1;
             Point2D pt2;
             double length = 10;
-            if (link.getP2() == null && link.getP1() != null) {
-                pt1 = map.getTileFactory().geoToPixel(link.getP1().getGeoposition(), map.getZoom());
-                pt2 = map.getTileFactory().geoToPixel(map.convertPointToGeoPosition(mousePos), map.getZoom());
-            } else {
-                pt1 = map.getTileFactory().geoToPixel(link.getP1().getGeoposition(), map.getZoom());
-                pt2 = map.getTileFactory().geoToPixel(link.getP2().getGeoposition(), map.getZoom());
+            if (mousePos != null) {
+                if (link.getP2() == null && link.getP1() != null) {
+                    pt1 = map.getTileFactory().geoToPixel(link.getP1().getGeoposition(), map.getZoom());
+                    pt2 = map.getTileFactory().geoToPixel(map.convertPointToGeoPosition(mousePos), map.getZoom());
+                } else {
+                    pt1 = map.getTileFactory().geoToPixel(link.getP1().getGeoposition(), map.getZoom());
+                    pt2 = map.getTileFactory().geoToPixel(link.getP2().getGeoposition(), map.getZoom());
+                }
+                g.drawLine((int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
+
+                Point2D middle;
+                if (pt1.getX() == pt2.getX()) {
+                    middle = new Point2D.Double(pt1.getX(), (pt1.getY() + pt2.getY()) / 2);
+                } else if (pt1.getY() == pt2.getY()) {
+                    middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, pt1.getY());
+                } else {
+                    middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
+                }
+
+                double difX = (double) pt1.getX() - (double) pt2.getX();
+                double difY = (double) pt1.getY() - (double) pt2.getY();
+
+                double angle = Math.atan(difX / difY);
+
+                Point2D arrowLineY;
+                Point2D arrowLineX;
+
+                double arrowAngle = angle - 95;
+
+                double deltaX = length * Math.sin(arrowAngle);
+                double deltaY = length * Math.cos(arrowAngle);
+
+                if (difY > 0) {
+                    arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
+                    arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
+                } else {
+                    arrowLineX = new Point2D.Double(middle.getX() - deltaY, middle.getY() + deltaX);
+                    arrowLineY = new Point2D.Double(middle.getX() - deltaX, middle.getY() - deltaY);
+                }
+
+                g.drawLine((int) middle.getX(), (int) middle.getY(), (int) arrowLineY.getX(), (int) arrowLineY.getY());
+                g.drawLine((int) middle.getX(), (int) middle.getY(), (int) arrowLineX.getX(), (int) arrowLineX.getY());
             }
-            g.drawLine((int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
-
-            Point2D middle;
-            if (pt1.getX() == pt2.getX()) {
-                middle = new Point2D.Double(pt1.getX(), (pt1.getY() + pt2.getY()) / 2);
-            } else if (pt1.getY() == pt2.getY()) {
-                middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, pt1.getY());
-            } else {
-                middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
-            }
-
-            double difX = (double) pt1.getX() - (double) pt2.getX();
-            double difY = (double) pt1.getY() - (double) pt2.getY();
-
-            double angle = Math.atan(difX / difY);
-
-            Point2D arrowLineY;
-            Point2D arrowLineX;
-            
-            double arrowAngle = angle - 95;
-            
-            double deltaX = length * Math.sin(arrowAngle);
-            double deltaY = length * Math.cos(arrowAngle);
-            
-            if (difY > 0) {
-                arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
-                arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
-            } else {
-                arrowLineX = new Point2D.Double(middle.getX() - deltaY, middle.getY() + deltaX);
-                arrowLineY = new Point2D.Double(middle.getX() - deltaX, middle.getY() - deltaY);
-            }
-            
-            g.drawLine((int) middle.getX(), (int) middle.getY(), (int) arrowLineY.getX(), (int) arrowLineY.getY());
-            g.drawLine((int) middle.getX(), (int) middle.getY(), (int) arrowLineX.getX(), (int) arrowLineX.getY());
         }
     }
 }

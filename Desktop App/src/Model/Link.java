@@ -1,16 +1,6 @@
 package Model;
 
-import Plugins.jxmap.swingx.JXMapViewer;
-import Plugins.jxmap.swingx.mapviewer.GeoPosition;
-import Plugins.jxmap.swingx.painter.Painter;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A Link between two Nodes. A Route consists of multiple Links.
@@ -132,16 +122,14 @@ public class Link {
             link.print(i);
         }
     }
-    
-    public Link getLinkForNode(Node endNode) {
-         if(this.getP2().equals(endNode))
-        {
+
+    public Link getLinkForEndNode(Node endNode) {
+        if (this.getP2().equals(endNode)) {
             return this;
-        }else{
+        } else {
             for (Link currentLink : links) {
-                Link link = currentLink.getLinkForNode(endNode);
-                if(link != null)
-                {
+                Link link = currentLink.getLinkForEndNode(endNode);
+                if (link != null) {
                     return link;
                 }
             }
@@ -149,4 +137,3 @@ public class Link {
         }
     }
 }
-

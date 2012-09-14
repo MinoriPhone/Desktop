@@ -31,14 +31,17 @@ public class Main extends JFrame {
 
         // Center the window
         this.setLocation(x, y);
-
-        // Add Map
-        map = new Map();
-        pMain.add(this.map, BorderLayout.CENTER);
         
         // Add Routes
         routes = new Routes();
         pMenu.add(routes, BorderLayout.CENTER);
+
+        // Create a story
+        story = new Story("New Story", routes);
+        
+        // Add Map
+        map = new Map(story);
+        pMain.add(this.map, BorderLayout.CENTER);
 
         // Revalidate JPanels
         this.pack();
@@ -204,21 +207,21 @@ public class Main extends JFrame {
     }//GEN-LAST:event_miAboutActionPerformed
     private void bNodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bNodeActionPerformed
         // Add Node to the map
-        this.map.setNodeClicked(true);
+        this.map.setButtonNodeClicked(true);
         this.map.setButtonLinkClicked(false);
         this.map.setButtonStartClicked(false);
     }//GEN-LAST:event_bNodeActionPerformed
 
     private void bLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLinkActionPerformed
         // Add link to a node
-        this.map.setNodeClicked(false);
+        this.map.setButtonNodeClicked(false);
         this.map.setButtonLinkClicked(true);
         this.map.setButtonStartClicked(false);
     }//GEN-LAST:event_bLinkActionPerformed
 
     private void bStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bStartActionPerformed
         // Add startlink to node
-        this.map.setNodeClicked(false);
+        this.map.setButtonNodeClicked(false);
         this.map.setButtonLinkClicked(false);
         this.map.setButtonStartClicked(true);
     }//GEN-LAST:event_bStartActionPerformed

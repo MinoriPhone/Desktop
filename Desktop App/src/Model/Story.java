@@ -1,6 +1,8 @@
 package Model;
 
+import View.Routes;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * A Story that the user is going to watch. This class holds all the different
@@ -11,13 +13,15 @@ public class Story {
     // Variables
     private String name;
     private ArrayList<Route> routes;
+    private Routes routesPanel;
 
     /**
      * Constructor
      */
-    public Story(String name) {
+    public Story(String name, Routes routesPanel) {
         this.name = name;
         this.routes = new ArrayList<Route>();
+        this.routesPanel = routesPanel;
     }
 
     /**
@@ -64,8 +68,9 @@ public class Story {
      * @param startNode The Node where the Route starts
      */
     public void newRoute(Node startNode) {
-        Route route = new Route("",startNode);
+        Route route = new Route("" + Math.random(),startNode);
         routes.add(route);
+        routesPanel.refreshList(routes);
     }
 
     /**
@@ -73,10 +78,10 @@ public class Story {
      *
      * @param endNode the Node which the Link has as an end
      */
-    public Link getLinkForNode(Node endNode) {
+    public Link getLinkForEndNode(Node endNode) {
         Link currentLink;
         for (Route route : routes) {
-            currentLink = route.getStartLink().getLinkForNode(endNode);
+            currentLink = route.getStartLink().getLinkForEndNode(endNode);
             if(currentLink != null) {
                 return currentLink;
             }

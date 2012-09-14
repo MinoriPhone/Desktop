@@ -5,6 +5,7 @@ import Model.LinkPainter;
 import Model.Node;
 import Model.NodeRenderer;
 import Model.Story;
+import Model.ContextMenuMap;
 import Plugins.jxmap.swingx.JXMapViewer;
 import Plugins.jxmap.swingx.OSMTileFactoryInfo;
 import Plugins.jxmap.swingx.input.CenterMapListener;
@@ -20,17 +21,19 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
-
 
 /**
  * Panel containing the Map
@@ -45,7 +48,7 @@ public class Map extends JPanel {
     private CompoundPainter<JXMapViewer> painter;
     private Set<Node> nodes;
     private Story story;
-    private boolean nodeClicked;
+    private boolean buttonNodeClicked;
     private boolean buttonLinkClicked;
     private boolean buttonStartClicked;
     private boolean linkOnMouse;
@@ -53,12 +56,12 @@ public class Map extends JPanel {
     /**
      * Creates new form Map
      */
-    public Map() {
+    public Map(Story story) {
         initComponents();
-        
+
         // Create a story
-        story = new Story("reinier");
-        
+        this.story = story;
+
         // Create a map
         mapViewer = new JXMapViewer();
 
@@ -70,14 +73,11 @@ public class Map extends JPanel {
 
         // Set the GEO position + Zoom
         GeoPosition zHHS = new GeoPosition(52.051194, 4.475518);
-        GeoPosition zHHS2 = new GeoPosition(53, 5);
         mapViewer.setZoom(0);
         mapViewer.setAddressLocation(zHHS);
 
         // Create waypoint from the geo-positions
         nodes = new HashSet<Node>();
-        nodes.add(new Node(zHHS));
-        nodes.add(new Node(zHHS2));
 
         // Create a waypoint painter that paints all the waypoints
         waypointPainter = new WaypointPainter<Node>();
@@ -129,6 +129,20 @@ public class Map extends JPanel {
     }
 
     /**
+     * Delete Node from the mapViewer
+     *
+     * @param node Node The Node we want to delete from the mapViewer
+     */
+    public void deleteNode(Node node) {
+
+        // Checks if the node has any links combined
+        nodes.remove(node);
+
+        waypointPainter.setWaypoints(nodes);
+        mapViewer.repaint();
+    }
+
+    /**
      * Add Node to the mapViewer
      *
      * @param node Node The Node we want to add to the mapViewer
@@ -149,31 +163,30 @@ public class Map extends JPanel {
         return story;
     }
 
-    
     /**
-     * Getter nodeClicked
+     * Getter buttonNodeClicked
      *
-     * @return nodeClicked
+     * @return buttonNodeClicked
      */
-    public boolean isNodeClicked() {
-        return nodeClicked;
+    public boolean isButtonNodeClicked() {
+        return buttonNodeClicked;
     }
 
     /**
-     * Getter nodeClicked
+     * Getter buttonNodeClicked
      *
-     * @return boolean nodeClicked
+     * @return boolean buttonNodeClicked
      */
-    public void setNodeClicked(boolean nodeClicked) {
-        this.nodeClicked = nodeClicked;
-        if (nodeClicked) {
+    public void setButtonNodeClicked(boolean buttonNodeClicked) {
+        this.buttonNodeClicked = buttonNodeClicked;
+        if (buttonNodeClicked) {
             Toolkit tk = Toolkit.getDefaultToolkit();
             /*try {
-                mapViewer.setCursor(tk.createCustomCursor(ImageIO.read(this.getClass().getResourceAsStream("../View/Images/waypoint_white.png")), new Point(0, 0), "MyCursor"));
+             mapViewer.setCursor(tk.createCustomCursor(ImageIO.read(this.getClass().getResourceAsStream("../View/Images/waypoint_white.png")), new Point(0, 0), "MyCursor"));
                 
-            } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
+             } catch (IOException ex) {
+             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+             }*/
         }
     }
 
@@ -202,7 +215,7 @@ public class Map extends JPanel {
     public void setButtonStartClicked(boolean buttonStartClicked) {
         this.buttonStartClicked = buttonStartClicked;
     }
-    
+
     public boolean isLinkOnMouse() {
         return linkOnMouse;
     }
@@ -211,6 +224,7 @@ public class Map extends JPanel {
         this.linkOnMouse = linkOnMouse;
     }
 }
+
 /**
  * Class containing all listeners for the Map.
  */
@@ -221,6 +235,7 @@ class MapListeners extends MouseInputAdapter {
     private JXMapViewer mapViewer;
     private Map map;
     private LinkPainter linkPainter;
+    private Node draggingNode;
 
     /**
      * Constructor
@@ -231,6 +246,7 @@ class MapListeners extends MouseInputAdapter {
         this.mapViewer = mapViewer;
         this.map = map;
         this.linkPainter = linkPainter;
+
     }
 
     /**
@@ -239,8 +255,8 @@ class MapListeners extends MouseInputAdapter {
      * @param evt MouseEvent
      */
     @Override
-    public void mouseClicked(MouseEvent evt) {
-        if (map.isNodeClicked()) {
+    public void mouseClicked(final MouseEvent evt) {
+        if (map.isButtonNodeClicked()) {
             // Get mouse clicked coordinates
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
 
@@ -252,52 +268,91 @@ class MapListeners extends MouseInputAdapter {
 
             // Repaint Map
             mapViewer.repaint();
-            map.setNodeClicked(false);
+            map.setButtonNodeClicked(false);
             mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         } else if (map.isButtonLinkClicked()) {
             // Get mouse clicked coordinates
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
             if (clickedNode != null) {
-                if(map.getStory().getLinkForNode(clickedNode) != null)
-                {
+                if (map.getStory().getLinkForEndNode(clickedNode) != null) {
                     map.setLinkOnMouse(true);
                     map.setButtonLinkClicked(false);
                     //Add link to first node
-                    Link link = new Link("A1",clickedNode,null);
+                    Link link = new Link("A1", clickedNode, null);
                     linkPainter.addLink(link);
-                }else{
+                } else {
                     System.out.println("No link on this Node");
                 }
             }
-        } else if(map.isLinkOnMouse()) {
+        } else if (map.isLinkOnMouse()) {
             // Get mouse clicked coordinates
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
             if (clickedNode != null) {
                 //Add second Node to Link
                 Link link = linkPainter.getLastLink();
-                if(!clickedNode.equals(link.getP1())){
+                if (!clickedNode.equals(link.getP1())) {
                     link.setP2(clickedNode);
-                    map.getStory().getLinkForNode(link.getP1()).addLink(link);
-                }else{
+                    map.getStory().getLinkForEndNode(link.getP1()).addLink(link);
+                } else {
                     linkPainter.removeLastLink();
                 }
-            }else{
+            } else {
                 linkPainter.removeLastLink();
             }
             map.setLinkOnMouse(false);
             mapViewer.repaint();
-        } else if(map.isButtonStartClicked()) {
+        } else if (map.isButtonStartClicked()) {
             // Get mouse clicked coordinates
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
             if (clickedNode != null) {
-                //Add second Node to Link
+                // Create new route
                 map.getStory().newRoute(clickedNode);
             }
             map.setButtonStartClicked(false);
             mapViewer.repaint();
+        } else if (map.getNodeAtCoord(evt.getPoint()) != null) {
+            ContextMenuMap contextMenuMap = new ContextMenuMap();
+            final Node currentNode = map.getNodeAtCoord(evt.getPoint());
+
+            // Check if the node got any links attached. If so, the item is disabled and no listener is created
+            if (map.getStory().getLinkForEndNode(currentNode) != null) {
+                contextMenuMap.getDeleteItem().setEnabled(false);
+
+                // Listener for CreateLinkItem
+                contextMenuMap.getCreateLinkItem().addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        map.setLinkOnMouse(true);
+                        //Add link to first node
+                        Link link = new Link("A1", currentNode, null);
+                        linkPainter.addLink(link);
+                    }
+                });
+            } else {
+                // Listener for DeleteItem
+                contextMenuMap.getDeleteItem().addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        map.deleteNode(currentNode);
+                    }
+                });
+                contextMenuMap.getCreateLinkItem().setEnabled(false);
+            }
+
+            contextMenuMap.getSetStartItem().addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    
+                    // ---------> Make code for user prompt window
+                    
+                    map.getStory().newRoute(currentNode);
+                    mapViewer.repaint();
+                }
+            });
+            contextMenuMap.showContextMenuMap(evt);
         }
     }
 
@@ -318,30 +373,56 @@ class MapListeners extends MouseInputAdapter {
      */
     @Override
     public void mouseDragged(MouseEvent evt) {
-        if (!SwingUtilities.isRightMouseButton(evt)) {
-            return;
-        }
+        if (SwingUtilities.isLeftMouseButton(evt)) {
 
-        Point current = evt.getPoint();
-        double x = mapViewer.getCenter().getX() - (current.x - prev.x);
-        double y = mapViewer.getCenter().getY() - (current.y - prev.y);
-
-        if (!mapViewer.isNegativeYAllowed()) {
-            if (y < 0) {
-                y = 0;
+            Point current = evt.getPoint();
+            // Drag a Node from a location to another location
+            Point2D coord = new Point2D.Double(current.x, current.y);
+            if (draggingNode == null) {
+                draggingNode = map.getNodeAtCoord(coord);
             }
-        }
 
-        int maxHeight = (int) (mapViewer.getTileFactory().getMapSize(mapViewer.getZoom()).getHeight() * mapViewer
-                .getTileFactory().getTileSize(mapViewer.getZoom()));
-        if (y > maxHeight) {
-            y = maxHeight;
-        }
+            // If a Node was clicked and dragged
+            // Check if no button from the left menu was clicked and still active
+            if (draggingNode != null && !map.isButtonLinkClicked() && !map.isButtonNodeClicked() && !map.isButtonStartClicked()) {
+                // Get mouse dragged coordinates
+                Point2D draggedCoord = new Point2D.Double(evt.getX(), evt.getY());
 
-        prev = current;
-        mapViewer.setCenter(new Point2D.Double(x, y));
-        mapViewer.repaint();
-        mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                // Get GEO Position where we want to place the node
+                GeoPosition geopos = mapViewer.convertPointToGeoPosition(draggedCoord);
+
+                // Set the new coords and repaint
+                draggingNode.setGeoposition(geopos);
+                prev = current;
+                mapViewer.repaint();
+            }
+            if (map.isButtonNodeClicked()) {
+                mouseClicked(evt);
+            }
+
+        } else if (SwingUtilities.isRightMouseButton(evt)) {
+
+            Point current = evt.getPoint();
+            double x = mapViewer.getCenter().getX() - (current.x - prev.x);
+            double y = mapViewer.getCenter().getY() - (current.y - prev.y);
+
+            if (!mapViewer.isNegativeYAllowed()) {
+                if (y < 0) {
+                    y = 0;
+                }
+            }
+
+            int maxHeight = (int) (mapViewer.getTileFactory().getMapSize(mapViewer.getZoom()).getHeight() * mapViewer
+                    .getTileFactory().getTileSize(mapViewer.getZoom()));
+            if (y > maxHeight) {
+                y = maxHeight;
+            }
+
+            prev = current;
+            mapViewer.setCenter(new Point2D.Double(x, y));
+            mapViewer.repaint();
+            mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+        }
     }
 
     /**
@@ -351,12 +432,13 @@ class MapListeners extends MouseInputAdapter {
      */
     @Override
     public void mouseReleased(MouseEvent evt) {
-        if (!SwingUtilities.isRightMouseButton(evt)) {
-            return;
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            draggingNode = null;
+        } else if (SwingUtilities.isRightMouseButton(evt)) {
+            mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
-
         prev = null;
-        mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
     }
 
     /**
@@ -384,6 +466,13 @@ class MapListeners extends MouseInputAdapter {
         if (map.isLinkOnMouse()) {
             linkPainter.setMousePos(new Point2D.Double(e.getX(), e.getY()));
             mapViewer.repaint();
+        }
+        Node currentNode = map.getNodeAtCoord(e.getPoint());
+        if (currentNode != null) {
+            //currentNode.setColor(Color.getHSBColor(0.5f, 0.2f, 1f));
+            mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        } else {
+            mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
     }
 }
