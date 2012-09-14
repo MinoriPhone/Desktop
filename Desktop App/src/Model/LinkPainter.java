@@ -107,22 +107,32 @@ public class LinkPainter implements Painter<JXMapViewer> {
                 double difX = (double) pt1.getX() - (double) pt2.getX();
                 double difY = (double) pt1.getY() - (double) pt2.getY();
 
-                double angle = Math.atan(difX / difY);
-
                 Point2D arrowLineY;
                 Point2D arrowLineX;
 
-                double arrowAngle = angle - 95;
-
-                double deltaX = length * Math.sin(arrowAngle);
-                double deltaY = length * Math.cos(arrowAngle);
-
-                if (difY > 0) {
+                if (difY == 0) {
+                    double deltaX = Math.sqrt((length*length)/2);
+                    if (difX < 0) {
+                        deltaX = deltaX * -1;
+                    }
+                    double deltaY = deltaX;
                     arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
                     arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
                 } else {
-                    arrowLineX = new Point2D.Double(middle.getX() - deltaY, middle.getY() + deltaX);
-                    arrowLineY = new Point2D.Double(middle.getX() - deltaX, middle.getY() - deltaY);
+                    double angle = Math.atan(difX / difY);
+
+                    double arrowAngle = angle - 95;
+
+                    double deltaX = length * Math.sin(arrowAngle);
+                    double deltaY = length * Math.cos(arrowAngle);
+
+                    if (difY > 0) {
+                        arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
+                        arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
+                    } else {
+                        arrowLineX = new Point2D.Double(middle.getX() - deltaY, middle.getY() + deltaX);
+                        arrowLineY = new Point2D.Double(middle.getX() - deltaX, middle.getY() - deltaY);
+                    }
                 }
 
                 g.drawLine((int) middle.getX(), (int) middle.getY(), (int) arrowLineY.getX(), (int) arrowLineY.getY());
