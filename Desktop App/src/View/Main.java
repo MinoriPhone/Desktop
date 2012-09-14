@@ -1,18 +1,11 @@
 package View;
 
-<<<<<<< HEAD
-=======
-import Model.FileChooser;
-import Model.Node;
->>>>>>> Drag and Drop + nieuwe klassen (video, text, image, mediaItem)
 import Model.Story;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 /**
@@ -25,6 +18,7 @@ public class Main extends JFrame {
     private Map map;
     private Story story;
     private Routes routes;
+
     /**
      * Creates new form Main
      */
@@ -40,22 +34,14 @@ public class Main extends JFrame {
 
         // Center the window
         this.setLocation(x, y);
-<<<<<<< HEAD
-        
-=======
 
-        // Add Map
-        map = new Map();
-        pMain.add(this.map, BorderLayout.CENTER);
-
->>>>>>> Drag and Drop + nieuwe klassen (video, text, image, mediaItem)
         // Add Routes
         routes = new Routes();
         pMenu.add(routes, BorderLayout.CENTER);
 
         // Create a story
         story = new Story("New Story", routes);
-        
+
         // Add Map
         map = new Map(story);
         pMain.add(this.map, BorderLayout.CENTER);
@@ -75,6 +61,7 @@ public class Main extends JFrame {
         bNode = new javax.swing.JButton();
         bLink = new javax.swing.JButton();
         bStart = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         mbMenubar = new javax.swing.JMenuBar();
         mFile = new javax.swing.JMenu();
         miNew = new javax.swing.JMenuItem();
@@ -126,6 +113,13 @@ public class Main extends JFrame {
             }
         });
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout pMenuButtonsLayout = new org.jdesktop.layout.GroupLayout(pMenuButtons);
         pMenuButtons.setLayout(pMenuButtonsLayout);
         pMenuButtonsLayout.setHorizontalGroup(
@@ -134,9 +128,13 @@ public class Main extends JFrame {
                 .addContainerGap()
                 .add(pMenuButtonsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, bLink, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
                     .add(bStart, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .add(pMenuButtonsLayout.createSequentialGroup()
+                .add(29, 29, 29)
+                .add(jButton1)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pMenuButtonsLayout.setVerticalGroup(
             pMenuButtonsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -147,7 +145,8 @@ public class Main extends JFrame {
                 .add(bLink, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(bStart)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jButton1))
         );
 
         pMenu.add(pMenuButtons, java.awt.BorderLayout.PAGE_START);
@@ -228,7 +227,6 @@ public class Main extends JFrame {
         this.map.setButtonStartClicked(false);
     }//GEN-LAST:event_bNodeActionPerformed
 
-<<<<<<< HEAD
     private void bLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLinkActionPerformed
         // Add link to a node
         this.map.setButtonNodeClicked(false);
@@ -241,11 +239,12 @@ public class Main extends JFrame {
         this.map.setButtonNodeClicked(false);
         this.map.setButtonLinkClicked(false);
         this.map.setButtonStartClicked(true);
-=======
-    private void bStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bStartActionPerformed
-
->>>>>>> Drag and Drop + nieuwe klassen (video, text, image, mediaItem)
     }//GEN-LAST:event_bStartActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        new addMedia(this).setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * Run Main window
@@ -284,6 +283,7 @@ public class Main extends JFrame {
     private javax.swing.JButton bLink;
     private javax.swing.JButton bNode;
     private javax.swing.JButton bStart;
+    private javax.swing.JButton jButton1;
     private javax.swing.JMenuItem mCopy;
     private javax.swing.JMenu mEdit;
     private javax.swing.JMenu mFile;
