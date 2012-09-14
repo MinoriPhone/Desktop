@@ -11,11 +11,12 @@ public class Node extends DefaultWaypoint {
 
     private Color color = Color.BLUE;
     private String label;
+
     /**
      * Constructor with doubles
-     * 
+     *
      * @param latitude double
-     * @param longitude double     * 
+     * @param longitude double
      */
     public Node(double latitude, double longitude) {
         super(new GeoPosition(latitude, longitude)); // Creates a waypoint with the geoposition        
@@ -29,25 +30,25 @@ public class Node extends DefaultWaypoint {
     public Node(GeoPosition geoposition) {
         super(geoposition); // Creates a waypoint with the geoposition        
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public GeoPosition getGeoposition() {
         return super.getPosition();
     }
-    
+
     /**
-     * 
-     * @param geoposition 
+     *
+     * @param geoposition
      */
     public void setGeoposition(GeoPosition geoposition) {
         super.setPosition(geoposition);
     }
 
     /**
-     * 
+     *
      * @return color
      */
     public String getLabel() {
@@ -55,48 +56,45 @@ public class Node extends DefaultWaypoint {
     }
 
     /**
-     * 
+     *
      * @param label
      */
     public void setLabel(String label) {
         this.label = label;
     }
 
-    
     /**
-     * 
+     *
      * @return color
      */
     public Color getColor() {
         return color;
     }
 
-    
     /**
-     * 
-     * @param color 
+     *
+     * @param color
      */
     public void setColor(Color color) {
         this.color = color;
     }
-    
-    
+
     public void setStart() {
         this.color = Color.GREEN;
         this.label = "S";
     }
-    
+
     public void setEnd() {
         this.color = Color.RED;
         this.label = "E";
     }
-    
+
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
-        return  super.getPosition().getLatitude()+ " : " + super.getPosition().getLongitude();
+        return super.getPosition().getLatitude() + " : " + super.getPosition().getLongitude();
     }
 }

@@ -16,5 +16,4 @@ public class Application {
     public double getVersion() {
         return version;
     }
-    
 }

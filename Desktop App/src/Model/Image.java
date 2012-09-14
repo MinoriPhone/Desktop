@@ -53,8 +53,7 @@ public class Image implements MediaItem {
     }
 
     /**
-     * Set the number of seconds for how long we want to show the Image-file.
-     * Number of seconds can NOT be smaller than 2
+     * Set the number of seconds for how long we want to show the Image-file. Number of seconds can NOT be smaller than 2
      *
      * @param showDurationInSeconds int Number of seconds for showing the Image-file
      */

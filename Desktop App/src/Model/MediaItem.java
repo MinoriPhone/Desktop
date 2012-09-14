@@ -4,7 +4,7 @@ package Model;
  * Super class for Video, Image, Message
  */
 public interface MediaItem {
-    
+
     /**
      * Get the name of the file including the extension
      *

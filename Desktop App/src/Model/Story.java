@@ -2,11 +2,9 @@ package Model;
 
 import View.Routes;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
- * A Story that the user is going to watch. This class holds all the different
- * Routes an user can make.
+ * A Story that the user is going to watch. This class holds all the different Routes an user can make.
  */
 public class Story {
 
@@ -68,7 +66,7 @@ public class Story {
      * @param startNode The Node where the Route starts
      */
     public void newRoute(Node startNode) {
-        Route route = new Route("" + Math.random(),startNode);
+        Route route = new Route("" + Math.random(), startNode);
         routes.add(route);
         routesPanel.refreshList(routes);
     }
@@ -82,7 +80,7 @@ public class Story {
         Link currentLink;
         for (Route route : routes) {
             currentLink = route.getStartLink().getLinkForEndNode(endNode);
-            if(currentLink != null) {
+            if (currentLink != null) {
                 return currentLink;
             }
         }

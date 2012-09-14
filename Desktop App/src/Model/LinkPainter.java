@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Model;
 
 import Plugins.jxmap.swingx.JXMapViewer;
@@ -16,18 +12,17 @@ import java.util.ArrayList;
 
 /**
  * Paints a link
- *
- * @author Reinier
  */
 public class LinkPainter implements Painter<JXMapViewer> {
 
+    // Variables
     private Color color = Color.RED;
     private boolean antiAlias = true;
     private ArrayList<Link> links;
     private Point2D mousePos;
 
     /**
-     * @param track the track
+     * Constructor
      */
     public LinkPainter() {
         // copy the list so that changes in the 
@@ -35,26 +30,57 @@ public class LinkPainter implements Painter<JXMapViewer> {
         this.links = new ArrayList();
     }
 
+    /**
+     * TODO
+     *
+     * @param link
+     */
     public void addLink(Link link) {
         this.links.add(link);
     }
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     public Link getLastLink() {
         return links.get(links.size() - 1);
     }
 
+    /**
+     * TODO
+     */
     public void removeLastLink() {
         links.remove(links.size() - 1);
     }
 
+    /**
+     * TODO
+     *
+     * @return
+     */
     public Point2D getMousePos() {
         return mousePos;
     }
 
+    /**
+     * TODO
+     *
+     * @param mousePos
+     */
     public void setMousePos(Point2D mousePos) {
         this.mousePos = mousePos;
     }
 
+    /**
+     * TODO
+     *
+     * @param g
+     * @param map
+     * @param w
+     * @param h
+     */
     @Override
     public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
         g = (Graphics2D) g.create();
@@ -76,8 +102,10 @@ public class LinkPainter implements Painter<JXMapViewer> {
     }
 
     /**
-     * @param g the graphics object
-     * @param map the map
+     * TODO
+     *
+     * @param g
+     * @param map
      */
     private void drawLink(Graphics2D g, JXMapViewer map) {
         for (Link link : links) {
@@ -111,7 +139,7 @@ public class LinkPainter implements Painter<JXMapViewer> {
                 Point2D arrowLineX;
 
                 if (difY == 0) {
-                    double deltaX = Math.sqrt((length*length)/2);
+                    double deltaX = Math.sqrt((length * length) / 2);
                     if (difX < 0) {
                         deltaX = deltaX * -1;
                     }

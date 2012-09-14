@@ -53,8 +53,7 @@ public class Text implements MediaItem {
     }
 
     /**
-     * Set the number of seconds for how long we want to show the Text-file.
-     * Number of seconds can NOT be smaller than 2
+     * Set the number of seconds for how long we want to show the Text-file. Number of seconds can NOT be smaller than 2
      *
      * @param showDurationInSeconds int Number of seconds for showing the Text-file
      */
