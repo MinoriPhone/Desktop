@@ -154,4 +154,14 @@ public class Link {
             return null;
         }
     }
+
+    public ArrayList<String> getAllFileNames(ArrayList<String> fileNames) {
+        for (MediaItem item : this.items) {
+            fileNames.add(item.getFileName());
+        }
+        for (Link link : this.links) {
+            fileNames = link.getAllFileNames(fileNames);
+        }
+        return fileNames;
+    }
 }

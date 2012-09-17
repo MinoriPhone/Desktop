@@ -103,4 +103,15 @@ public class Story {
         XMLString += "</story>";
         return XMLString;
     }
+
+    /**
+     * Get all file names
+     */
+    public ArrayList<String> getAllFileNames() {
+        ArrayList<String> fileNames = new ArrayList<String>();
+        for (Route route : this.routes) {
+            fileNames = route.getStartLink().getAllFileNames(fileNames);
+        }
+        return fileNames;
+    }
 }
