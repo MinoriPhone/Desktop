@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -47,6 +48,7 @@ public class Map extends JPanel {
     private CompoundPainter<JXMapViewer> painter;
     private Set<Node> nodes;
     private Story story;
+    private JFrame parent;
     private boolean buttonNodeClicked;
     private boolean buttonLinkClicked;
     private boolean buttonStartClicked;
@@ -55,11 +57,14 @@ public class Map extends JPanel {
     /**
      * Creates new form Map
      */
-    public Map(Story story) {
+    public Map(Story story, JFrame parent) {
         initComponents();
 
         // Create a story
         this.story = story;
+        
+        // Remember the parent
+        this.parent = parent;
 
         // Create a map
         mapViewer = new JXMapViewer();
@@ -86,7 +91,7 @@ public class Map extends JPanel {
         linkPainter = new LinkPainter();
 
         // Add listeners to the map
-        MouseInputListener mia = new MapListeners(mapViewer, this, linkPainter);
+        MouseInputListener mia = new MapListeners(mapViewer, this, linkPainter, parent);
         mapViewer.addMouseListener(mia);
         mapViewer.addMouseMotionListener(mia);
         mapViewer.addMouseListener(new CenterMapListener(mapViewer));
@@ -235,16 +240,18 @@ class MapListeners extends MouseInputAdapter {
     private Map map;
     private LinkPainter linkPainter;
     private Node draggingNode;
+    private JFrame parent;
 
     /**
      * Constructor
      *
      * @param mapViewer JXMapViewer The map
      */
-    public MapListeners(JXMapViewer mapViewer, Map map, LinkPainter linkPainter) {
+    public MapListeners(JXMapViewer mapViewer, Map map, LinkPainter linkPainter, JFrame parent) {
         this.mapViewer = mapViewer;
         this.map = map;
         this.linkPainter = linkPainter;
+        this.parent = parent;
 
     }
 
@@ -294,6 +301,8 @@ class MapListeners extends MouseInputAdapter {
                 if (!clickedNode.equals(link.getP1())) {
                     link.setP2(clickedNode);
                     map.getStory().getLinkForEndNode(link.getP1()).addLink(link);
+                    mapViewer.repaint();
+                    new addMedia(parent).setVisible(true);
                 } else {
                     linkPainter.removeLastLink();
                 }
@@ -383,7 +392,7 @@ class MapListeners extends MouseInputAdapter {
 
             // If a Node was clicked and dragged
             // Check if no button from the left menu was clicked and still active
-            if (draggingNode != null && !map.isButtonLinkClicked() && !map.isButtonNodeClicked() && !map.isButtonStartClicked()) {
+            if (draggingNode != null && !map.isButtonLinkClicked() && !map.isButtonNodeClicked() && !map.isButtonStartClicked() && !map.isLinkOnMouse()) {
                 // Get mouse dragged coordinates
                 Point2D draggedCoord = new Point2D.Double(evt.getX(), evt.getY());
 
@@ -395,7 +404,7 @@ class MapListeners extends MouseInputAdapter {
                 prev = current;
                 mapViewer.repaint();
             }
-            if (map.isButtonNodeClicked()) {
+            if (map.isButtonNodeClicked() || map.isLinkOnMouse()) {
                 mouseClicked(evt);
             }
 
