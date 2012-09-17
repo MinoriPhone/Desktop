@@ -65,4 +65,14 @@ public class Text implements MediaItem {
             this.showDurationInSeconds = showDurationInSeconds;
         }
     }
+
+    @Override
+    public String printXML() {
+        String XMLString = "";
+        XMLString += "<message>";
+        XMLString += "<filename>"+this.fileName+"</filename>";
+        XMLString += "<duration>"+this.showDurationInSeconds+"</duration>";
+        XMLString += "</message>";
+        return XMLString;
+    }
 }

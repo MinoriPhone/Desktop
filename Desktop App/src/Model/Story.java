@@ -86,4 +86,21 @@ public class Story {
         }
         return null;
     }
+
+    /**
+     * Print XML
+     */
+    public String printXML() {
+        String XMLString = "";
+        
+        XMLString += "<story>";
+        XMLString += "<story.name>"+this.name+"</story.name>";
+        XMLString += "<routes>";
+        for (Route route : this.routes) {
+            XMLString += route.printXML();
+        }
+        XMLString += "</routes>";
+        XMLString += "</story>";
+        return XMLString;
+    }
 }
