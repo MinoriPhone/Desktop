@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -40,6 +42,7 @@ import javax.swing.event.MouseInputListener;
 public class Map extends JPanel {
 
     // Variables
+    private static final Logger LOGGER = Logger.getLogger(Map.class.getName());
     private JXMapViewer mapViewer;
     private WaypointPainter<Node> waypointPainter;
     private LinkPainter linkPainter;
@@ -75,7 +78,7 @@ public class Map extends JPanel {
         mapViewer.setZoom(0);
         mapViewer.setAddressLocation(zHHS);
 
-        // Create waypoint from the geo-positions
+        // Create set to remember the geo-positions
         nodes = new HashSet<Node>();
 
         // Create a waypoint painter that paints all the waypoints
@@ -83,6 +86,7 @@ public class Map extends JPanel {
         waypointPainter.setWaypoints(nodes);
         waypointPainter.setRenderer(new NodeRenderer());
 
+        // Create a link painter that paints all the links
         linkPainter = new LinkPainter();
 
         // Add listeners to the map
@@ -93,7 +97,7 @@ public class Map extends JPanel {
         mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
         mapViewer.addKeyListener(new PanKeyListener(mapViewer));
 
-        // Create a compound painter that uses both the route-painter and the waypoint-painter
+        // Create a compound painter that uses both the route-painter, the waypoint-painter and the link-painter
         painters = new ArrayList<Painter<JXMapViewer>>();
         painters.add(linkPainter);
         painters.add(waypointPainter);
@@ -133,18 +137,16 @@ public class Map extends JPanel {
      * @param node Node The Node we want to delete from the mapViewer
      */
     public void deleteNode(Node node) {
-
-        // Checks if the node has any links combined
         nodes.remove(node);
-
         waypointPainter.setWaypoints(nodes);
         mapViewer.repaint();
     }
 
     /**
-     * Add Node to the mapViewer
+     * Get Node at a certain Point2D
      *
-     * @param node Node The Node we want to add to the mapViewer
+     * @param point Point2D
+     * @return Node
      */
     public Node getNodeAtCoord(Point2D point) {
         for (Node node : nodes) {
@@ -158,23 +160,28 @@ public class Map extends JPanel {
         return null;
     }
 
+    /**
+     * Get Story
+     *
+     * @return Story
+     */
     public Story getStory() {
         return story;
     }
 
     /**
-     * Getter buttonNodeClicked
+     * Get buttonNodeClicked
      *
-     * @return buttonNodeClicked
+     * @return boolean
      */
     public boolean isButtonNodeClicked() {
         return buttonNodeClicked;
     }
 
     /**
-     * Getter buttonNodeClicked
+     * Get buttonNodeClicked
      *
-     * @return boolean buttonNodeClicked
+     * @return boolean
      */
     public void setButtonNodeClicked(boolean buttonNodeClicked) {
         this.buttonNodeClicked = buttonNodeClicked;
@@ -190,35 +197,55 @@ public class Map extends JPanel {
     }
 
     /**
-     * Getter buttonLinkClicked
+     * Get buttonLinkClicked
      *
-     * @return buttonLinkClicked
+     * @return boolean
      */
     public boolean isButtonLinkClicked() {
         return buttonLinkClicked;
     }
 
     /**
-     * Getter buttonLinkClicked
+     * Get buttonLinkClicked
      *
-     * @return boolean buttonLinkClicked
+     * @return boolean
      */
     public void setButtonLinkClicked(boolean buttonLinkClicked) {
         this.buttonLinkClicked = buttonLinkClicked;
     }
 
+    /**
+     * Get buttonStartClicked
+     *
+     * @return boolean
+     */
     public boolean isButtonStartClicked() {
         return buttonStartClicked;
     }
 
+    /**
+     * Set buttonStartClicked
+     *
+     * @param buttonStartClicked boolean
+     */
     public void setButtonStartClicked(boolean buttonStartClicked) {
         this.buttonStartClicked = buttonStartClicked;
     }
 
+    /**
+     * Get isLinkOnMouse
+     *
+     * @return boolean
+     */
     public boolean isLinkOnMouse() {
         return linkOnMouse;
     }
 
+    /**
+     * Set linkOnMouse
+     *
+     * @param linkOnMouse boolean
+     */
     public void setLinkOnMouse(boolean linkOnMouse) {
         this.linkOnMouse = linkOnMouse;
     }
@@ -230,6 +257,7 @@ public class Map extends JPanel {
 class MapListeners extends MouseInputAdapter {
 
     // Variables
+    private static final Logger LOGGER = Logger.getLogger(Map.class.getName());
     private Point prev;
     private JXMapViewer mapViewer;
     private Map map;
@@ -255,7 +283,10 @@ class MapListeners extends MouseInputAdapter {
      */
     @Override
     public void mouseClicked(final MouseEvent evt) {
+
+        // Place Node
         if (map.isButtonNodeClicked()) {
+
             // Get mouse clicked coordinates
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
 
@@ -269,54 +300,95 @@ class MapListeners extends MouseInputAdapter {
             mapViewer.repaint();
             map.setButtonNodeClicked(false);
             mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        } else if (map.isButtonLinkClicked()) {
+
+        } // Place Link
+        else if (map.isButtonLinkClicked()) {
+
             // Get mouse clicked coordinates
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
+
+            // Clicked Node exists
             if (clickedNode != null) {
+
+                // Check if node already has a Link. If not, we can not
+                // make the Link, because it is not linked to a existing Route
                 if (map.getStory().getLinkForEndNode(clickedNode) != null) {
                     map.setLinkOnMouse(true);
                     map.setButtonLinkClicked(false);
-                    //Add link to first node
-                    Link link = new Link("A1", clickedNode, null);
+
+                    // Add link to the first node
+                    Link link = new Link("TODO", clickedNode, null);
                     linkPainter.addLink(link);
+
                 } else {
-                    System.out.println("No link on this Node");
+                    LOGGER.log(Level.INFO, "No Link on this Node");
                 }
             }
-        } else if (map.isLinkOnMouse()) {
+
+        } // Link is stuck on mouse
+        else if (map.isLinkOnMouse()) {
+
             // Get mouse clicked coordinates
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
+
+            // Clicked Node exists
             if (clickedNode != null) {
-                //Add second Node to Link
+
+                // Add second Node to Link
                 Link link = linkPainter.getLastLink();
+
+                // Can not make a Link to itself
                 if (!clickedNode.equals(link.getP1())) {
+                    
+                    // Create Link
                     link.setP2(clickedNode);
                     map.getStory().getLinkForEndNode(link.getP1()).addLink(link);
+                    
+                    // Show popup for adding media to this created Link
+                    
+                    
                 } else {
+                    // Remove first Node
                     linkPainter.removeLastLink();
                 }
             } else {
+                // Remove first Node
                 linkPainter.removeLastLink();
             }
+
+            // Repaint
             map.setLinkOnMouse(false);
             mapViewer.repaint();
-        } else if (map.isButtonStartClicked()) {
+
+        } // Place startpoint
+        else if (map.isButtonStartClicked()) {
+
             // Get mouse clicked coordinates
             Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
+
+            // Clicked Node exists
             if (clickedNode != null) {
+
                 // Create new route
                 map.getStory().newRoute(clickedNode);
             }
+
+            // Repaint
             map.setButtonStartClicked(false);
             mapViewer.repaint();
-        } else if (map.getNodeAtCoord(evt.getPoint()) != null) {
+
+        } // No buttons are clicked, but we still clicked on the map
+        else if (map.getNodeAtCoord(evt.getPoint()) != null) {
+
+            // Create node menu
             ContextMenuMap contextMenuMap = new ContextMenuMap();
             final Node currentNode = map.getNodeAtCoord(evt.getPoint());
 
-            // Check if the node got any links attached. If so, the item is disabled and no listener is created
+            // Check if the node got any links attached. If so, the
+            // item is disabled and no listener is created
             if (map.getStory().getLinkForEndNode(currentNode) != null) {
                 contextMenuMap.getDeleteItem().setEnabled(false);
 
@@ -372,17 +444,21 @@ class MapListeners extends MouseInputAdapter {
      */
     @Override
     public void mouseDragged(MouseEvent evt) {
+
+        // Left mouse dragged event
         if (SwingUtilities.isLeftMouseButton(evt)) {
 
+            // Get mouse clicked coords
             Point current = evt.getPoint();
+
             // Drag a Node from a location to another location
             Point2D coord = new Point2D.Double(current.x, current.y);
             if (draggingNode == null) {
                 draggingNode = map.getNodeAtCoord(coord);
             }
 
-            // If a Node was clicked and dragged
-            // Check if no button from the left menu was clicked and still active
+            // If a Node was clicked and dragged, check if no button
+            // from the left menu was clicked and still active
             if (draggingNode != null && !map.isButtonLinkClicked() && !map.isButtonNodeClicked() && !map.isButtonStartClicked()) {
                 // Get mouse dragged coordinates
                 Point2D draggedCoord = new Point2D.Double(evt.getX(), evt.getY());
@@ -395,12 +471,16 @@ class MapListeners extends MouseInputAdapter {
                 prev = current;
                 mapViewer.repaint();
             }
+
+            // Call mouseClicked event
             if (map.isButtonNodeClicked()) {
                 mouseClicked(evt);
             }
 
-        } else if (SwingUtilities.isRightMouseButton(evt)) {
+        } // Right mouse dragged event -> drag map
+        else if (SwingUtilities.isRightMouseButton(evt)) {
 
+            // Get coords
             Point current = evt.getPoint();
             double x = mapViewer.getCenter().getX() - (current.x - prev.x);
             double y = mapViewer.getCenter().getY() - (current.y - prev.y);
@@ -411,12 +491,14 @@ class MapListeners extends MouseInputAdapter {
                 }
             }
 
-            int maxHeight = (int) (mapViewer.getTileFactory().getMapSize(mapViewer.getZoom()).getHeight() * mapViewer
-                    .getTileFactory().getTileSize(mapViewer.getZoom()));
+            // Get max height
+            int maxHeight = (int) (mapViewer.getTileFactory().getMapSize(mapViewer.getZoom()).getHeight()
+                    * mapViewer.getTileFactory().getTileSize(mapViewer.getZoom()));
             if (y > maxHeight) {
                 y = maxHeight;
             }
 
+            // Repaint map
             prev = current;
             mapViewer.setCenter(new Point2D.Double(x, y));
             mapViewer.repaint();

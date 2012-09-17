@@ -33,6 +33,11 @@ public class FileChooser {
                 new String[]{".AVI", ".M4V", ".MOV", ".MP4"},
                 "Video's (*.AVI|M4V|MOV|MP4)"));
 
+        // Add a filter with all the supported files
+        chooser.addChoosableFileFilter(new ExtensionFileFilter(
+                new String[]{".RTF", ".TXT", ".JPG", ".JPEG", ".PNG", ".BMP", ".AVI", ".M4V", ".MOV", ".MP4"},
+                "All supported files"));
+
         // Turn off 'All Files' capability of file chooser, so only our custom filter is used.
         chooser.setAcceptAllFileFilterUsed(false);
     }

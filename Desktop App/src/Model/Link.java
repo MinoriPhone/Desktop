@@ -135,7 +135,7 @@ public class Link {
                     return link;
                 }
             }
-            return null;
         }
+        return null;
     }
 }

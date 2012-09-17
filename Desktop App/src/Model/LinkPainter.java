@@ -27,7 +27,7 @@ public class LinkPainter implements Painter<JXMapViewer> {
     public LinkPainter() {
         // copy the list so that changes in the 
         // original list do not have an effect here
-        this.links = new ArrayList();
+        this.links = new ArrayList<Link>();
     }
 
     /**
