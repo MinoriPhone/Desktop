@@ -46,12 +46,12 @@
                               </Group>
                               <Component id="bBrowse" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="8" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Component id="lSpaceRight" min="-2" pref="35" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="lSpaceBetween" pref="1" max="32767" attributes="0"/>
+                  <Component id="lSpaceBetween" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -80,7 +80,7 @@
                       <Component id="lSpaceRight" alignment="0" pref="295" max="32767" attributes="0"/>
                       <Component id="lSpaceLeft" alignment="0" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="38" max="32767" attributes="0"/>
+                  <EmptySpace pref="34" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
