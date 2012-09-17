@@ -56,4 +56,19 @@ public class Route {
     public void setStartLink(Link startLink) {
         this.startLink = startLink;
     }
+
+    /**
+     * Print XML
+     */
+    public String printXML() {
+        String XMLString = "";
+        XMLString += "<route>";
+        XMLString += "<route.name>"+this.name+"</route.name>";
+        XMLString += "<route.link>";
+        XMLString += startLink.printXML();
+        XMLString += "</route.link>";
+        XMLString += "</route>";
+        return XMLString;
+        
+    }
 }

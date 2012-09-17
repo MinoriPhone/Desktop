@@ -65,4 +65,14 @@ public class Image implements MediaItem {
             this.showDurationInSeconds = showDurationInSeconds;
         }
     }
+
+    @Override
+    public String printXML() {
+        String XMLString = "";
+        XMLString += "<image>";
+        XMLString += "<filename>"+this.fileName+"</filename>";
+        XMLString += "<duration>"+this.showDurationInSeconds+"</duration>";
+        XMLString += "</image>";
+        return XMLString;
+    }
 }

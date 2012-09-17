@@ -152,6 +152,11 @@ public class Main extends JFrame {
 
         miSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         miSave.setText("Save");
+        miSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miSaveActionPerformed(evt);
+            }
+        });
         mFile.add(miSave);
         mFile.add(sepFile);
 
@@ -228,10 +233,9 @@ public class Main extends JFrame {
         this.map.setButtonStartClicked(true);
     }//GEN-LAST:event_bStartActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        //new AddMedia(this).setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void miSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveActionPerformed
+        System.out.println(this.story.printXML());
+    }//GEN-LAST:event_miSaveActionPerformed
 
     /**
      * Run Main window

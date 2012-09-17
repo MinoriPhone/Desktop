@@ -97,4 +97,14 @@ public class Node extends DefaultWaypoint {
     public String toString() {
         return super.getPosition().getLatitude() + " : " + super.getPosition().getLongitude();
     }
+
+    /**
+     * Print XML
+     */
+    public String printXML() {
+        String XMLString = "";
+        XMLString += "<longitude>"+this.getGeoposition().getLongitude()+"</longitude>";
+        XMLString += "<latitude>"+this.getGeoposition().getLatitude()+"</latitude>";
+        return XMLString;
+    }
 }

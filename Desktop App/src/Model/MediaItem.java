@@ -32,4 +32,10 @@ public interface MediaItem {
      * @param showDurationInSeconds int Number of seconds for showing the file
      */
     public void setShowDurationInSeconds(int showDurationInSeconds);
+    
+    /**
+     * Print to XML
+     *
+     */
+    public String printXML();
 }

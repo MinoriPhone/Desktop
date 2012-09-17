@@ -111,18 +111,34 @@ public class Link {
     }
 
     /**
-     * LATER WEGHALEN!!
+     * Print XML
      */
-    public void print(int i) {
-        String spaties = "";
-        for (int a = 0; a < i; a++) {
-            spaties += "   ";
+    public String printXML() {
+        String XMLString = "";
+        XMLString += "<link.name>" + this.name + "</link.name>";
+        if (p1 != null) {
+            XMLString += "<from>";
+            XMLString += this.p1.printXML();
+            XMLString += "</from>";
         }
-        i++;
-        System.out.println(spaties + "--->" + this.toString());
-        for (Link link : this.links) {
-            link.print(i);
+        if (p2 != null) {
+            XMLString += "<to>";
+            XMLString += this.p2.printXML();
+            XMLString += "</to>";
         }
+        XMLString += "<queue>";
+        for (MediaItem item : this.items) {
+            XMLString += item.printXML();
+        }
+        XMLString += "</queue>";
+        if (this.links.size() > 0) {
+            XMLString += "<links>";
+            for (Link link : this.links) {
+                XMLString += link.printXML();
+            }
+            XMLString += "</links>";
+        }
+        return XMLString;
     }
 
     public Link getLinkForEndNode(Node endNode) {
@@ -135,7 +151,7 @@ public class Link {
                     return link;
                 }
             }
+            return null;
         }
-        return null;
     }
 }

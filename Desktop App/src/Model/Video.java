@@ -58,4 +58,13 @@ public class Video implements MediaItem {
     @Override
     public void setShowDurationInSeconds(int showDurationInSeconds) {
     }
+
+    @Override
+    public String printXML() {
+        String XMLString = "";
+        XMLString += "<video>";
+        XMLString += "<filename>"+this.fileName+"</filename>";
+        XMLString += "</video>";
+        return XMLString;
+    }
 }
