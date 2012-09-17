@@ -1,11 +1,23 @@
 package View;
 
+import Model.MediaItem;
 import Model.Story;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.swing.JFrame;
 
 /**
@@ -235,7 +247,95 @@ public class Main extends JFrame {
     }//GEN-LAST:event_bStartActionPerformed
 
     private void miSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveActionPerformed
-        System.out.println(this.story.printXML());
+        //System.out.println(this.story.printXML());
+                // Max length of the buffer
+        int maxFileSize = 100000000;
+        String storyName = "story1";
+        String XMLcontent = "";
+                
+        // List of names (paths) to the mediafile locations
+        //List<String> fileNames = new ArrayList<String>();
+        //fileNames.add("C:\\klein.png");
+        //fileNames.add("C:\\Users\\Public\\Videos\\Sample Videos\\Natuur.wmv");
+        
+        try {
+            // Zipje
+            ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(storyName+".iStory")));
+  
+            ///////////
+            // XML
+            ///////////
+            
+            // Create an XML-file
+            String file_name = storyName+".xml";
+            
+            File XMLfile = new File(file_name);
+            boolean exist = XMLfile.createNewFile();
+            if (!exist) {
+                System.out.println("File already exists.");                
+            } else {
+                FileWriter fstream = new FileWriter(file_name);
+                BufferedWriter out = new BufferedWriter(fstream);
+                out.write(XMLcontent);
+                out.close();
+                // Get the data from the file
+                    byte[] data = new byte[maxFileSize];
+                    // Create inputBuffer for the data
+                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(file_name));
+                    // Internal count for the databuffer
+                    int count = 0;
+                    // Add new file to the zip file
+                    zipOut.putNextEntry(new ZipEntry(file_name));
+                    // Fill the new file with data
+                    while ((count = in.read(data, 0, maxFileSize)) != -1) {
+                        zipOut.write(data, 0, count);
+                    }
+                    in.close();
+                    XMLfile.delete();
+                System.out.println("Temp XML-file created successfully.");
+            }
+            
+            
+            ///////////
+            // MEDIAFILES
+            ///////////
+            
+            // Loop over mediafiles
+            for (MediaItem mediaItem : story.getAllMediaItems()) {
+
+                // Get the file from the location
+                File file = new File(mediaItem.getAbsolutePath() + "" + mediaItem.getFileName());
+                exist = file.isFile();
+                if (exist) {
+                    System.out.println("File exists.");
+
+                    // Get the data from the file
+                    byte[] data = new byte[maxFileSize];
+                    // Create inputBuffer for the data
+                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+                    // Internal count for the databuffer
+                    int count = 0;
+                    // Add new file to the zip file
+                    zipOut.putNextEntry(new ZipEntry(mediaItem.getFileName()));
+                    // Fill the new file with data
+                    while ((count = in.read(data, 0, maxFileSize)) != -1) {
+                        zipOut.write(data, 0, count);
+                    }
+                    in.close();
+
+                } else {
+                    System.out.println("File does not exist!");                    
+                }
+            }
+            
+            // Save and close the buffers
+            zipOut.flush();
+            zipOut.close();
+            System.out.println("Your file is zipped");
+
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_miSaveActionPerformed
 
     /**

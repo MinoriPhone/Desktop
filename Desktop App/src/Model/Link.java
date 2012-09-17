@@ -171,4 +171,17 @@ public class Link {
             return false;
         }
     }
+    
+    /**
+     * Get all media items
+     */
+    public ArrayList<MediaItem> getAllMediaItems(ArrayList<MediaItem> MediaItems) {
+        for (MediaItem item : this.items) {
+            MediaItems.add(item);
+        }
+        for (Link link : this.links) {
+            MediaItems = link.getAllMediaItems(MediaItems);
+        }
+        return MediaItems;
+    }
 }

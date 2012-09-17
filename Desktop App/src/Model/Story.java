@@ -4,7 +4,8 @@ import View.Routes;
 import java.util.ArrayList;
 
 /**
- * A Story that the user is going to watch. This class holds all the different Routes an user can make.
+ * A Story that the user is going to watch. This class holds all the different
+ * Routes an user can make.
  */
 public class Story {
 
@@ -119,5 +120,16 @@ public class Story {
             }
         }
         return r;
+    }
+
+    /**
+     * Get all media items
+     */
+    public ArrayList<MediaItem> getAllMediaItems() {
+        ArrayList<MediaItem> MediaItems = new ArrayList<MediaItem>();
+        for (Route route : this.routes) {
+            MediaItems = route.getStartLink().getAllMediaItems(MediaItems);
+        }
+        return MediaItems;
     }
 }
