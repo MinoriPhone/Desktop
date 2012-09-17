@@ -155,13 +155,20 @@ public class Link {
         }
     }
 
-    public ArrayList<String> getAllFileNames(ArrayList<String> fileNames) {
-        for (MediaItem item : this.items) {
-            fileNames.add(item.getFileName());
+    /**
+     * Get routes that are part of this given Node
+     * 
+     * @param node Node
+     * @return boolean
+     */
+    public boolean getRoutesFromNode(Node node) {
+        if (this.getP2().equals(node)) {
+            return true;
+        } else {
+            for (Link currentLink : links) {
+                return currentLink.getRoutesFromNode(node);
+            }
+            return false;
         }
-        for (Link link : this.links) {
-            fileNames = link.getAllFileNames(fileNames);
-        }
-        return fileNames;
     }
 }

@@ -1,10 +1,13 @@
 package View;
 
+import Model.AddMediaWindowListener;
 import Model.ContextMenuMap;
 import Model.Link;
 import Model.LinkPainter;
+import Model.MediaItem;
 import Model.Node;
 import Model.NodeRenderer;
+import Model.Route;
 import Model.Story;
 import Plugins.jxmap.swingx.JXMapViewer;
 import Plugins.jxmap.swingx.OSMTileFactoryInfo;
@@ -24,6 +27,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
@@ -51,7 +55,7 @@ public class Map extends JPanel {
     private CompoundPainter<JXMapViewer> painter;
     private Set<Node> nodes;
     private Story story;
-    private JFrame parent;
+    private Main parent;
     private boolean buttonNodeClicked;
     private boolean buttonLinkClicked;
     private boolean buttonStartClicked;
@@ -60,7 +64,7 @@ public class Map extends JPanel {
     /**
      * Creates new form Map
      */
-    public Map(Story story, JFrame parent) {
+    public Map(Story story, Main parent) {
         initComponents();
 
         // Create a story
@@ -95,7 +99,7 @@ public class Map extends JPanel {
         linkPainter = new LinkPainter();
 
         // Add listeners to the map
-        MouseInputListener mia = new MapListeners(mapViewer, this, linkPainter, parent);
+        MouseInputListener mia = new MapListeners(mapViewer, this, linkPainter, this.parent);
         mapViewer.addMouseListener(mia);
         mapViewer.addMouseMotionListener(mia);
         mapViewer.addMouseListener(new CenterMapListener(mapViewer));
@@ -268,14 +272,14 @@ class MapListeners extends MouseInputAdapter {
     private Map map;
     private LinkPainter linkPainter;
     private Node draggingNode;
-    private JFrame parent;
+    private Main parent;
 
     /**
      * Constructor
      *
      * @param mapViewer JXMapViewer The map
      */
-    public MapListeners(JXMapViewer mapViewer, Map map, LinkPainter linkPainter, JFrame parent) {
+    public MapListeners(JXMapViewer mapViewer, Map map, LinkPainter linkPainter, Main parent) {
         this.mapViewer = mapViewer;
         this.map = map;
         this.linkPainter = linkPainter;
@@ -351,9 +355,48 @@ class MapListeners extends MouseInputAdapter {
 
                     // Create Link
                     link.setP2(clickedNode);
-                    map.getStory().getLinkForEndNode(link.getP1()).addLink(link);
-                    mapViewer.repaint();
-                    //new AddMedia(parent).setVisible(true);
+                    this.map.getStory().getLinkForEndNode(link.getP1()).addLink(link);
+                    this.mapViewer.repaint();
+
+                    // Get routes for Node (p1)
+                    ArrayList<Route> routes = this.map.getStory().getRoutesFromNode(link.getP1());
+                    
+                    // Show popup for adding media to the created Link
+                    final addMedia popup = new addMedia(this.parent, routes);
+                    popup.setVisible(true);
+
+                    // Add window listener to the popup dialog window
+                    popup.addWindowListener(new AddMediaWindowListener() {
+                        /**
+                         * Window closed event
+                         */
+                        @Override
+                        public void windowClosed(WindowEvent we) {
+
+                            // Get all added media items
+                            ArrayList<MediaItem> items = popup.getAddedMediaItems();
+
+                            // If user did not add any media to the link,
+                            if (items.isEmpty()) {
+
+                                // show popup
+                                JOptionPane.showMessageDialog(popup,
+                                        "You didn't add any media to this Link." + "\n"
+                                        + "You can still add media to this Link by clicking on this Link!", // message
+                                        "Info", // title
+                                        JOptionPane.INFORMATION_MESSAGE);
+                            } else {
+                                // From here on we have the media the user added to this Link
+                                // 1. media toeveogen aan link object + naam!
+                                // 2. 
+                                //TODO
+                                // 1. custom name
+                                // 2. route selection
+                                // 3. on save --> 
+                            }
+                        }
+                    });
+
                 } else {
                     // Remove first Node
                     linkPainter.removeLastLink();

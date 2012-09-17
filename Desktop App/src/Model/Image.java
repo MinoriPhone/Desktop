@@ -9,16 +9,19 @@ public class Image implements MediaItem {
 
     // Variables
     private String fileName;
+    private String absPath;
     private int showDurationInSeconds;
 
     /**
      * Constructor
      *
      * @param fileName String Name of the Image-file
+     * @param absPath String absolute path to Image-file
      * @param showDurationInSeconds String The number of seconds for how long we want to show the Image
      */
-    public Image(String fileName, int showDurationInSeconds) {
+    public Image(String fileName, String absPath, int showDurationInSeconds) {
         this.fileName = fileName;
+        this.absPath = absPath;
         this.showDurationInSeconds = showDurationInSeconds;
     }
 
@@ -74,5 +77,25 @@ public class Image implements MediaItem {
         XMLString += "<duration>"+this.showDurationInSeconds+"</duration>";
         XMLString += "</image>";
         return XMLString;
+    }
+
+    /**
+     * Get the absolute path of the file
+     * 
+     * @return String absolute path
+     */
+    @Override
+    public String getAbsolutePath() {
+        return this.absPath;
+    }
+
+    /**
+     * Set the absolute path to the file
+     * 
+     * @param absPath String absolute path to file
+     */
+    @Override
+    public void setAbsolutePath(String absPath) {
+        this.absPath = absPath;
     }
 }

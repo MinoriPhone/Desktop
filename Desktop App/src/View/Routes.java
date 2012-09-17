@@ -18,6 +18,7 @@ import javax.swing.ListSelectionModel;
  */
 public class Routes extends JPanel {
 
+    // Variables
     private JList list;
 
     /**

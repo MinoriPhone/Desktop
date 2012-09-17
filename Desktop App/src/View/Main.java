@@ -17,15 +17,16 @@ public class Main extends JFrame {
     public static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     private Map map;
     private Story story;
-    private Routes routes;
+    private Routes panelRoutes;
 
     /**
      * Creates new form Main
      */
     public Main() {
         initComponents();
-        Toolkit tk = Toolkit.getDefaultToolkit();
+        
         // Get the size of the screen
+        Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
 
         // Determine the new location of the window
@@ -36,11 +37,11 @@ public class Main extends JFrame {
         this.setLocation(x, y);
 
         // Add Routes
-        routes = new Routes();
-        pMenu.add(routes, BorderLayout.CENTER);
+        panelRoutes = new Routes();
+        pMenu.add(panelRoutes, BorderLayout.CENTER);
 
         // Create a story
-        story = new Story("New Story", routes);
+        story = new Story("New Story", panelRoutes);
 
         // Add Map
         map = new Map(story, this);
@@ -120,7 +121,7 @@ public class Main extends JFrame {
                 .addContainerGap()
                 .add(pMenuButtonsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, bLink, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                     .add(bStart, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -133,7 +134,7 @@ public class Main extends JFrame {
                 .add(bLink, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(bStart)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
 
         pMenu.add(pMenuButtons, java.awt.BorderLayout.PAGE_START);

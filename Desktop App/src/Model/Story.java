@@ -92,9 +92,9 @@ public class Story {
      */
     public String printXML() {
         String XMLString = "";
-        
+
         XMLString += "<story>";
-        XMLString += "<story.name>"+this.name+"</story.name>";
+        XMLString += "<story.name>" + this.name + "</story.name>";
         XMLString += "<routes>";
         for (Route route : this.routes) {
             XMLString += route.printXML();
@@ -105,13 +105,19 @@ public class Story {
     }
 
     /**
-     * Get all file names
+     * Get all routes that are part of a Node
+     *
+     * @param node Node
      */
-    public ArrayList<String> getAllFileNames() {
-        ArrayList<String> fileNames = new ArrayList<String>();
-        for (Route route : this.routes) {
-            fileNames = route.getStartLink().getAllFileNames(fileNames);
+    public ArrayList<Route> getRoutesFromNode(Node node) {
+        ArrayList<Route> r = new ArrayList<Route>();
+
+        // Get all routes that are part of the given Node
+        for (Route route : routes) {
+            if (route.getStartLink().getRoutesFromNode(node)) {
+                r.add(route);
+            }
         }
-        return fileNames;
+        return r;
     }
 }

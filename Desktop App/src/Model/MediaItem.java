@@ -20,6 +20,19 @@ public interface MediaItem {
     public void setFileName(String fileName);
 
     /**
+     * Get absolute path to the file
+     */
+    public String getAbsolutePath();
+    
+    /**
+     * Set the absolute path of the file
+     * 
+     * @param absPath String absolute path to file
+     * @return String
+     */
+    public void setAbsolutePath(String absPath);
+    
+    /**
      * Get the number of seconds for how long we want to show the file
      *
      * @return int Number of seconds for showing the file

@@ -66,11 +66,11 @@ public class FileChooser {
 
         // Return Media Item object (Video, Image or Text)
         if (extension.equals("rtf") || extension.equals("txt")) {
-            return new Text(fileName, 0);
+            return new Text(fileName, filePath, 0);
         } else if (extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png") || extension.equals("bmp")) {
-            return new Model.Image(fileName, 0);
+            return new Model.Image(fileName, filePath, 0);
         } else if (extension.equals("avi") || extension.equals("m4v") || extension.equals("mov") || extension.equals("mp4")) {
-            return new Video(fileName);
+            return new Video(fileName, filePath);
         }
         return null;
     }

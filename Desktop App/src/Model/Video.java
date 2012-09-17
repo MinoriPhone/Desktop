@@ -9,15 +9,18 @@ public class Video implements MediaItem {
 
     // Variables
     private String fileName;
+    private String absPath;
     private int showDurationInSeconds = -1;
 
     /**
      * Constructor
      *
      * @param fileName String Name of the Video-file
+     * @param absPath String absolute path to Text-file
      */
-    public Video(String fileName) {
+    public Video(String fileName, String absPath) {
         this.fileName = fileName;
+        this.absPath = absPath;
     }
 
     /**
@@ -66,5 +69,25 @@ public class Video implements MediaItem {
         XMLString += "<filename>"+this.fileName+"</filename>";
         XMLString += "</video>";
         return XMLString;
+    }
+
+    /**
+     * Get the absolute path of the file
+     * 
+     * @return String absolute path
+     */
+    @Override
+    public String getAbsolutePath() {
+        return this.absPath;
+    }
+
+    /**
+     * Set the absolute path to the file
+     * 
+     * @param absPath String absolute path to file
+     */
+    @Override
+    public void setAbsolutePath(String absPath) {
+        this.absPath = absPath;
     }
 }
