@@ -251,7 +251,7 @@ public class Main extends JFrame {
                 // Max length of the buffer
         int maxFileSize = 100000000;
         String storyName = "story1";
-        String XMLcontent = "";
+        String XMLcontent = this.story.printXML();
                 
         // List of names (paths) to the mediafile locations
         //List<String> fileNames = new ArrayList<String>();
