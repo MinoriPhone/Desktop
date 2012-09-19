@@ -1,5 +1,6 @@
 package Model;
 
+import java.io.File;
 import javax.swing.JFileChooser;
 
 /**
@@ -83,7 +84,7 @@ class Filename {
 
     // Variables
     private String fullPath;
-    private char pathSeparator;
+    private String pathSeparator;
     private char extensionSeparator;
 
     /**
@@ -93,7 +94,7 @@ class Filename {
      */
     public Filename(String str) {
         this.fullPath = str;
-        this.pathSeparator = '/';
+        this.pathSeparator = System.getProperty("file.separator");
         this.extensionSeparator = '.';
     }
 

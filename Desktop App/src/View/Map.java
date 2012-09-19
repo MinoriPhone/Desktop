@@ -1,13 +1,11 @@
 package View;
 
-import Model.AddMediaWindowListener;
 import Model.ContextMenuMap;
 import Model.Link;
 import Model.LinkPainter;
 import Model.MediaItem;
 import Model.Node;
 import Model.NodeRenderer;
-import Model.Route;
 import Model.Story;
 import Plugins.jxmap.swingx.JXMapViewer;
 import Plugins.jxmap.swingx.OSMTileFactoryInfo;
@@ -21,13 +19,12 @@ import Plugins.jxmap.swingx.mapviewer.WaypointPainter;
 import Plugins.jxmap.swingx.painter.CompoundPainter;
 import Plugins.jxmap.swingx.painter.Painter;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -196,8 +193,8 @@ public class Map extends JPanel {
     public void setButtonNodeClicked(boolean buttonNodeClicked) {
         this.buttonNodeClicked = buttonNodeClicked;
         if (buttonNodeClicked) {
-            Toolkit tk = Toolkit.getDefaultToolkit();
-            /*try {
+            /*Toolkit tk = Toolkit.getDefaultToolkit();
+             try {
              mapViewer.setCursor(tk.createCustomCursor(ImageIO.read(this.getClass().getResourceAsStream("../View/Images/waypoint_white.png")), new Point(0, 0), "MyCursor"));
                 
              } catch (IOException ex) {
@@ -285,7 +282,6 @@ class MapListeners extends MouseInputAdapter {
         this.map = map;
         this.linkPainter = linkPainter;
         this.parent = parent;
-
     }
 
     /**
@@ -295,16 +291,19 @@ class MapListeners extends MouseInputAdapter {
      */
     @Override
     public void mouseClicked(final MouseEvent evt) {
+
+        // Get mouse clicked coordinates
         Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+
+        // ------- REINIER --------- //
         Link linkje = linkPainter.intersects(mapViewer);
         if (linkje != null) {
             System.out.println(linkje.getName());
         }
+        // ------------------------- //
+
         // Place Node
         if (map.isButtonNodeClicked()) {
-
-            // Get mouse clicked coordinates
-            //Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
 
             // Get GEO Position where we want to place the node
             GeoPosition geopos = mapViewer.convertPointToGeoPosition(coord);
@@ -320,8 +319,7 @@ class MapListeners extends MouseInputAdapter {
         } // Place Link
         else if (map.isButtonLinkClicked()) {
 
-            // Get mouse clicked coordinates
-            //Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            // Get clicked Node
             Node clickedNode = map.getNodeAtCoord(coord);
 
             // Clicked Node exists
@@ -345,8 +343,7 @@ class MapListeners extends MouseInputAdapter {
         } // Link is stuck on mouse
         else if (map.isLinkOnMouse()) {
 
-            // Get mouse clicked coordinates
-            //Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            // Get clicked Node
             Node clickedNode = map.getNodeAtCoord(coord);
 
             // Clicked Node exists
@@ -360,44 +357,45 @@ class MapListeners extends MouseInputAdapter {
 
                     // Create Link
                     link.setP2(clickedNode);
-                    this.map.getStory().getLinkForEndNode(link.getP1()).addLink(link);
+                    //this.map.getStory().getLinkForEndNode(link.getP1()).addLink(link);
                     this.mapViewer.repaint();
 
-                    // Get routes for Node (p1)
-                    ArrayList<Route> routes = this.map.getStory().getRoutesFromNode(link.getP1());
+                    // Get previous links for this Node (p1)
+                    ArrayList<Link> prevLinks = this.map.getStory().getPreviousLinksForStartNode(link.getP1());
 
                     // Show popup for adding media to the created Link
-                    final addMedia popup = new addMedia(this.parent, routes);
+                    final addMedia popup = new addMedia(this.parent, prevLinks, link);
                     popup.setVisible(true);
 
-                    // Add window listener to the popup dialog window
-                    popup.addWindowListener(new AddMediaWindowListener() {
+                    // Add window listener to the popup dialog window, so we
+                    // can get the added MediaItems in the right order
+                    popup.addWindowListener(new WindowAdapter() {
                         /**
                          * Window closed event
                          */
                         @Override
                         public void windowClosed(WindowEvent we) {
 
-                            // Get all added media items
-                            ArrayList<MediaItem> items = popup.getAddedMediaItems();
+                            // Get all added media items in the right order!
+                            ArrayList<MediaItem> items = popup.getAddedItems();
 
-                            // If user did not add any media to the link,
-                            if (items.isEmpty()) {
+                            // User saved link properties
+                            if (popup.isClosedBySave()) {
 
-                                // show popup
-                                JOptionPane.showMessageDialog(popup,
-                                        "You didn't add any media to this Link." + "\n"
-                                        + "You can still add media to this Link by clicking on this Link!", // message
-                                        "Info", // title
-                                        JOptionPane.INFORMATION_MESSAGE);
-                            } else {
-                                // From here on we have the media the user added to this Link
-                                // 1. media toeveogen aan link object + naam!
-                                // 2. 
-                                //TODO
-                                // 1. custom name
-                                // 2. route selection
-                                // 3. on save --> 
+                                // If user did not add any media to the link,
+                                if (items.isEmpty()) {
+
+                                    // then show popup.
+                                    JOptionPane.showMessageDialog(popup,
+                                            "You didn't add any media to this Link." + "\n"
+                                            + "You can still add media to this Link by clicking on this Link!", // message
+                                            "Info", // title
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            } // User closed window --> so do NOT save anything
+                            else {
+                                // Delete created Link
+                                linkPainter.removeLastLink();
                             }
                         }
                     });
@@ -418,8 +416,7 @@ class MapListeners extends MouseInputAdapter {
         } // Place startpoint
         else if (map.isButtonStartClicked()) {
 
-            // Get mouse clicked coordinates
-            //Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            // Get clicked Node
             Node clickedNode = map.getNodeAtCoord(coord);
 
             // Clicked Node exists

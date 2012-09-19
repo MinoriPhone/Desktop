@@ -4,8 +4,7 @@ import View.Routes;
 import java.util.ArrayList;
 
 /**
- * A Story that the user is going to watch. This class holds all the different
- * Routes an user can make.
+ * A Story that the user is going to watch. This class holds all the different Routes an user can make.
  */
 public class Story {
 
@@ -91,19 +90,32 @@ public class Story {
     }
 
     /**
+     * Get previous links for this given Node
+     *
+     * @param startNode the Node which the user just clicked for creating a Link
+     */
+    public ArrayList<Link> getPreviousLinksForStartNode(Node startNode) {
+        ArrayList<Link> prevLinks = new ArrayList<Link>();
+        for (Route route : routes) {
+            prevLinks = route.getStartLink().getPrevLinksForNode(startNode, prevLinks);
+        }
+        return prevLinks;
+    }
+
+    /**
      * Print XML
      */
     public String printXML() {
-        String XMLString = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n";
+        String XMLString = "";
 
-        XMLString += "<story>\r\n";
-        XMLString += "<story.name>" + this.name + "</story.name>\r\n";
-        XMLString += "<routes>\r\n";
+        XMLString += "<story>";
+        XMLString += "<story.name>" + this.name + "</story.name>";
+        XMLString += "<routes>";
         for (Route route : this.routes) {
             XMLString += route.printXML();
         }
-        XMLString += "</routes>\r\n";
-        XMLString += "</story>\r\n";
+        XMLString += "</routes>";
+        XMLString += "</story>";
         return XMLString;
     }
 
@@ -136,22 +148,20 @@ public class Story {
     }
 
     /**
-     * Check if the user did changed something from the story
-     * 
-     * @return boolean true if somthing did changed / false is nothing had changed
+     * TODO
+     *
+     * @return boolean
      */
     public boolean isSomethingChanged() {
         return somethingChanged;
     }
-    
+
     /**
-     * Set if the user did changed something from the story
-     * 
-     * @param somethingChanged true if somthing did changed / false is nothing had changed
+     * TODO
+     *
+     * @param somethingChanged
      */
     public void setSomethingChanged(boolean somethingChanged) {
         this.somethingChanged = somethingChanged;
     }
-    
-    
 }

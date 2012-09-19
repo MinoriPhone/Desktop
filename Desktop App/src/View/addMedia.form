@@ -41,12 +41,6 @@
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="pAddedMedia" alignment="1" max="32767" attributes="0"/>
-                              <Component id="lSpaceTop" min="-2" pref="435" max="-2" attributes="0"/>
-                              <Component id="bBrowse" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  <Component id="bSave" min="-2" max="-2" attributes="0"/>
-                              </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
@@ -56,8 +50,20 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="tfLinkName" max="32767" attributes="0"/>
-                                      <Component id="cbRoutes" max="32767" attributes="0"/>
+                                      <Component id="cbLinks" max="32767" attributes="0"/>
                                   </Group>
+                              </Group>
+                              <Component id="lSpaceBottom" alignment="1" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="lSpaceTop" min="-2" pref="435" max="-2" attributes="0"/>
+                                      <Component id="bBrowse" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <Component id="bSave" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -86,14 +92,16 @@
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="lRoute" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="cbRoutes" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                              <Component id="cbLinks" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="pAddedMedia" min="-2" pref="193" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="bBrowse" min="-2" pref="37" max="-2" attributes="0"/>
-                          <EmptySpace pref="32" max="32767" attributes="0"/>
+                          <EmptySpace pref="24" max="32767" attributes="0"/>
                           <Component id="bSave" min="-2" pref="37" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="lSpaceBottom" min="-2" pref="15" max="-2" attributes="0"/>
                       </Group>
                       <Component id="lSpaceLeft" max="32767" attributes="0"/>
                   </Group>
@@ -171,10 +179,10 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="13" style="0"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Link name:"/>
+            <Property name="text" type="java.lang.String" value="Previous link:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="cbRoutes">
+        <Component class="javax.swing.JComboBox" name="cbLinks">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Segoe UI" size="13" style="0"/>
@@ -183,6 +191,8 @@
               <StringArray count="0"/>
             </Property>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lSpaceBottom">
         </Component>
       </SubComponents>
     </Container>
