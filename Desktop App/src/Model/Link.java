@@ -1,5 +1,9 @@
 package Model;
 
+import Plugins.jxmap.swingx.JXMapViewer;
+import java.awt.Color;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 /**
@@ -13,6 +17,7 @@ public class Link {
     private Node p2;
     private ArrayList<Link> links;
     private ArrayList<MediaItem> items;
+    private Color color;
 
     /**
      * Constructor
@@ -27,6 +32,7 @@ public class Link {
         this.p2 = p2;
         this.links = new ArrayList<Link>();
         this.items = new ArrayList<MediaItem>();
+        this.color = Color.RED;
     }
 
     /**
@@ -110,6 +116,14 @@ public class Link {
         this.links = links;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     /**
      * Print XML
      */
@@ -183,5 +197,69 @@ public class Link {
             MediaItems = link.getAllMediaItems(MediaItems);
         }
         return MediaItems;
+    }
+    
+    /**
+     * Get all media items
+     */
+    public ArrayList<Line2D.Double> GetLines(JXMapViewer map, Point2D mousePos) {
+        ArrayList<Line2D.Double> lines = new ArrayList<Line2D.Double>();
+        Point2D pt1;
+        Point2D pt2;
+        double length = 10;
+        if (p2 == null && p1 != null) {
+                    pt1 = map.getTileFactory().geoToPixel(p1.getGeoposition(), map.getZoom());
+                    pt2 = map.getTileFactory().geoToPixel(map.convertPointToGeoPosition(mousePos), map.getZoom());
+                } else {
+                    pt1 = map.getTileFactory().geoToPixel(p1.getGeoposition(), map.getZoom());
+                    pt2 = map.getTileFactory().geoToPixel(p2.getGeoposition(), map.getZoom());
+                }
+                Line2D.Double line = new Line2D.Double((int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
+                lines.add(line);
+
+                Point2D middle;
+                if (pt1.getX() == pt2.getX()) {
+                    middle = new Point2D.Double(pt1.getX(), (pt1.getY() + pt2.getY()) / 2);
+                } else if (pt1.getY() == pt2.getY()) {
+                    middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, pt1.getY());
+                } else {
+                    middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
+                }
+
+                double difX = (double) pt1.getX() - (double) pt2.getX();
+                double difY = (double) pt1.getY() - (double) pt2.getY();
+
+                Point2D arrowLineY;
+                Point2D arrowLineX;
+
+                if (difY == 0) {
+                    double deltaX = Math.sqrt((length * length) / 2);
+                    if (difX < 0) {
+                        deltaX = deltaX * -1;
+                    }
+                    double deltaY = deltaX;
+                    arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
+                    arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
+                } else {
+                    double angle = Math.atan(difX / difY);
+
+                    double arrowAngle = angle - 95;
+
+                    double deltaX = length * Math.sin(arrowAngle);
+                    double deltaY = length * Math.cos(arrowAngle);
+
+                    if (difY > 0) {
+                        arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
+                        arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
+                    } else {
+                        arrowLineX = new Point2D.Double(middle.getX() - deltaY, middle.getY() + deltaX);
+                        arrowLineY = new Point2D.Double(middle.getX() - deltaX, middle.getY() - deltaY);
+                    }
+                }
+                Line2D.Double pijltje1 = new Line2D.Double((int) middle.getX(), (int) middle.getY(), (int) arrowLineY.getX(), (int) arrowLineY.getY());
+                lines.add(pijltje1);
+                Line2D.Double pijltje2 = new Line2D.Double((int) middle.getX(), (int) middle.getY(), (int) arrowLineX.getX(), (int) arrowLineX.getY());
+                lines.add(pijltje2);
+                return lines;
     }
 }
