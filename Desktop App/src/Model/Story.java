@@ -13,6 +13,7 @@ public class Story {
     private String name;
     private ArrayList<Route> routes;
     private Routes routesPanel;
+    private boolean somethingChanged;
 
     /**
      * Constructor
@@ -21,6 +22,7 @@ public class Story {
         this.name = name;
         this.routes = new ArrayList<Route>();
         this.routesPanel = routesPanel;
+        somethingChanged = false;
     }
 
     /**
@@ -92,16 +94,16 @@ public class Story {
      * Print XML
      */
     public String printXML() {
-        String XMLString = "";
+        String XMLString = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n";
 
-        XMLString += "<story>";
-        XMLString += "<story.name>" + this.name + "</story.name>";
-        XMLString += "<routes>";
+        XMLString += "<story>\r\n";
+        XMLString += "<story.name>" + this.name + "</story.name>\r\n";
+        XMLString += "<routes>\r\n";
         for (Route route : this.routes) {
             XMLString += route.printXML();
         }
-        XMLString += "</routes>";
-        XMLString += "</story>";
+        XMLString += "</routes>\r\n";
+        XMLString += "</story>\r\n";
         return XMLString;
     }
 
@@ -132,4 +134,24 @@ public class Story {
         }
         return MediaItems;
     }
+
+    /**
+     * Check if the user did changed something from the story
+     * 
+     * @return boolean true if somthing did changed / false is nothing had changed
+     */
+    public boolean isSomethingChanged() {
+        return somethingChanged;
+    }
+    
+    /**
+     * Set if the user did changed something from the story
+     * 
+     * @param somethingChanged true if somthing did changed / false is nothing had changed
+     */
+    public void setSomethingChanged(boolean somethingChanged) {
+        this.somethingChanged = somethingChanged;
+    }
+    
+    
 }

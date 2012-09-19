@@ -6,7 +6,7 @@ package Model;
 public class Application {
 
     // Variables
-    private double version = 0.2;
+    private double version = 0.3;
 
     /**
      * Get the current version of this application

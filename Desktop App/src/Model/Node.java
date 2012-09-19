@@ -103,8 +103,8 @@ public class Node extends DefaultWaypoint {
      */
     public String printXML() {
         String XMLString = "";
-        XMLString += "<longitude>"+this.getGeoposition().getLongitude()+"</longitude>";
-        XMLString += "<latitude>"+this.getGeoposition().getLatitude()+"</latitude>";
+        XMLString += "<longitude>"+this.getGeoposition().getLongitude()+"</longitude>\r\n";
+        XMLString += "<latitude>"+this.getGeoposition().getLatitude()+"</latitude>\r\n";
         return XMLString;
     }
 }

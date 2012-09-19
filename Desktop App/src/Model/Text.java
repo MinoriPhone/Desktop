@@ -72,10 +72,10 @@ public class Text implements MediaItem {
     @Override
     public String printXML() {
         String XMLString = "";
-        XMLString += "<message>";
-        XMLString += "<filename>"+this.fileName+"</filename>";
-        XMLString += "<duration>"+this.showDurationInSeconds+"</duration>";
-        XMLString += "</message>";
+        XMLString += "<message>\r\n";
+        XMLString += "<filename>"+this.fileName+"</filename>\r\n";
+        XMLString += "<duration>"+this.showDurationInSeconds+"</duration>\r\n";
+        XMLString += "</message>\r\n";
         return XMLString;
     }
 

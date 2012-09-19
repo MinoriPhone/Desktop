@@ -62,12 +62,12 @@ public class Route {
      */
     public String printXML() {
         String XMLString = "";
-        XMLString += "<route>";
-        XMLString += "<route.name>"+this.name+"</route.name>";
-        XMLString += "<route.link>";
+        XMLString += "<route>\r\n";
+        XMLString += "<route.name>"+this.name+"</route.name>\r\n";
+        XMLString += "<route.link>\r\n";
         XMLString += startLink.printXML();
-        XMLString += "</route.link>";
-        XMLString += "</route>";
+        XMLString += "</route.link>\r\n";
+        XMLString += "</route>\r\n";
         return XMLString;
         
     }

@@ -65,9 +65,9 @@ public class Video implements MediaItem {
     @Override
     public String printXML() {
         String XMLString = "";
-        XMLString += "<video>";
-        XMLString += "<filename>"+this.fileName+"</filename>";
-        XMLString += "</video>";
+        XMLString += "<video>\r\n";
+        XMLString += "<filename>"+this.fileName+"</filename>\r\n";
+        XMLString += "</video>\r\n";
         return XMLString;
     }
 

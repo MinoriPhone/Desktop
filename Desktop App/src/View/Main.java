@@ -6,6 +6,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -18,7 +21,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 /**
  * The Main screen of the application
@@ -36,7 +43,7 @@ public class Main extends JFrame {
      */
     public Main() {
         initComponents();
-        
+
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -58,6 +65,33 @@ public class Main extends JFrame {
         // Add Map
         map = new Map(story, this);
         pMain.add(this.map, BorderLayout.CENTER);
+
+        // Lister to prevent the application from closing when the user did something change
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                if (story.isSomethingChanged()) {
+
+                    // Show save confirm window
+                    int n = JOptionPane.showConfirmDialog(null,
+                            "You made one or several changes to the current story.\n"
+                            + "Do you want to save this before closing the program?\n",
+                            "Save?",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (n == 1) {
+                        System.exit(0);
+                    } else {
+                        if (saveStory()) {
+                            System.exit(0);
+                        }
+                    }
+                } else {
+                    System.exit(0);
+                }
+            }
+        });
 
         // Revalidate JPanels
         this.pack();
@@ -247,95 +281,7 @@ public class Main extends JFrame {
     }//GEN-LAST:event_bStartActionPerformed
 
     private void miSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveActionPerformed
-        //System.out.println(this.story.printXML());
-                // Max length of the buffer
-        int maxFileSize = 100000000;
-        String storyName = "story1";
-        String XMLcontent = this.story.printXML();
-                
-        // List of names (paths) to the mediafile locations
-        //List<String> fileNames = new ArrayList<String>();
-        //fileNames.add("C:\\klein.png");
-        //fileNames.add("C:\\Users\\Public\\Videos\\Sample Videos\\Natuur.wmv");
-        
-        try {
-            // Zipje
-            ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(storyName+".iStory")));
-  
-            ///////////
-            // XML
-            ///////////
-            
-            // Create an XML-file
-            String file_name = storyName+".xml";
-            
-            File XMLfile = new File(file_name);
-            boolean exist = XMLfile.createNewFile();
-            if (!exist) {
-                System.out.println("File already exists.");                
-            } else {
-                FileWriter fstream = new FileWriter(file_name);
-                BufferedWriter out = new BufferedWriter(fstream);
-                out.write(XMLcontent);
-                out.close();
-                // Get the data from the file
-                    byte[] data = new byte[maxFileSize];
-                    // Create inputBuffer for the data
-                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(file_name));
-                    // Internal count for the databuffer
-                    int count = 0;
-                    // Add new file to the zip file
-                    zipOut.putNextEntry(new ZipEntry(file_name));
-                    // Fill the new file with data
-                    while ((count = in.read(data, 0, maxFileSize)) != -1) {
-                        zipOut.write(data, 0, count);
-                    }
-                    in.close();
-                    XMLfile.delete();
-                System.out.println("Temp XML-file created successfully.");
-            }
-            
-            
-            ///////////
-            // MEDIAFILES
-            ///////////
-            
-            // Loop over mediafiles
-            for (MediaItem mediaItem : story.getAllMediaItems()) {
-
-                // Get the file from the location
-                File file = new File(mediaItem.getAbsolutePath() + "" + mediaItem.getFileName());
-                exist = file.isFile();
-                if (exist) {
-                    System.out.println("File exists.");
-
-                    // Get the data from the file
-                    byte[] data = new byte[maxFileSize];
-                    // Create inputBuffer for the data
-                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-                    // Internal count for the databuffer
-                    int count = 0;
-                    // Add new file to the zip file
-                    zipOut.putNextEntry(new ZipEntry(mediaItem.getFileName()));
-                    // Fill the new file with data
-                    while ((count = in.read(data, 0, maxFileSize)) != -1) {
-                        zipOut.write(data, 0, count);
-                    }
-                    in.close();
-
-                } else {
-                    System.out.println("File does not exist!");                    
-                }
-            }
-            
-            // Save and close the buffers
-            zipOut.flush();
-            zipOut.close();
-            System.out.println("Your file is zipped");
-
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        saveStory();
     }//GEN-LAST:event_miSaveActionPerformed
 
     /**
@@ -370,6 +316,114 @@ public class Main extends JFrame {
                 new Main().setVisible(true);
             }
         });
+    }
+
+    private boolean saveStory() {
+        JFileChooser j = new JFileChooser();
+        j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int dialog = j.showSaveDialog(this);
+
+        // Catch actions of the File Chooser Dialog Window
+        if (dialog == JFileChooser.APPROVE_OPTION) {
+
+            // Max length of the buffer
+            int maxFileSize = 100000000;
+            String storyName = "story1";
+            String XMLcontent = this.story.printXML();
+
+            // List of names (paths) to the mediafile locations
+            //List<String> fileNames = new ArrayList<String>();
+            //fileNames.add("C:\\klein.png");
+            //fileNames.add("C:\\Users\\Public\\Videos\\Sample Videos\\Natuur.wmv");
+
+            try {
+                // Zipje
+                ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(j.getSelectedFile() + System.getProperty("file.separator") + storyName + ".iStory")));
+
+                ///////////
+                // XML
+                ///////////
+
+                // Create an XML-file
+                String file_name = storyName + ".xml";
+
+                File XMLfile = new File(file_name);
+                boolean exist = XMLfile.createNewFile();
+                if (!exist) {
+                    System.out.println("File already exists.");
+                } else {
+                    FileWriter fstream = new FileWriter(file_name);
+                    BufferedWriter out = new BufferedWriter(fstream);
+                    out.write(XMLcontent);
+                    out.close();
+                    // Get the data from the file
+                    byte[] data = new byte[maxFileSize];
+                    // Create inputBuffer for the data
+                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(file_name));
+                    // Internal count for the databuffer
+                    int count = 0;
+                    // Add new file to the zip file
+                    zipOut.putNextEntry(new ZipEntry(file_name));
+                    // Fill the new file with data
+                    while ((count = in.read(data, 0, maxFileSize)) != -1) {
+                        zipOut.write(data, 0, count);
+                    }
+                    in.close();
+                    XMLfile.delete();
+                    System.out.println("Temp XML-file created successfully.");
+                }
+
+
+                ///////////
+                // MEDIAFILES
+                ///////////
+
+                // Loop over mediafiles
+                for (MediaItem mediaItem : story.getAllMediaItems()) {
+
+                    // Get the file from the location
+                    File file = new File(mediaItem.getAbsolutePath() + "" + mediaItem.getFileName());
+                    exist = file.isFile();
+                    if (exist) {
+                        System.out.println("File exists.");
+
+                        // Get the data from the file
+                        byte[] data = new byte[maxFileSize];
+                        // Create inputBuffer for the data
+                        BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+                        // Internal count for the databuffer
+                        int count = 0;
+                        // Add new file to the zip file
+                        zipOut.putNextEntry(new ZipEntry(mediaItem.getFileName()));
+                        // Fill the new file with data
+                        while ((count = in.read(data, 0, maxFileSize)) != -1) {
+                            zipOut.write(data, 0, count);
+                        }
+                        in.close();
+
+                    } else {
+                        System.out.println("File does not exist!");
+                    }
+                }
+
+                // Save and close the buffers
+                zipOut.flush();
+                zipOut.close();
+                System.out.println("Your file is zipped");
+
+                // Confirm the save
+                JOptionPane.showMessageDialog(null,
+                        "The story has been saved.");
+
+                // Set the changed to false to be able to close the program
+                story.setSomethingChanged(false);
+                return true;
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+
+            }
+        }
+        return false;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bLink;
