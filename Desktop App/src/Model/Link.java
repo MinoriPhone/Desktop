@@ -157,28 +157,28 @@ public class Link {
      */
     public String printXML() {
         String XMLString = "";
-        XMLString += "<link.name>" + this.name + "</link.name>";
+        XMLString += "<link.name>" + this.name + "</link.name>\r\n";
         if (p1 != null) {
-            XMLString += "<from>";
+            XMLString += "<from>\r\n";
             XMLString += this.p1.printXML();
-            XMLString += "</from>";
+            XMLString += "</from>\r\n";
         }
         if (p2 != null) {
-            XMLString += "<to>";
+            XMLString += "<to>\r\n";
             XMLString += this.p2.printXML();
-            XMLString += "</to>";
+            XMLString += "</to>\r\n";
         }
-        XMLString += "<queue>";
+        XMLString += "<queue>\r\n";
         for (MediaItem item : this.items) {
             XMLString += item.printXML();
         }
-        XMLString += "</queue>";
+        XMLString += "</queue>\r\n";
         if (this.links.size() > 0) {
-            XMLString += "<links>";
+            XMLString += "<links>\r\n";
             for (Link link : this.links) {
                 XMLString += link.printXML();
             }
-            XMLString += "</links>";
+            XMLString += "</links>\r\n";
         }
         return XMLString;
     }

@@ -65,13 +65,16 @@ public class FileChooser {
         String fileName = fn.filename();
         String extension = fn.extension();
 
+        // Get absolute path to the file (so path without filename and extension)
+        String abspath = filePath.substring(0, filePath.length() - fileName.length() - extension.length() - 1);
+
         // Return Media Item object (Video, Image or Text)
         if (extension.equals("rtf") || extension.equals("txt")) {
-            return new Text(fileName, filePath, 0);
+            return new Text(fileName + "." + extension, abspath, 0);
         } else if (extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png") || extension.equals("bmp")) {
-            return new Model.Image(fileName, filePath, 0);
+            return new Model.Image(fileName + "." + extension, abspath, 0);
         } else if (extension.equals("avi") || extension.equals("m4v") || extension.equals("mov") || extension.equals("mp4")) {
-            return new Video(fileName, filePath);
+            return new Video(fileName + "." + extension, abspath);
         }
         return null;
     }

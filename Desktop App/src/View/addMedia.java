@@ -350,7 +350,7 @@ public class addMedia extends JDialog {
             this.link.setItems(mediaItems);
 
             // Add this link to the selected previous link (so this is the next link for that previous link)
-            prevLink.addLink(prevLink);
+            prevLink.addLink(this.link);
 
             // Close this window and bring main window to the front
             super.toFront();

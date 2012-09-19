@@ -330,10 +330,11 @@ public class Main extends JFrame {
         if (dialog == JFileChooser.APPROVE_OPTION) {
 
             // Max length of the buffer
-            int maxFileSize = 100000000;
+            int maxFileSize = 20000000;
             String storyName = "story1";
             String XMLcontent = this.story.printXML();
-
+            String path = j.getSelectedFile() + System.getProperty("file.separator");
+            
             // List of names (paths) to the mediafile locations
             //List<String> fileNames = new ArrayList<String>();
             //fileNames.add("C:\\klein.png");
@@ -341,7 +342,7 @@ public class Main extends JFrame {
 
             try {
                 // Zipje
-                ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(j.getSelectedFile() + System.getProperty("file.separator") + storyName + ".iStory")));
+                ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(path + storyName + ".iStory")));
 
                 ///////////
                 // XML
@@ -350,9 +351,9 @@ public class Main extends JFrame {
                 // Create an XML-file
                 String file_name = storyName + ".xml";
 
-                File XMLfile = new File(file_name);
-                boolean exist = XMLfile.createNewFile();
-                if (!exist) {
+                File XMLfile = new File(path + file_name);
+                boolean exists = XMLfile.createNewFile();
+                if (!exists) {
                     System.out.println("File already exists.");
                 } else {
                     FileWriter fstream = new FileWriter(file_name);
@@ -383,11 +384,10 @@ public class Main extends JFrame {
 
                 // Loop over mediafiles
                 for (MediaItem mediaItem : story.getAllMediaItems()) {
-
                     // Get the file from the location
-                    File file = new File(mediaItem.getAbsolutePath() + "" + mediaItem.getFileName());
-                    exist = file.isFile();
-                    if (exist) {
+                    File file = new File(mediaItem.getAbsolutePath() +  mediaItem.getFileName());
+                    exists = file.isFile();
+                    if (exists) {
                         System.out.println("File exists.");
 
                         // Get the data from the file

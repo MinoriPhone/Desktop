@@ -106,16 +106,16 @@ public class Story {
      * Print XML
      */
     public String printXML() {
-        String XMLString = "";
+        String XMLString = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n";
 
-        XMLString += "<story>";
-        XMLString += "<story.name>" + this.name + "</story.name>";
-        XMLString += "<routes>";
+        XMLString += "<story>\r\n";
+        XMLString += "<story.name>" + this.name + "</story.name>\r\n";
+        XMLString += "<routes>\r\n";
         for (Route route : this.routes) {
             XMLString += route.printXML();
         }
-        XMLString += "</routes>";
-        XMLString += "</story>";
+        XMLString += "</routes>\r\n";
+        XMLString += "</story>\r\n";
         return XMLString;
     }
 
