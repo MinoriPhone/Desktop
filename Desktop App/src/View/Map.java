@@ -21,6 +21,7 @@ import Plugins.jxmap.swingx.mapviewer.WaypointPainter;
 import Plugins.jxmap.swingx.painter.CompoundPainter;
 import Plugins.jxmap.swingx.painter.Painter;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -294,12 +295,16 @@ class MapListeners extends MouseInputAdapter {
      */
     @Override
     public void mouseClicked(final MouseEvent evt) {
-
+        Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+        Link linkje = linkPainter.intersects(mapViewer);
+        if (linkje != null) {
+            System.out.println(linkje.getName());
+        }
         // Place Node
         if (map.isButtonNodeClicked()) {
 
             // Get mouse clicked coordinates
-            Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            //Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
 
             // Get GEO Position where we want to place the node
             GeoPosition geopos = mapViewer.convertPointToGeoPosition(coord);
@@ -316,7 +321,7 @@ class MapListeners extends MouseInputAdapter {
         else if (map.isButtonLinkClicked()) {
 
             // Get mouse clicked coordinates
-            Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            //Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
 
             // Clicked Node exists
@@ -341,7 +346,7 @@ class MapListeners extends MouseInputAdapter {
         else if (map.isLinkOnMouse()) {
 
             // Get mouse clicked coordinates
-            Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            //Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
 
             // Clicked Node exists
@@ -360,7 +365,7 @@ class MapListeners extends MouseInputAdapter {
 
                     // Get routes for Node (p1)
                     ArrayList<Route> routes = this.map.getStory().getRoutesFromNode(link.getP1());
-                    
+
                     // Show popup for adding media to the created Link
                     final addMedia popup = new addMedia(this.parent, routes);
                     popup.setVisible(true);
@@ -414,7 +419,7 @@ class MapListeners extends MouseInputAdapter {
         else if (map.isButtonStartClicked()) {
 
             // Get mouse clicked coordinates
-            Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
+            //Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
             Node clickedNode = map.getNodeAtCoord(coord);
 
             // Clicked Node exists
@@ -590,16 +595,20 @@ class MapListeners extends MouseInputAdapter {
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (map.isLinkOnMouse()) {
-            linkPainter.setMousePos(new Point2D.Double(e.getX(), e.getY()));
-            mapViewer.repaint();
-        }
+        Point2D coord = new Point2D.Double(e.getX(), e.getY());
+        linkPainter.setMousePos(coord);
         Node currentNode = map.getNodeAtCoord(e.getPoint());
         if (currentNode != null) {
             //currentNode.setColor(Color.getHSBColor(0.5f, 0.2f, 1f));
             mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         } else {
             mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
+        if (map.isLinkOnMouse()) {
+            mapViewer.repaint();
+        } else {
+            linkPainter.intersects(mapViewer);
+            mapViewer.repaint();
         }
     }
 }
