@@ -41,7 +41,6 @@ public class Main extends JFrame {
      */
     public Main() {
         initComponents();
-
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -81,7 +80,7 @@ public class Main extends JFrame {
                     if (n == 1) {
                         System.exit(0);
                     } else {
-                        if (saveStory()) {
+                        if (exportStory()) {
                             System.exit(0);
                         }
                     }
@@ -116,6 +115,8 @@ public class Main extends JFrame {
         mEdit = new javax.swing.JMenu();
         mCopy = new javax.swing.JMenuItem();
         mPaste = new javax.swing.JMenuItem();
+        jSeparator = new javax.swing.JPopupMenu.Separator();
+        mProjectSettings = new javax.swing.JMenuItem();
         mHelp = new javax.swing.JMenu();
         miAbout = new javax.swing.JMenuItem();
 
@@ -165,7 +166,7 @@ public class Main extends JFrame {
                 .addContainerGap()
                 .add(pMenuButtonsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, bLink, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bNode, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
                     .add(bStart, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -220,6 +221,15 @@ public class Main extends JFrame {
         mPaste.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.CTRL_MASK));
         mPaste.setText("Paste");
         mEdit.add(mPaste);
+        mEdit.add(jSeparator);
+
+        mProjectSettings.setText("Project settings");
+        mProjectSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mProjectSettingsActionPerformed(evt);
+            }
+        });
+        mEdit.add(mProjectSettings);
 
         mbMenubar.add(mEdit);
 
@@ -279,8 +289,13 @@ public class Main extends JFrame {
     }//GEN-LAST:event_bStartActionPerformed
 
     private void miSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveActionPerformed
-        saveStory();
+        exportStory();
     }//GEN-LAST:event_miSaveActionPerformed
+
+    private void mProjectSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mProjectSettingsActionPerformed
+        ProjectSettings projectSettings = new ProjectSettings(map);
+        projectSettings.setVisible(true);        
+    }//GEN-LAST:event_mProjectSettingsActionPerformed
 
     /**
      * Run Main window
@@ -321,37 +336,32 @@ public class Main extends JFrame {
      *
      * @return boolean
      */
-    private boolean saveStory() {
+    private boolean exportStory() {
         JFileChooser j = new JFileChooser();
-        j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        j.setSelectedFile(new File("NewStory"));
         int dialog = j.showSaveDialog(this);
 
         // Catch actions of the File Chooser Dialog Window
         if (dialog == JFileChooser.APPROVE_OPTION) {
-
-            // Max length of the buffer
-            int maxFileSize = 20000000;
-            String storyName = "story1";
-            String XMLcontent = this.story.printXML();
-            String path = j.getSelectedFile() + System.getProperty("file.separator");
             
-            // List of names (paths) to the mediafile locations
-            //List<String> fileNames = new ArrayList<String>();
-            //fileNames.add("C:\\klein.png");
-            //fileNames.add("C:\\Users\\Public\\Videos\\Sample Videos\\Natuur.wmv");
+            // Max length of the buffer
+            int maxBufferSize = 1024; // bytes
+            String XMLcontent = this.story.printXML();
+            String fileName = j.getSelectedFile().toString();
 
             try {
                 // Zipje
-                ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(path + storyName + ".iStory")));
-
+                ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
+                
                 ///////////
                 // XML
                 ///////////
 
                 // Create an XML-file
-                String file_name = storyName + ".xml";
+                String file_name = story.getName() + ".xml";
 
-                File XMLfile = new File(path + file_name);
+                File XMLfile = new File(fileName + file_name);
                 boolean exists = XMLfile.createNewFile();
                 if (!exists) {
                     System.out.println("File already exists.");
@@ -361,7 +371,7 @@ public class Main extends JFrame {
                     out.write(XMLcontent);
                     out.close();
                     // Get the data from the file
-                    byte[] data = new byte[maxFileSize];
+                    byte[] data = new byte[maxBufferSize];
                     // Create inputBuffer for the data
                     BufferedInputStream in = new BufferedInputStream(new FileInputStream(file_name));
                     // Internal count for the databuffer
@@ -369,7 +379,7 @@ public class Main extends JFrame {
                     // Add new file to the zip file
                     zipOut.putNextEntry(new ZipEntry(file_name));
                     // Fill the new file with data
-                    while ((count = in.read(data, 0, maxFileSize)) != -1) {
+                    while ((count = in.read(data, 0, maxBufferSize)) != -1) {
                         zipOut.write(data, 0, count);
                     }
                     in.close();
@@ -385,13 +395,13 @@ public class Main extends JFrame {
                 // Loop over mediafiles
                 for (MediaItem mediaItem : story.getAllMediaItems()) {
                     // Get the file from the location
-                    File file = new File(mediaItem.getAbsolutePath() +  mediaItem.getFileName());
+                    File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
                     exists = file.isFile();
                     if (exists) {
                         System.out.println("File exists.");
 
                         // Get the data from the file
-                        byte[] data = new byte[maxFileSize];
+                        byte[] data = new byte[maxBufferSize];
                         // Create inputBuffer for the data
                         BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
                         // Internal count for the databuffer
@@ -399,7 +409,7 @@ public class Main extends JFrame {
                         // Add new file to the zip file
                         zipOut.putNextEntry(new ZipEntry(mediaItem.getFileName()));
                         // Fill the new file with data
-                        while ((count = in.read(data, 0, maxFileSize)) != -1) {
+                        while ((count = in.read(data, 0, maxBufferSize)) != -1) {
                             zipOut.write(data, 0, count);
                         }
                         in.close();
@@ -432,11 +442,13 @@ public class Main extends JFrame {
     private javax.swing.JButton bLink;
     private javax.swing.JButton bNode;
     private javax.swing.JButton bStart;
+    private javax.swing.JPopupMenu.Separator jSeparator;
     private javax.swing.JMenuItem mCopy;
     private javax.swing.JMenu mEdit;
     private javax.swing.JMenu mFile;
     private javax.swing.JMenu mHelp;
     private javax.swing.JMenuItem mPaste;
+    private javax.swing.JMenuItem mProjectSettings;
     private javax.swing.JMenuBar mbMenubar;
     private javax.swing.JMenuItem miAbout;
     private javax.swing.JMenuItem miClose;

@@ -69,6 +69,16 @@
                 <Property name="text" type="java.lang.String" value="Paste"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="mProjectSettings">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Project settings"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mProjectSettingsActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="mHelp">
