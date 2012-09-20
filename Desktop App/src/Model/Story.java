@@ -64,11 +64,12 @@ public class Story {
 
     /**
      * Create a new Route and add Route to the Routelist
-     *
-     * @param startNode The Node where the Route starts
+     * 
+     * @param routeName String Name of the Route
+     * @param startLink Link The startlink for this Route
      */
-    public void newRoute(Node startNode) {
-        Route route = new Route("" + Math.random(), startNode);
+    public void newRoute(String routeName, Link startLink) {
+        Route route = new Route(routeName, startLink);
         routes.add(route);
         routesPanel.refreshList(routes);
     }

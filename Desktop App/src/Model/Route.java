@@ -15,10 +15,10 @@ public class Route {
      * @param name String Name of the Route
      * @param startLink Link Startlink of the Route
      */
-    public Route(String name, Node startNode) {
+    public Route(String name, Link startLink) {
         this.name = name;
-        this.startLink = new Link("Start", null, startNode);
-        startNode.setStart();
+        this.startLink = startLink;
+        startLink.getP2().setStart();
     }
 
     /**

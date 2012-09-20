@@ -9,7 +9,6 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Double;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
@@ -20,6 +19,7 @@ public class LinkPainter implements Painter<JXMapViewer> {
 
     // Variables
     private Color color = Color.RED;
+    private Color hoverColor = Color.GREEN;
     private boolean antiAlias = true;
     private ArrayList<Link> links;
     private Point2D mousePos;
@@ -121,16 +121,22 @@ public class LinkPainter implements Painter<JXMapViewer> {
         }
     }
 
+    /**
+     * TODO 
+     * 
+     * @param mapViewer
+     * @return 
+     */
     public Link intersects(JXMapViewer mapViewer) {
         for (Link link : links) {
             if (mousePos != null) {
                 for (Line2D line : link.GetLines(mapViewer, mousePos)) {
                     if (line.ptSegDist(mapViewer.getTileFactory().geoToPixel(mapViewer.convertPointToGeoPosition(mousePos), mapViewer.getZoom())) < 3) {
-                        link.setColor(Color.GREEN);
+                        link.setColor(this.hoverColor);
                         mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         return link;
                     } else {
-                        link.setColor(Color.RED);
+                        link.setColor(this.color);
                     }
                 }
             }

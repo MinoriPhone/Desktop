@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<story>
+<story.name>New Story</story.name>
+<routes>
+<route>
+<route.name>0.41875382361942737</route.name>
+<route.link>
+<link.name>Start</link.name>
+<to>
+<longitude>4.473956823348999</longitude>
+<latitude>52.05217379090007</latitude>
+</to>
+<queue>
+</queue>
+<links>
+<link.name>DG</link.name>
+<from>
+<longitude>4.473956823348999</longitude>
+<latitude>52.05217379090007</latitude>
+</from>
+<to>
+<longitude>4.473978281021118</longitude>
+<latitude>52.0519428732656</latitude>
+</to>
+<queue>
+<image><filename>City-Lights.png</filename><duration>0</duration></image></queue>
+</links>
+</route.link>
+</route>
+</routes>
+</story>

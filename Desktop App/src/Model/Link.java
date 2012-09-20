@@ -197,6 +197,13 @@ public class Link {
         }
     }
 
+    /**
+     * TODO 
+     * 
+     * @param node
+     * @param prevLinks
+     * @return 
+     */
     public ArrayList<Link> getPrevLinksForNode(Node node, ArrayList<Link> prevLinks) {
         if (this.getP2().equals(node)) {
             prevLinks.add(this);

@@ -332,7 +332,7 @@ class MapListeners extends MouseInputAdapter {
                     map.setButtonLinkClicked(false);
 
                     // Add link to the first node
-                    Link link = new Link("TODO", clickedNode, null);
+                    Link link = new Link(null, clickedNode, null);
                     linkPainter.addLink(link);
 
                 } else {
@@ -357,55 +357,46 @@ class MapListeners extends MouseInputAdapter {
 
                     // Create Link
                     link.setP2(clickedNode);
-                    //this.map.getStory().getLinkForEndNode(link.getP1()).addLink(link);
                     this.mapViewer.repaint();
 
                     // Get previous links for this Node (p1)
                     ArrayList<Link> prevLinks = this.map.getStory().getPreviousLinksForStartNode(link.getP1());
 
-                    // Show popup for adding media to the created Link
-                    final addMedia popup = new addMedia(this.parent, prevLinks, link);
-                    popup.setVisible(true);
-
-                    // Add window listener to the popup dialog window, so we
-                    // can get the added MediaItems in the right order
-                    popup.addWindowListener(new WindowAdapter() {
-                        /**
-                         * Window closed event
-                         */
-                        @Override
-                        public void windowClosed(WindowEvent we) {
-
-                            // Get all added media items in the right order!
-                            ArrayList<MediaItem> items = popup.getAddedItems();
-
-                            // User saved link properties
-                            if (popup.isClosedBySave()) {
-
-                                // If user did not add any media to the link,
-                                if (items.isEmpty()) {
-
-                                    // then show popup.
-                                    JOptionPane.showMessageDialog(popup,
-                                            "You didn't add any media to this Link." + "\n"
-                                            + "You can still add media to this Link by clicking on this Link!", // message
-                                            "Info", // title
-                                            JOptionPane.INFORMATION_MESSAGE);
+                    // Delete possible previous links that are already chosen
+                    ArrayList<Link> prevLinksForP2 = this.map.getStory().getPreviousLinksForStartNode(link.getP2());
+                    boolean found = false;
+                    for (Link prevP2 : prevLinksForP2) {
+                        for (Link prevP1 : prevLinks) {
+                            for (Link l : prevP1.getLinks()) {
+                                if (l.equals(prevP2)) {
+                                    found = true;
+                                    prevLinks.remove(prevP1);
+                                    break;
                                 }
-                            } // User closed window --> so do NOT save anything
-                            else {
-                                // Delete created Link
-                                linkPainter.removeLastLink();
+                            }
+                            if (found) {
+                                break;
                             }
                         }
-                    });
+                    }
 
+                    // If there are previous links to choose from
+                    if (prevLinks.size() > 0) {
+
+                        // Open window to add media to this Link
+                        // 0 indicates that we are creating a Link and not a StartNode (Link)
+                        openAddMediaDialog(clickedNode, prevLinks, 0);
+
+                    } else {
+                        // There are no previous links to choose from
+                        linkPainter.removeLastLink();
+                    }
                 } else {
-                    // Remove first Node
+                    // Can NOT make Link to itself
                     linkPainter.removeLastLink();
                 }
             } else {
-                // Remove first Node
+                // User did NOT click on a Node
                 linkPainter.removeLastLink();
             }
 
@@ -422,8 +413,8 @@ class MapListeners extends MouseInputAdapter {
             // Clicked Node exists
             if (clickedNode != null) {
 
-                // Create new route
-                map.getStory().newRoute(clickedNode);
+                // Open window to add media to this Link
+                openAddMediaDialog(clickedNode, null, 1);
             }
 
             // Repaint
@@ -438,7 +429,7 @@ class MapListeners extends MouseInputAdapter {
             final Node currentNode = map.getNodeAtCoord(evt.getPoint());
 
             // Check if the node got any links attached. If so, the
-            // item is disabled and no listener is created
+            // item is disabled and the delete function will be added.
             if (map.getStory().getLinkForEndNode(currentNode) != null) {
                 contextMenuMap.getDeleteItem().setEnabled(false);
 
@@ -447,8 +438,7 @@ class MapListeners extends MouseInputAdapter {
                     @Override
                     public void actionPerformed(ActionEvent ae) {
                         map.setLinkOnMouse(true);
-                        //Add link to first node
-                        Link link = new Link("A1", currentNode, null);
+                        Link link = new Link(null, currentNode, null);
                         linkPainter.addLink(link);
                     }
                 });
@@ -466,10 +456,7 @@ class MapListeners extends MouseInputAdapter {
             contextMenuMap.getSetStartItem().addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
-
-                    // ---------> Make code for user prompt window
-
-                    map.getStory().newRoute(currentNode);
+                    openAddMediaDialog(currentNode, null, 1);
                     mapViewer.repaint();
                 }
             });
@@ -607,5 +594,58 @@ class MapListeners extends MouseInputAdapter {
             linkPainter.intersects(mapViewer);
             mapViewer.repaint();
         }
+    }
+
+    /**
+     * Open addMedia Dialog
+     * 
+     * @param node
+     * @param prevLinks
+     * @param startOrLink 
+     */
+    protected void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink) {
+
+        // Create startLink
+        Link startLink = new Link(null, null, node);
+
+        // Show popup window for adding media to the startnode (Link)
+        final addMedia popup = new addMedia(parent, map, prevLinks, startLink, startOrLink);
+        popup.setVisible(true);
+
+        // Add window listener to the popup dialog window, so we
+        // can get the added MediaItems in the right order
+        popup.addWindowListener(new WindowAdapter() {
+            /**
+             * Window closed event
+             */
+            @Override
+            public void windowClosed(WindowEvent we) {
+
+                // Get all added media items in the right order!
+                ArrayList<MediaItem> items = popup.getAddedItems();
+
+                // User saved link properties
+                if (popup.isClosedBySave()) {
+
+                    // If user did not add any media to the link,
+                    if (items.isEmpty()) {
+
+                        // then show popup.
+                        JOptionPane.showMessageDialog(popup,
+                                "You didn't add any media to this Link." + "\n"
+                                + "You can still add media to this Link by clicking on this Link!", // message
+                                "Info", // title
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+
+                } else {
+                    // User closed window and did NOT save anything.
+                    if(startOrLink == 0) {
+                        linkPainter.removeLastLink();
+                    }
+                }
+            }
+        });
+
     }
 }
