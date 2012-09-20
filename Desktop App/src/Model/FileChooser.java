@@ -63,7 +63,7 @@ public class FileChooser {
         // Get filename and extension
         Filename fn = new Filename(filePath);
         String fileName = fn.filename();
-        String extension = fn.extension();
+        String extension = fn.extension().toLowerCase();
 
         // Get absolute path to the file (so path without filename and extension)
         String abspath = filePath.substring(0, filePath.length() - fileName.length() - extension.length() - 1);
