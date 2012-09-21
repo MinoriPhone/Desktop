@@ -9,6 +9,8 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -24,18 +26,22 @@ import java.util.zip.ZipOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 
 /**
  * The Main screen of the application
  */
-public class Main extends JFrame {
+public class Main extends JFrame implements PropertyChangeListener {
 
     // Variables
     public static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     private Map map;
     private Story story;
     private Routes panelRoutes;
+    private ProgressMonitor progressMonitor;
+    private Task task;
 
     /**
      * Creates new form Main
@@ -81,9 +87,8 @@ public class Main extends JFrame {
                     if (n == 1) {
                         System.exit(0);
                     } else {
-                        if (exportStory()) {
-                            System.exit(0);
-                        }
+                        triggerExportStory();
+                        System.exit(0);
                     }
                 } else {
                     System.exit(0);
@@ -93,6 +98,14 @@ public class Main extends JFrame {
 
         // Revalidate JPanels
         this.pack();
+    }
+
+    private void triggerExportStory() {
+        progressMonitor = new ProgressMonitor(Main.this, "Exporting iStory..", "", 0, 100);
+        progressMonitor.setProgress(0);
+        task = new Task();
+        task.addPropertyChangeListener(this);
+        task.execute();
     }
 
     /* DO NOT TOUCH */
@@ -290,7 +303,7 @@ public class Main extends JFrame {
     }//GEN-LAST:event_bStartActionPerformed
 
     private void miSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveActionPerformed
-        exportStory();
+        triggerExportStory();
     }//GEN-LAST:event_miSaveActionPerformed
 
     private void mProjectSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mProjectSettingsActionPerformed
@@ -338,6 +351,9 @@ public class Main extends JFrame {
      * @return boolean
      */
     private boolean exportStory() {
+        int progress = 0;
+
+
         JFileChooser j = new JFileChooser();
         //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         j.setSelectedFile(new File("NewStory"));
@@ -346,13 +362,13 @@ public class Main extends JFrame {
         // Catch actions of the File Chooser Dialog Window
         if (dialog == JFileChooser.APPROVE_OPTION) {
 
-            // Max length of the buffer
-            int maxBufferSize = 1024; // bytes
-            String XMLcontent = this.story.printXML();
-            String fileName = j.getSelectedFile().toString();
-
             try {
-
+                
+                // Max length of the buffer
+                int maxBufferSize = 1024; // bytes
+                String XMLcontent = this.story.printXML();
+                String fileName = j.getSelectedFile().toString();
+                
                 // Check if the iStory file already exists
                 File iStoryFile = new File(fileName);
                 ZipOutputStream zipOut = null;
@@ -360,7 +376,7 @@ public class Main extends JFrame {
                     // Zipje                    
                     if (fileName.endsWith("iStory")) {
                         zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
-                    } else { 
+                    } else {
                         zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
                     }
                 } else {
@@ -384,7 +400,9 @@ public class Main extends JFrame {
                         return false;
                     }
                 }
-
+                
+                task.setProgression(Math.min(10, 100));
+                
                 ///////////
                 // XML
                 ///////////
@@ -424,6 +442,8 @@ public class Main extends JFrame {
                 // MEDIAFILES
                 ///////////
 
+                int storyFilesSize = story.getAllLinks().size();
+                double percent = (90 / storyFilesSize);
                 // Loop over all links to get the  mediafiles
                 for (Link link : story.getAllLinks()) {
 
@@ -452,22 +472,27 @@ public class Main extends JFrame {
                             System.out.println("File does not exist!");
                         }
                     }
+                    progress += percent;
+                    task.setProgression(Math.min(progress, 100));
                 }
                 // Save and close the buffers
                 zipOut.flush();
                 zipOut.close();
                 System.out.println("Your file is zipped");
-
-                // Confirm the save
-                JOptionPane.showMessageDialog(null,
-                        "The story has been saved.");
+                
+                task.setProgression(Math.min(99, 100)); 
+                Thread.sleep(1000);
+                task.setProgression(100);                
 
                 // Set the changed to false to be able to close the program
                 story.setSomethingChanged(false);
                 return true;
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-
+                return false;
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
             }
         }
         return false;
@@ -494,4 +519,89 @@ public class Main extends JFrame {
     private javax.swing.JPanel pMenuButtons;
     private javax.swing.JPopupMenu.Separator sepFile;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Progressbar for exporting a story
+     */
+    class Task extends SwingWorker<Void, Void> {
+
+        /**
+         * Set progress
+         *
+         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
+         * final protected.
+         *
+         * @param progress int current progress
+         */
+        public void setProgression(int progress) {
+            this.setProgress(progress);
+        }
+
+        /**
+         * Export story
+         *
+         * @return null
+         * @throws InterruptedException
+         */
+        @Override
+        public Void doInBackground() {
+            if (!exportStory()) {
+
+                //TODO Delete corrupted file
+
+                // Show popup to user that exporting failed
+                JOptionPane.showMessageDialog(
+                        Main.this,
+                        "Exporting failed!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return null;
+        }
+
+        /**
+         * This function is called when the exporting progress is done
+         */
+        @Override
+        public void done() {
+            // Exporting is canceled by user
+            if (progressMonitor.isCanceled()) {
+                JOptionPane.showMessageDialog(
+                        Main.this,
+                        "Exporting canceled by user!",
+                        "Canceled",
+                        JOptionPane.WARNING_MESSAGE);
+
+            } // Export succeeded
+            else if (task.isDone() && task.getProgress() == 100) {
+                JOptionPane.showMessageDialog(
+                        Main.this,
+                        "Exporting succeeded!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
+    /**
+     * Invoked when task's progress property changes.
+     *
+     * @param pce PropertyChangeEvent
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent pce) {
+        if ("progress".equals(pce.getPropertyName())) {
+            int progress = (Integer) pce.getNewValue();
+
+            // Show progress to user
+            progressMonitor.setProgress(progress);
+            progressMonitor.setNote(String.format("Completed %d%%.\n", progress));
+
+            // If user cancel export
+            if (progressMonitor.isCanceled()) {
+                task.cancel(true);
+                // Task.done() is called
+            }
+        }
+    }
 }
