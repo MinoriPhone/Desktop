@@ -336,7 +336,7 @@ class MapListeners extends MouseInputAdapter {
                     linkPainter.addLink(link);
 
                 } else {
-                    LOGGER.log(Level.INFO, "No Link on this Node");
+                    JOptionPane.showMessageDialog(null, "There is no route leading to this node.");
                 }
             }
 
@@ -389,10 +389,12 @@ class MapListeners extends MouseInputAdapter {
 
                     } else {
                         // There are no previous links to choose from
+                        JOptionPane.showMessageDialog(null, "This link already exists.");
                         linkPainter.removeLastLink();
                     }
                 } else {
                     // Can NOT make Link to itself
+                    JOptionPane.showMessageDialog(null, "Can not make Link to itself");
                     linkPainter.removeLastLink();
                 }
             } else {
@@ -452,14 +454,17 @@ class MapListeners extends MouseInputAdapter {
                 });
                 contextMenuMap.getCreateLinkItem().setEnabled(false);
             }
-
-            contextMenuMap.getSetStartItem().addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent ae) {
-                    openAddMediaDialog(currentNode, null, 1);
-                    mapViewer.repaint();
-                }
-            });
+            if (!currentNode.getStart()) {
+                contextMenuMap.getSetStartItem().addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        openAddMediaDialog(currentNode, null, 1);
+                        mapViewer.repaint();
+                    }
+                });
+            } else {
+                contextMenuMap.getSetStartItem().setEnabled(false);
+            }
             contextMenuMap.showContextMenuMap(evt);
         }
     }
@@ -598,54 +603,57 @@ class MapListeners extends MouseInputAdapter {
 
     /**
      * Open addMedia Dialog
-     * 
+     *
      * @param node
      * @param prevLinks
-     * @param startOrLink 
+     * @param startOrLink
      */
     protected void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink) {
+        if (startOrLink != 1 || !node.getStart()) {
+            // Create startLink
+            Link startLink = new Link(null, null, node);
 
-        // Create startLink
-        Link startLink = new Link(null, null, node);
+            // Show popup window for adding media to the startnode (Link)
+            final addMedia popup = new addMedia(parent, map, prevLinks, startLink, startOrLink);
+            popup.setVisible(true);
 
-        // Show popup window for adding media to the startnode (Link)
-        final addMedia popup = new addMedia(parent, map, prevLinks, startLink, startOrLink);
-        popup.setVisible(true);
+            // Add window listener to the popup dialog window, so we
+            // can get the added MediaItems in the right order
+            popup.addWindowListener(new WindowAdapter() {
+                /**
+                 * Window closed event
+                 */
+                @Override
+                public void windowClosed(WindowEvent we) {
 
-        // Add window listener to the popup dialog window, so we
-        // can get the added MediaItems in the right order
-        popup.addWindowListener(new WindowAdapter() {
-            /**
-             * Window closed event
-             */
-            @Override
-            public void windowClosed(WindowEvent we) {
+                    // Get all added media items in the right order!
+                    ArrayList<MediaItem> items = popup.getAddedItems();
 
-                // Get all added media items in the right order!
-                ArrayList<MediaItem> items = popup.getAddedItems();
+                    // User saved link properties
+                    if (popup.isClosedBySave()) {
 
-                // User saved link properties
-                if (popup.isClosedBySave()) {
+                        // If user did not add any media to the link,
+                        if (items.isEmpty()) {
 
-                    // If user did not add any media to the link,
-                    if (items.isEmpty()) {
+                            // then show popup.
+                            JOptionPane.showMessageDialog(popup,
+                                    "You didn't add any media to this Link." + "\n"
+                                    + "You can still add media to this Link by clicking on this Link!", // message
+                                    "Info", // title
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
 
-                        // then show popup.
-                        JOptionPane.showMessageDialog(popup,
-                                "You didn't add any media to this Link." + "\n"
-                                + "You can still add media to this Link by clicking on this Link!", // message
-                                "Info", // title
-                                JOptionPane.INFORMATION_MESSAGE);
-                    }
-
-                } else {
-                    // User closed window and did NOT save anything.
-                    if(startOrLink == 0) {
-                        linkPainter.removeLastLink();
+                    } else {
+                        // User closed window and did NOT save anything.
+                        if (startOrLink == 0) {
+                            linkPainter.removeLastLink();
+                        }
                     }
                 }
-            }
-        });
+            });
 
+        } else {
+            JOptionPane.showMessageDialog(null, "This node already has a start.");
+        }
     }
 }
