@@ -5,7 +5,8 @@ import Plugins.jxmap.swingx.mapviewer.GeoPosition;
 import java.awt.Color;
 
 /**
- * The node is a spot which can be placed on a map. You can say that a spot represents a location.
+ * The node is a spot which can be placed on a map. You can say that a spot
+ * represents a location.
  */
 public class Node extends DefaultWaypoint {
 
@@ -84,6 +85,14 @@ public class Node extends DefaultWaypoint {
         this.label = "S";
     }
 
+    public Boolean getStart() {
+        if (this.color == Color.GREEN && this.label == "S") {
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public void setEnd() {
         this.color = Color.RED;
         this.label = "E";
@@ -103,8 +112,8 @@ public class Node extends DefaultWaypoint {
      */
     public String printXML() {
         String XMLString = "";
-        XMLString += "<longitude>"+this.getGeoposition().getLongitude()+"</longitude>\r\n";
-        XMLString += "<latitude>"+this.getGeoposition().getLatitude()+"</latitude>\r\n";
+        XMLString += "<longitude>" + this.getGeoposition().getLongitude() + "</longitude>\r\n";
+        XMLString += "<latitude>" + this.getGeoposition().getLatitude() + "</latitude>\r\n";
         return XMLString;
     }
 }
