@@ -309,6 +309,22 @@ public class Link {
     }
 
     /**
+     * Get all route for link
+     *
+     * @param node Node
+     */
+    public Boolean getRouteForLink(Link link) {
+        if (this.equals(link)) {
+            return true;
+        } else {
+            for (Link currentLink : links) {
+                return currentLink.getRouteForLink(link);
+            }
+            return false;
+        }
+    }
+
+    /**
      * Return name of this Link
      */
     @Override

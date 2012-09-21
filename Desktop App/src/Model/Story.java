@@ -138,6 +138,21 @@ public class Story {
     }
 
     /**
+     * Get all route for link
+     *
+     * @param node Node
+     */
+    public Route getRouteForLink(Link link) {
+        // Get all routes that are part of the given Node
+        for (Route route : routes) {
+            if (route.getStartLink().getRouteForLink(link)) {
+                return route;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get all media items
      */
     public ArrayList<MediaItem> getAllMediaItems() {
