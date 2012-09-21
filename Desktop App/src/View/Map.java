@@ -332,7 +332,7 @@ class MapListeners extends MouseInputAdapter {
                     map.setButtonLinkClicked(false);
 
                     // Add link to the first node
-                    Link link = new Link(null, clickedNode, null);
+                    Link link = new Link(null, clickedNode, null, map.getStory().getLinkCounter());
                     linkPainter.addLink(link);
 
                 } else {
@@ -438,7 +438,7 @@ class MapListeners extends MouseInputAdapter {
                     @Override
                     public void actionPerformed(ActionEvent ae) {
                         map.setLinkOnMouse(true);
-                        Link link = new Link(null, currentNode, null);
+                        Link link = new Link(null, currentNode, null, map.getStory().getLinkCounter());
                         linkPainter.addLink(link);
                     }
                 });
@@ -606,7 +606,7 @@ class MapListeners extends MouseInputAdapter {
     protected void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink) {
 
         // Create startLink
-        Link startLink = new Link(null, null, node);
+        Link startLink = new Link(null, null, node, map.getStory().getLinkCounter());
 
         // Show popup window for adding media to the startnode (Link)
         final addMedia popup = new addMedia(parent, map, prevLinks, startLink, startOrLink);
