@@ -611,7 +611,7 @@ class MapListeners extends MouseInputAdapter {
     protected void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink) {
         if (startOrLink != 1 || !node.getStart()) {
             // Create startLink
-            Link startLink = new Link(null, null, node);
+            Link startLink = new Link(null, null, node, map.getStory().getLinkCounter());
 
             // Show popup window for adding media to the startnode (Link)
             final addMedia popup = new addMedia(parent, map, prevLinks, startLink, startOrLink);

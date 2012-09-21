@@ -16,8 +16,9 @@ public class Link {
     private Node p1;
     private Node p2;
     private ArrayList<Link> links;
-    private ArrayList<MediaItem> items;
+    private ArrayList<MediaItem> mediaItems;
     private Color color;
+    private long id;
 
     /**
      * Constructor
@@ -26,13 +27,14 @@ public class Link {
      * @param p1 Node
      * @param p2 Node
      */
-    public Link(String name, Node p1, Node p2) {
+    public Link(String name, Node p1, Node p2, long id) {
         this.name = name;
         this.p1 = p1;
         this.p2 = p2;
         this.links = new ArrayList<Link>();
-        this.items = new ArrayList<MediaItem>();
+        this.mediaItems = new ArrayList<MediaItem>();
         this.color = Color.RED;
+        this.id = id;
     }
 
     /**
@@ -121,8 +123,8 @@ public class Link {
      *
      * @return ArrayList<MediaItem>
      */
-    public ArrayList<MediaItem> getItems() {
-        return items;
+    public ArrayList<MediaItem> getMediaItems() {
+        return mediaItems;
     }
 
     /**
@@ -131,7 +133,7 @@ public class Link {
      * @param items ArrayList<MediaItem> The list of Media Items we want to add
      */
     public void setItems(ArrayList<MediaItem> items) {
-        this.items = items;
+        this.mediaItems = items;
     }
 
     /**
@@ -158,6 +160,7 @@ public class Link {
     public String printXML() {
         String XMLString = "";
         XMLString += "<link.name>" + this.name + "</link.name>\r\n";
+        XMLString += "<link.id>" + this.id + "</link.id>\r\n";
         if (p1 != null) {
             XMLString += "<from>\r\n";
             XMLString += this.p1.printXML();
@@ -169,7 +172,7 @@ public class Link {
             XMLString += "</to>\r\n";
         }
         XMLString += "<queue>\r\n";
-        for (MediaItem item : this.items) {
+        for (MediaItem item : this.mediaItems) {
             XMLString += item.printXML();
         }
         XMLString += "</queue>\r\n";
@@ -234,14 +237,12 @@ public class Link {
     /**
      * Get all media items
      */
-    public ArrayList<MediaItem> getAllMediaItems(ArrayList<MediaItem> MediaItems) {
-        for (MediaItem item : this.items) {
-            MediaItems.add(item);
+    public ArrayList<Link> getAllLinks(ArrayList<Link> allLinks) {
+        allLinks.add(this);
+        for (Link l : this.links) {
+            l.getAllLinks(allLinks);
         }
-        for (Link link : this.links) {
-            MediaItems = link.getAllMediaItems(MediaItems);
-        }
-        return MediaItems;
+        return allLinks;
     }
 
     /**
@@ -324,6 +325,15 @@ public class Link {
         }
     }
 
+    /**
+     * Get the identifier from this link
+     * 
+     * @return the id
+     */
+    public long getId() {
+        return id;
+    }
+    
     /**
      * Return name of this Link
      */

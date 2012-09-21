@@ -1,5 +1,6 @@
 package View;
 
+import Model.Link;
 import Model.MediaItem;
 import Model.Story;
 import java.awt.BorderLayout;
@@ -294,7 +295,7 @@ public class Main extends JFrame {
 
     private void mProjectSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mProjectSettingsActionPerformed
         ProjectSettings projectSettings = new ProjectSettings(map);
-        projectSettings.setVisible(true);        
+        projectSettings.setVisible(true);
     }//GEN-LAST:event_mProjectSettingsActionPerformed
 
     /**
@@ -344,25 +345,55 @@ public class Main extends JFrame {
 
         // Catch actions of the File Chooser Dialog Window
         if (dialog == JFileChooser.APPROVE_OPTION) {
-            
+
             // Max length of the buffer
             int maxBufferSize = 1024; // bytes
             String XMLcontent = this.story.printXML();
             String fileName = j.getSelectedFile().toString();
-            
+
             try {
-                // Zipje
-                ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
-                
+
+                // Check if the iStory file already exists
+                File iStoryFile = new File(fileName);
+                ZipOutputStream zipOut = null;
+                if (!iStoryFile.isFile()) {
+                    // Zipje                    
+                    if (fileName.endsWith("iStory")) {
+                        zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
+                    } else { 
+                        zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
+                    }
+                } else {
+                    // Confirm the save
+                    int option = JOptionPane.showConfirmDialog(null,
+                            "There is already a file with the same name in the selected folder. \n "
+                            + "Do you want to overwrite this file?",
+                            "File already exists",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        // Zipje                    
+                        if (fileName.endsWith("iStory")) {
+                            zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
+                        } else {
+                            zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
+                        }
+                    } else if (option == JOptionPane.NO_OPTION) {
+                        exportStory();
+                        return false;
+                    } else if (option == JOptionPane.CANCEL_OPTION || option == JOptionPane.CLOSED_OPTION) {
+                        return false;
+                    }
+                }
+
                 ///////////
                 // XML
                 ///////////
 
                 // Create an XML-file
-                String filenameWithPath = fileName + ".xml";                
+                String filenameWithPath = fileName + ".xml";
                 File XMLfile = new File(filenameWithPath);
                 String filename = j.getName(XMLfile);
-                
+
                 boolean exists = XMLfile.createNewFile();
                 if (!exists) {
                     System.out.println("File already exists.");
@@ -393,33 +424,35 @@ public class Main extends JFrame {
                 // MEDIAFILES
                 ///////////
 
-                // Loop over mediafiles
-                for (MediaItem mediaItem : story.getAllMediaItems()) {
-                    // Get the file from the location
-                    File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
-                    exists = file.isFile();
-                    if (exists) {
-                        System.out.println("File exists.");
+                // Loop over all links to get the  mediafiles
+                for (Link link : story.getAllLinks()) {
 
-                        // Get the data from the file
-                        byte[] data = new byte[maxBufferSize];
-                        // Create inputBuffer for the data
-                        BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-                        // Internal count for the databuffer
-                        int count = 0;
-                        // Add new file to the zip file
-                        zipOut.putNextEntry(new ZipEntry(mediaItem.getFileName()));
-                        // Fill the new file with data
-                        while ((count = in.read(data, 0, maxBufferSize)) != -1) {
-                            zipOut.write(data, 0, count);
+                    for (MediaItem mediaItem : link.getMediaItems()) {
+                        // Get the file from the location
+                        File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
+                        exists = file.isFile();
+                        if (exists) {
+                            System.out.println("File exists.");
+
+                            // Get the data from the file
+                            byte[] data = new byte[maxBufferSize];
+                            // Create inputBuffer for the data
+                            BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+                            // Internal count for the databuffer
+                            int count = 0;
+                            // Add new file to the zip file
+                            zipOut.putNextEntry(new ZipEntry(link.getId() + System.getProperty("file.separator") + mediaItem.getFileName()));
+                            // Fill the new file with data
+                            while ((count = in.read(data, 0, maxBufferSize)) != -1) {
+                                zipOut.write(data, 0, count);
+                            }
+                            in.close();
+
+                        } else {
+                            System.out.println("File does not exist!");
                         }
-                        in.close();
-
-                    } else {
-                        System.out.println("File does not exist!");
                     }
                 }
-
                 // Save and close the buffers
                 zipOut.flush();
                 zipOut.close();

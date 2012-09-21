@@ -13,6 +13,7 @@ public class Story {
     private ArrayList<Route> routes;
     private Routes routesPanel;
     private boolean somethingChanged;
+    private long linkCounter;
 
     /**
      * Constructor
@@ -21,6 +22,7 @@ public class Story {
         this.name = name;
         this.routes = new ArrayList<Route>();
         this.routesPanel = routesPanel;
+        this.linkCounter = 0;
         somethingChanged = false;
     }
 
@@ -155,12 +157,12 @@ public class Story {
     /**
      * Get all media items
      */
-    public ArrayList<MediaItem> getAllMediaItems() {
-        ArrayList<MediaItem> MediaItems = new ArrayList<MediaItem>();
+    public ArrayList<Link> getAllLinks() {
+        ArrayList<Link> allLinks = new ArrayList<Link>();
         for (Route route : this.routes) {
-            MediaItems = route.getStartLink().getAllMediaItems(MediaItems);
+            allLinks = route.getStartLink().getAllLinks(allLinks);
         }
-        return MediaItems;
+        return allLinks;
     }
 
     /**
@@ -179,5 +181,14 @@ public class Story {
      */
     public void setSomethingChanged(boolean somethingChanged) {
         this.somethingChanged = somethingChanged;
+    }
+
+    /**
+     * Returns the Link Counter
+     * @return the current linkCounter incremented with 1
+     */
+    public long getLinkCounter() {
+        linkCounter++;
+        return linkCounter;
     }
 }

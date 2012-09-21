@@ -97,7 +97,8 @@ public class addMedia extends JDialog {
         } // User is NOT creating a startnode, but a new link
         else {
             // Add routes to combobox
-            this.cbLinks.addItem(new Link("", null, null)); // this is an empty Link for checking if the user selected a previous Link
+            // this is an empty Link for checking if the user selected a previous Link
+            this.cbLinks.addItem(new Link("", null, null, map.getStory().getLinkCounter())); 
             for (Link l : this.prevLinks) {
                 this.cbLinks.addItem(l);
             }
