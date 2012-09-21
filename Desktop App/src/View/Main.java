@@ -349,7 +349,7 @@ public class Main extends JFrame {
             int maxBufferSize = 1024; // bytes
             String XMLcontent = this.story.printXML();
             String fileName = j.getSelectedFile().toString();
-            
+
             try {
                 // Zipje
                 ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
@@ -359,26 +359,25 @@ public class Main extends JFrame {
                 ///////////
 
                 // Create an XML-file
-                String filenameWithPath = fileName + ".xml";                
-                File XMLfile = new File(filenameWithPath);
-                String filename = j.getName(XMLfile);
-                
+                String file_name = story.getName() + ".xml";
+
+                File XMLfile = new File(fileName + file_name);
                 boolean exists = XMLfile.createNewFile();
                 if (!exists) {
                     System.out.println("File already exists.");
                 } else {
-                    FileWriter fstream = new FileWriter(filenameWithPath);
+                    FileWriter fstream = new FileWriter(file_name);
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(XMLcontent);
                     out.close();
                     // Get the data from the file
                     byte[] data = new byte[maxBufferSize];
                     // Create inputBuffer for the data
-                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(filenameWithPath));
+                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(file_name));
                     // Internal count for the databuffer
                     int count = 0;
                     // Add new file to the zip file
-                    zipOut.putNextEntry(new ZipEntry(filename));
+                    zipOut.putNextEntry(new ZipEntry(file_name));
                     // Fill the new file with data
                     while ((count = in.read(data, 0, maxBufferSize)) != -1) {
                         zipOut.write(data, 0, count);
