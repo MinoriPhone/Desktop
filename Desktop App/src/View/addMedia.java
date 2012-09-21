@@ -3,6 +3,7 @@ package View;
 import Model.FileChooser;
 import Model.Link;
 import Model.MediaItem;
+import Model.Route;
 import Model.Text;
 import Model.Video;
 import java.awt.BorderLayout;
@@ -50,13 +51,15 @@ public class addMedia extends JDialog {
     /**
      * Creates new form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can onnect this Link to
+     * @param parent JFrame The Main window of this application is the parent of
+     * this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can
+     * onnect this Link to
      * @param link Link The Link we are creating
      * @param callFrom int If int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
      */
-    public addMedia(Main parent, View.Map map, ArrayList<Link> prevLinks, Link link, int callFrom) {
+    public addMedia(Main parent, final View.Map map, ArrayList<Link> prevLinks, Link link, int callFrom) {
         super(parent, true);
 
         initComponents();
@@ -68,7 +71,6 @@ public class addMedia extends JDialog {
         this.link = link;
         this.callFrom = callFrom;
         this.tfRouteName.setEditable(false);
-        this.tfRouteName.setEnabled(false);
 
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
@@ -89,7 +91,6 @@ public class addMedia extends JDialog {
 
             // Enable routename and disable prev links
             this.tfRouteName.setEditable(true);
-            this.tfRouteName.setEnabled(true);
             this.cbLinks.setEditable(false);
             this.cbLinks.setEnabled(false);
 
@@ -168,15 +169,23 @@ public class addMedia extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 Link link = (Link) cbLinks.getSelectedItem();
                 //TODO GET ROUTE NAME
+                Route route = map.getStory().getRouteForLink(link);
+                if (route != null) {
+                    tfRouteName.setText(route.getName());
+                }else{
+                    tfRouteName.setText("");
+                }
             }
         });
 
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
+     * the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
@@ -184,9 +193,11 @@ public class addMedia extends JDialog {
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from
+     * the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to remove
      */
     public void removeItem(MediaItem mediaItem) {
         this.addedItems.remove(mediaItem);
@@ -194,7 +205,8 @@ public class addMedia extends JDialog {
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will be in the right order!
+     * Get all added media items. If we closed the window, then the items will
+     * be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -268,6 +280,12 @@ public class addMedia extends JDialog {
         cbLinks.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
 
         tfRouteName.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        tfRouteName.setToolTipText("");
+        tfRouteName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfRouteNameActionPerformed(evt);
+            }
+        });
 
         lRouteName.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         lRouteName.setText("Route name:");
@@ -302,10 +320,8 @@ public class addMedia extends JDialog {
                                 .add(lSpaceTop, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 435, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(pMainLayout.createSequentialGroup()
                                 .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(lSpaceBottom, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .add(pMainLayout.createSequentialGroup()
-                                        .add(bBrowse)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .add(lSpaceBottom, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                                    .add(bBrowse))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(bSave)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -448,6 +464,10 @@ public class addMedia extends JDialog {
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_bSaveActionPerformed
+
+    private void tfRouteNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfRouteNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfRouteNameActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bBrowse;
     private javax.swing.JButton bSave;
@@ -503,7 +523,8 @@ class ListTransferHandler extends StringTransferHandler {
     }
 
     /**
-     * Take the incoming string and wherever there is a newline, break it into a separate item in the list.
+     * Take the incoming string and wherever there is a newline, break it into a
+     * separate item in the list.
      *
      * @param c JComponent
      * @param str String
@@ -515,8 +536,10 @@ class ListTransferHandler extends StringTransferHandler {
         int index = target.getSelectedIndex();
 
         /**
-         * Prevent the user from dropping data back on itself. For example, if the user is moving items #4, #5, #6 and #7 and attempts
-         * to insert the items after item #5, this would be problematic when removing the original items. So this is not allowed.
+         * Prevent the user from dropping data back on itself. For example, if
+         * the user is moving items #4, #5, #6 and #7 and attempts to insert the
+         * items after item #5, this would be problematic when removing the
+         * original items. So this is not allowed.
          */
         if (indices != null && index >= indices[0] - 1
                 && index <= indices[indices.length - 1]) {
@@ -544,8 +567,9 @@ class ListTransferHandler extends StringTransferHandler {
     }
 
     /**
-     * If the remove argument is true, the drop has been successful and it's time to remove the selected items from the list. If the
-     * remove argument is false, it was a Copy operation and the original list is left intact.
+     * If the remove argument is true, the drop has been successful and it's
+     * time to remove the selected items from the list. If the remove argument
+     * is false, it was a Copy operation and the original list is left intact.
      *
      * @param c JComponent
      * @param remove boolean
@@ -557,8 +581,9 @@ class ListTransferHandler extends StringTransferHandler {
             DefaultListModel model = (DefaultListModel) source.getModel();
 
             /**
-             * If we are moving items around in the same list, we need to adjust the indices accordingly, since those after the
-             * insertion point have moved.
+             * If we are moving items around in the same list, we need to adjust
+             * the indices accordingly, since those after the insertion point
+             * have moved.
              */
             if (addCount > 0) {
                 for (int i = 0; i < indices.length; i++) {
