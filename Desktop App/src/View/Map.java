@@ -385,7 +385,7 @@ class MapListeners extends MouseInputAdapter {
 
                         // Open window to add media to this Link
                         // 0 indicates that we are creating a Link and not a StartNode (Link)
-                        openAddMediaDialog(clickedNode, prevLinks, 0);
+                        openAddMediaDialog(clickedNode, prevLinks, 0, link);
 
                     } else {
                         // There are no previous links to choose from
@@ -416,7 +416,7 @@ class MapListeners extends MouseInputAdapter {
             if (clickedNode != null) {
 
                 // Open window to add media to this Link
-                openAddMediaDialog(clickedNode, null, 1);
+                openAddMediaDialog(clickedNode, null, 1, null);
             }
 
             // Repaint
@@ -458,7 +458,7 @@ class MapListeners extends MouseInputAdapter {
                 contextMenuMap.getSetStartItem().addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent ae) {
-                        openAddMediaDialog(currentNode, null, 1);
+                        openAddMediaDialog(currentNode, null, 1, null);
                         mapViewer.repaint();
                     }
                 });
@@ -608,13 +608,14 @@ class MapListeners extends MouseInputAdapter {
      * @param prevLinks
      * @param startOrLink
      */
-    protected void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink) {
+    protected void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink, Link currentLink) {
         if (startOrLink != 1 || !node.getStart()) {
             // Create startLink
-            Link startLink = new Link(null, null, node, map.getStory().getLinkCounter());
-
+            if (currentLink == null) {
+                currentLink = new Link(null, null, node, map.getStory().getLinkCounter());
+            }
             // Show popup window for adding media to the startnode (Link)
-            final AddMedia popup = new AddMedia(parent, map, prevLinks, startLink, startOrLink);
+            final AddMedia popup = new AddMedia(parent, map, prevLinks, currentLink, startOrLink);
             popup.setVisible(true);
 
             // Add window listener to the popup dialog window, so we
