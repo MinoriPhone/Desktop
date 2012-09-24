@@ -602,7 +602,7 @@ class MapListeners extends MouseInputAdapter {
     }
 
     /**
-     * Open addMedia Dialog
+     * Open AddMedia Dialog
      *
      * @param node
      * @param prevLinks
@@ -614,7 +614,7 @@ class MapListeners extends MouseInputAdapter {
             Link startLink = new Link(null, null, node, map.getStory().getLinkCounter());
 
             // Show popup window for adding media to the startnode (Link)
-            final addMedia popup = new addMedia(parent, map, prevLinks, startLink, startOrLink);
+            final AddMedia popup = new AddMedia(parent, map, prevLinks, startLink, startOrLink);
             popup.setVisible(true);
 
             // Add window listener to the popup dialog window, so we
