@@ -639,8 +639,8 @@ public class Main extends JFrame implements PropertyChangeListener {
             int progress = (Integer) pce.getNewValue();
             // Show progress to user
             progressMonitor.setProgress(progress);
-            progressMonitor.setNote(String.format("Completed %d%%.\n %s", progress, currentFileName));
-
+            progressMonitor.setNote(String.format("<html><b>Completed %d%%.</b> <br /><br /> %s<br /></html>", progress, currentFileName));
+            
             // If user cancel export
             if (progressMonitor.isCanceled()) {
                 task.cancel(true);
