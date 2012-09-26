@@ -42,6 +42,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     private Routes panelRoutes;
     private ProgressMonitor progressMonitor;
     private Task task;
+    String currentFileName;
 
     /**
      * Creates new form Main
@@ -363,12 +364,12 @@ public class Main extends JFrame implements PropertyChangeListener {
         if (dialog == JFileChooser.APPROVE_OPTION) {
 
             try {
-                
+
                 // Max length of the buffer
                 int maxBufferSize = 1024; // bytes
                 String XMLcontent = this.story.printXML();
                 String fileName = j.getSelectedFile().toString();
-                
+
                 // Check if the iStory file already exists
                 File iStoryFile = new File(fileName);
                 ZipOutputStream zipOut = null;
@@ -400,9 +401,9 @@ public class Main extends JFrame implements PropertyChangeListener {
                         return false;
                     }
                 }
-                
+
                 task.setProgression(Math.min(10, 100));
-                
+
                 ///////////
                 // XML
                 ///////////
@@ -452,6 +453,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
                         exists = file.isFile();
                         if (exists) {
+                            currentFileName = file.getName();
                             System.out.println("File exists.");
 
                             // Get the data from the file
@@ -479,10 +481,10 @@ public class Main extends JFrame implements PropertyChangeListener {
                 zipOut.flush();
                 zipOut.close();
                 System.out.println("Your file is zipped");
-                
-                task.setProgression(Math.min(99, 100)); 
+
+                task.setProgression(Math.min(99, 100));
                 Thread.sleep(1000);
-                task.setProgression(100);                
+                task.setProgression(100);
 
                 // Set the changed to false to be able to close the program
                 story.setSomethingChanged(false);
@@ -528,8 +530,9 @@ public class Main extends JFrame implements PropertyChangeListener {
         /**
          * Set progress
          *
-         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
-         * final protected.
+         * Own implementation of setProgress() because we need to set the
+         * progress outside SwingWorker. The function setProgress() is final
+         * protected.
          *
          * @param progress int current progress
          */
@@ -592,10 +595,9 @@ public class Main extends JFrame implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent pce) {
         if ("progress".equals(pce.getPropertyName())) {
             int progress = (Integer) pce.getNewValue();
-
             // Show progress to user
             progressMonitor.setProgress(progress);
-            progressMonitor.setNote(String.format("Completed %d%%.\n", progress));
+            progressMonitor.setNote(String.format("Completed %d%%.\n %s", progress, currentFileName));
 
             // If user cancel export
             if (progressMonitor.isCanceled()) {
