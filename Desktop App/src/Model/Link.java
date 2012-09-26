@@ -38,6 +38,22 @@ public class Link {
     }
 
     /**
+     * Overload constructor
+     * 
+     * @param link Link
+     * @param id long
+     */
+    public Link(Link link, long id) {
+        this.name = link.getName();
+        this.p1 = link.getP1();
+        this.p2 = link.getP2();
+        this.links = new ArrayList<Link>();
+        this.mediaItems = link.getMediaItems();
+        this.color = Color.RED;
+        this.id = id;
+    }
+
+    /**
      * Get the first Node (position) of the Link
      *
      * @return Node first position
@@ -319,7 +335,10 @@ public class Link {
             return true;
         } else {
             for (Link currentLink : links) {
-                return currentLink.getRouteForLink(link);
+                if(currentLink.getRouteForLink(link))
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -332,6 +351,15 @@ public class Link {
      */
     public long getId() {
         return id;
+    }
+
+    /**
+     * Set the identifier from this link
+     * 
+     * @param the id
+     */
+    public void setId(long id) {
+        this.id = id;
     }
     
     /**
