@@ -7,8 +7,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -28,6 +28,7 @@ import java.util.zip.ZipOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
@@ -72,6 +73,15 @@ public class Main extends JFrame implements PropertyChangeListener {
         map = new Map(story, this);
         pMain.add(this.map, BorderLayout.CENTER);
 
+        // Add accelerators
+        miNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        miOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        miSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        miClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK)); 
+        
+        miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));        
+        miClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        
         // Lister to prevent the application from closing when the user did something change
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -97,24 +107,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                 }
             }
         });
-
-        this.addKeyListener(new KeyListener() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                System.out.println("tester : " + e.getKeyChar());
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                System.out.println("2test2 : " + e.getKeyChar());
-            }
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                System.out.println("3test3 : " + e.getKeyChar());
-            }
-        });
-
         // Revalidate JPanels
         this.pack();
     }
@@ -146,10 +138,10 @@ public class Main extends JFrame implements PropertyChangeListener {
         sepFile = new javax.swing.JPopupMenu.Separator();
         miClose = new javax.swing.JMenuItem();
         mEdit = new javax.swing.JMenu();
-        mCopy = new javax.swing.JMenuItem();
-        mPaste = new javax.swing.JMenuItem();
+        miCopy = new javax.swing.JMenuItem();
+        miPaste = new javax.swing.JMenuItem();
         jSeparator = new javax.swing.JPopupMenu.Separator();
-        mProjectSettings = new javax.swing.JMenuItem();
+        miProjectSettings = new javax.swing.JMenuItem();
         mHelp = new javax.swing.JMenu();
         miAbout = new javax.swing.JMenuItem();
 
@@ -221,15 +213,12 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         mFile.setText("File");
 
-        miNew.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
         miNew.setText("New");
         mFile.add(miNew);
 
-        miOpen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         miOpen.setText("Open");
         mFile.add(miOpen);
 
-        miSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         miSave.setText("Save");
         miSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -239,7 +228,6 @@ public class Main extends JFrame implements PropertyChangeListener {
         mFile.add(miSave);
         mFile.add(sepFile);
 
-        miClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
         miClose.setText("Close");
         miClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -252,22 +240,20 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         mEdit.setText("Edit");
 
-        mCopy.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
-        mCopy.setText("Copy");
-        mEdit.add(mCopy);
+        miCopy.setText("Copy");
+        mEdit.add(miCopy);
 
-        mPaste.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.CTRL_MASK));
-        mPaste.setText("Paste");
-        mEdit.add(mPaste);
+        miPaste.setText("Paste");
+        mEdit.add(miPaste);
         mEdit.add(jSeparator);
 
-        mProjectSettings.setText("Project settings");
-        mProjectSettings.addActionListener(new java.awt.event.ActionListener() {
+        miProjectSettings.setText("Project settings");
+        miProjectSettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mProjectSettingsActionPerformed(evt);
+                miProjectSettingsActionPerformed(evt);
             }
         });
-        mEdit.add(mProjectSettings);
+        mEdit.add(miProjectSettings);
 
         mbMenubar.add(mEdit);
 
@@ -330,10 +316,10 @@ public class Main extends JFrame implements PropertyChangeListener {
         triggerExportStory();
     }//GEN-LAST:event_miSaveActionPerformed
 
-    private void mProjectSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mProjectSettingsActionPerformed
+    private void miProjectSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miProjectSettingsActionPerformed
         ProjectSettings projectSettings = new ProjectSettings(map);
         projectSettings.setVisible(true);
-    }//GEN-LAST:event_mProjectSettingsActionPerformed
+    }//GEN-LAST:event_miProjectSettingsActionPerformed
 
     private void miCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCloseActionPerformed
         System.exit(0);
@@ -544,17 +530,17 @@ public class Main extends JFrame implements PropertyChangeListener {
     private javax.swing.JButton bNode;
     private javax.swing.JButton bStart;
     private javax.swing.JPopupMenu.Separator jSeparator;
-    private javax.swing.JMenuItem mCopy;
     private javax.swing.JMenu mEdit;
     private javax.swing.JMenu mFile;
     private javax.swing.JMenu mHelp;
-    private javax.swing.JMenuItem mPaste;
-    private javax.swing.JMenuItem mProjectSettings;
     private javax.swing.JMenuBar mbMenubar;
     private javax.swing.JMenuItem miAbout;
     private javax.swing.JMenuItem miClose;
+    private javax.swing.JMenuItem miCopy;
     private javax.swing.JMenuItem miNew;
     private javax.swing.JMenuItem miOpen;
+    private javax.swing.JMenuItem miPaste;
+    private javax.swing.JMenuItem miProjectSettings;
     private javax.swing.JMenuItem miSave;
     private javax.swing.JPanel pMain;
     private javax.swing.JPanel pMenu;
