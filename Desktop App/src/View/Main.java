@@ -45,6 +45,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     private Routes panelRoutes;
     private ProgressMonitor progressMonitor;
     private Task task;
+    String currentFileName;
 
     /**
      * Creates new form Main
@@ -482,6 +483,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
                         exists = file.isFile();
                         if (exists) {
+                            currentFileName = file.getName();
                             System.out.println("File exists.");
 
                             // Get the data from the file
@@ -556,8 +558,9 @@ public class Main extends JFrame implements PropertyChangeListener {
         /**
          * Set progress
          *
-         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
-         * final protected.
+         * Own implementation of setProgress() because we need to set the
+         * progress outside SwingWorker. The function setProgress() is final
+         * protected.
          *
          * @param progress int current progress
          */
@@ -620,11 +623,10 @@ public class Main extends JFrame implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent pce) {
         if ("progress".equals(pce.getPropertyName())) {
             int progress = (Integer) pce.getNewValue();
-
             // Show progress to user
             progressMonitor.setProgress(progress);
-            progressMonitor.setNote(String.format("Completed %d%%.\n", progress));
-
+            progressMonitor.setNote(String.format("<html><b>Completed %d%%.</b> <br /><br /> %s<br /></html>", progress, currentFileName));
+            
             // If user cancel export
             if (progressMonitor.isCanceled()) {
                 task.cancel(true);
