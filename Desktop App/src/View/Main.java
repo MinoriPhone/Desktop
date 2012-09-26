@@ -7,6 +7,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -94,6 +96,23 @@ public class Main extends JFrame implements PropertyChangeListener {
                 } else {
                     System.exit(0);
                 }
+            }
+        });
+
+        this.addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                System.out.println("tester : " + e.getKeyChar());
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                System.out.println("2test2 : " + e.getKeyChar());
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                System.out.println("3test3 : " + e.getKeyChar());
             }
         });
 
@@ -223,6 +242,11 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         miClose.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
         miClose.setText("Close");
+        miClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miCloseActionPerformed(evt);
+            }
+        });
         mFile.add(miClose);
 
         mbMenubar.add(mFile);
@@ -312,6 +336,10 @@ public class Main extends JFrame implements PropertyChangeListener {
         projectSettings.setVisible(true);
     }//GEN-LAST:event_mProjectSettingsActionPerformed
 
+    private void miCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCloseActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_miCloseActionPerformed
+
     /**
      * Run Main window
      *
@@ -352,7 +380,7 @@ public class Main extends JFrame implements PropertyChangeListener {
      * @return boolean
      */
     private boolean exportStory() {
-        int progress = 0;
+        float progress = 0f;
 
 
         JFileChooser j = new JFileChooser();
@@ -390,6 +418,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                     if (option == JOptionPane.YES_OPTION) {
                         // Zipje                    
                         if (fileName.endsWith("iStory")) {
+                            File deletedFile = new File(fileName);
+                            deletedFile.delete();
                             zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
                         } else {
                             zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
@@ -438,13 +468,27 @@ public class Main extends JFrame implements PropertyChangeListener {
                     System.out.println("Temp XML-file created successfully.");
                 }
 
+                task.setProgression(Math.min(20, 100));
 
+               
                 ///////////
                 // MEDIAFILES
                 ///////////
+                progress = 20f;
+                float storyFilesSize = 0f;
 
-                int storyFilesSize = story.getAllLinks().size();
-                double percent = (90 / storyFilesSize);
+
+                // Get total of filesize
+                for (Link link : story.getAllLinks()) {
+
+                    for (MediaItem mediaItem : link.getMediaItems()) {
+                        File tempFile = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
+                        // Filesize
+                        storyFilesSize += tempFile.length() / maxBufferSize;
+                    }
+                }
+                float percent = (80f / storyFilesSize);
+
                 // Loop over all links to get the  mediafiles
                 for (Link link : story.getAllLinks()) {
 
@@ -467,6 +511,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                             // Fill the new file with data
                             while ((count = in.read(data, 0, maxBufferSize)) != -1) {
                                 zipOut.write(data, 0, count);
+                                progress += percent;
+                                task.setProgression((int)Math.floor(Math.min(progress, 99)));
                             }
                             in.close();
 
@@ -474,8 +520,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                             System.out.println("File does not exist!");
                         }
                     }
-                    progress += percent;
-                    task.setProgression(Math.min(progress, 100));
+
+
                 }
                 // Save and close the buffers
                 zipOut.flush();
@@ -483,16 +529,12 @@ public class Main extends JFrame implements PropertyChangeListener {
                 System.out.println("Your file is zipped");
 
                 task.setProgression(Math.min(99, 100));
-                Thread.sleep(1000);
                 task.setProgression(100);
 
                 // Set the changed to false to be able to close the program
                 story.setSomethingChanged(false);
                 return true;
             } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            } catch (InterruptedException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
