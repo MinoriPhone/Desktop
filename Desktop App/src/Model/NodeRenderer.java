@@ -1,6 +1,7 @@
 package Model;
 
 import Plugins.jxmap.swingx.JXMapViewer;
+import Plugins.jxmap.swingx.mapviewer.GeoPosition;
 import Plugins.jxmap.swingx.mapviewer.WaypointRenderer;
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -37,10 +38,10 @@ public class NodeRenderer implements WaypointRenderer<Node> {
 
     /**
      * TODO
-     * 
+     *
      * @param loadImg
      * @param newColor
-     * @return 
+     * @return
      */
     private BufferedImage convert(BufferedImage loadImg, Color newColor) {
         int w = loadImg.getWidth();
@@ -64,34 +65,48 @@ public class NodeRenderer implements WaypointRenderer<Node> {
 
     /**
      * TODO
-     * 
+     *
      * @param g
      * @param viewer
-     * @param w 
+     * @param node
      */
     @Override
-    public void paintWaypoint(Graphics2D g, JXMapViewer viewer, Node w) {
+    public void paintWaypoint(Graphics2D g, JXMapViewer viewer, Node node) {
         g = (Graphics2D) g.create();
 
         if (origImage == null) {
             return;
         }
 
-        BufferedImage myImg = map.get(w.getColor());
+        BufferedImage myImg = map.get(node.getColor());
 
         if (myImg == null) {
-            myImg = convert(origImage, w.getColor());
-            map.put(w.getColor(), myImg);
+            myImg = convert(origImage, node.getColor());
+            map.put(node.getColor(), myImg);
         }
 
-        Point2D point = viewer.getTileFactory().geoToPixel(w.getPosition(), viewer.getZoom());
+        Point2D point = viewer.getTileFactory().geoToPixel(node.getPosition(), viewer.getZoom());
 
         int x = (int) point.getX();
         int y = (int) point.getY();
 
+        // Paint radius
+        double radius = 0.0002;
+
+        GeoPosition leftTop = new GeoPosition(node.getPosition().getLatitude() + radius, node.getPosition().getLongitude() - radius);
+        //GeoPosition rightBottom = new GeoPosition(node.getGeoposition().getLatitude()-radius, node.getGeoposition().getLongitude()+radius);
+        
+        //Point2D ltPoint = viewer.getTileFactory().geoToPixel(leftTop, viewer.getZoom());
+        double diff = 20;
+
+        //g.drawOval((int) ltPoint.getX(), (int) ltPoint.getY(), (int) diff, (int) diff);
+        g.setColor(Color.yellow);
+        g.fillOval((int) (point.getX()-diff), (int) (point.getY()-diff), (int) diff, (int) diff);
+
+        //Draw node
         g.drawImage(myImg, x - myImg.getWidth() / 2, y - myImg.getHeight(), null);
 
-        String label = w.getLabel();
+        String label = node.getLabel();
 
         //g.setFont(font);
         if (label != null) {
