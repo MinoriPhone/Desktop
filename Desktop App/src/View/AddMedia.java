@@ -513,7 +513,14 @@ public class AddMedia extends JDialog {
                     // Add this link to the selected previous link (so this is the next link for that previous link)
                     for (Object object : objArray) {
                         Link prevLink = (Link) object;
-                        prevLink.addLink(this.link);
+                        // If user selected more than one previous link, we have to make 2 new links instead of using the same one
+                        if (objArray.length > 1) {
+                            // Make a new link so the link won't be saved twice.
+                            Link newLink = new Link(this.link, map.getStory().getLinkCounter());
+                            prevLink.addLink(newLink);
+                        } else {
+                            prevLink.addLink(this.link);
+                        }
                     }
                 }
 
