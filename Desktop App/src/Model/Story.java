@@ -155,22 +155,6 @@ public class Story {
     }
 
     /**
-     * Get all route for link
-     *
-     * @param node Node
-     */
-    public Link getParentFromLink(Link link) {
-        // Get all routes that are part of the given Node
-        for (Route route : routes) {
-            Link parentLink = route.getStartLink().getParentFromLink(link,null);
-            if (parentLink != null) {
-                return parentLink;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Get all media items
      */
     public ArrayList<Link> getAllLinks() {
@@ -179,20 +163,6 @@ public class Story {
             allLinks = route.getStartLink().getAllLinks(allLinks);
         }
         return allLinks;
-    }
-
-    /**
-     * Get all media items
-     */
-    public Link getTwins(Link link) {
-        // Get all routes that are part of the given Node
-        for (Route route : routes) {
-            Link twin = route.getStartLink().getTwins(link);
-            if (twin != null) {
-                return twin;
-            }
-        }
-        return null;
     }
 
     /**
