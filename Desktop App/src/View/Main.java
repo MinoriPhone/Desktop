@@ -7,7 +7,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -31,7 +30,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
-import javax.swing.WindowConstants;
 
 /**
  * The Main screen of the application
@@ -45,7 +43,8 @@ public class Main extends JFrame implements PropertyChangeListener {
     private Routes panelRoutes;
     private ProgressMonitor progressMonitor;
     private Task task;
-    String currentFileName;
+    private boolean close = false;
+    String currentMediaItemName;
 
     /**
      * Creates new form Main
@@ -78,38 +77,42 @@ public class Main extends JFrame implements PropertyChangeListener {
         miNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        miClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK)); 
-        
-        miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));        
-        miClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        
+        miClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
+
+        miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
         // Lister to prevent the application from closing when the user did something change
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-                if (story.isSomethingChanged()) {
-
-                    // Show save confirm window
-                    int n = JOptionPane.showConfirmDialog(null,
-                            "You made one or several changes to the current story.\n"
-                            + "Do you want to save this before closing the program?\n",
-                            "Save?",
-                            JOptionPane.YES_NO_OPTION);
-
-                    if (n == 1) {
-                        System.exit(0);
-                    } else {
-                        triggerExportStory();
-                        System.exit(0);
-                    }
-                } else {
-                    System.exit(0);
-                }
+                checkChangeBeforeClose();
             }
         });
+
         // Revalidate JPanels
         this.pack();
+    }
+
+    private void checkChangeBeforeClose() {
+        if (story.isSomethingChanged()) {
+
+            // Show save confirm window
+            int n = JOptionPane.showConfirmDialog(null,
+                    "You made one or several changes to the current story.\n"
+                    + "Do you want to save this before closing the program?\n",
+                    "Save?",
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+
+            if (n == JOptionPane.YES_OPTION) {
+                close = true;
+                triggerExportStory();
+            } else if (n == JOptionPane.NO_OPTION) {
+                System.exit(0);
+            }
+        } else {
+            System.exit(0);
+        }
     }
 
     private void triggerExportStory() {
@@ -146,7 +149,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         mHelp = new javax.swing.JMenu();
         miAbout = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("iStory designer");
         setMinimumSize(new java.awt.Dimension(1024, 768));
         setName("fMain"); // NOI18N
@@ -323,7 +326,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     }//GEN-LAST:event_miProjectSettingsActionPerformed
 
     private void miCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCloseActionPerformed
-        System.exit(0);
+        checkChangeBeforeClose();
     }//GEN-LAST:event_miCloseActionPerformed
 
     /**
@@ -371,29 +374,29 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         JFileChooser j = new JFileChooser();
         //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        j.setSelectedFile(new File("NewStory"));
+        j.setSelectedFile(new File(map.getStory().getName()));
         int dialog = j.showSaveDialog(this);
 
         // Catch actions of the File Chooser Dialog Window
         if (dialog == JFileChooser.APPROVE_OPTION) {
 
             try {
-
                 // Max length of the buffer
                 int maxBufferSize = 1024; // bytes
                 String XMLcontent = this.story.printXML();
                 String fileName = j.getSelectedFile().toString();
 
+                // Add ".iStory  at the end of the string (only if it not exists)
+                if (!fileName.endsWith(".iStory")) {
+                    fileName += ".iStory";
+                }
+
                 // Check if the iStory file already exists
                 File iStoryFile = new File(fileName);
                 ZipOutputStream zipOut = null;
                 if (!iStoryFile.isFile()) {
-                    // Zipje                    
-                    if (fileName.endsWith("iStory")) {
-                        zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
-                    } else {
-                        zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
-                    }
+                    // Zipje
+                    zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
                 } else {
                     // Confirm the save
                     int option = JOptionPane.showConfirmDialog(null,
@@ -402,14 +405,9 @@ public class Main extends JFrame implements PropertyChangeListener {
                             "File already exists",
                             JOptionPane.YES_NO_CANCEL_OPTION);
                     if (option == JOptionPane.YES_OPTION) {
-                        // Zipje                    
-                        if (fileName.endsWith("iStory")) {
-                            File deletedFile = new File(fileName);
-                            deletedFile.delete();
-                            zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
-                        } else {
-                            zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName + ".iStory")));
-                        }
+                        File deletedFile = new File(fileName);
+                        deletedFile.delete();
+                        zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
                     } else if (option == JOptionPane.NO_OPTION) {
                         exportStory();
                         return false;
@@ -417,7 +415,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                         return false;
                     }
                 }
-
                 task.setProgression(Math.min(10, 100));
 
                 ///////////
@@ -425,14 +422,12 @@ public class Main extends JFrame implements PropertyChangeListener {
                 ///////////
 
                 // Create an XML-file
-                String filenameWithPath = fileName + ".xml";
+                String filenameWithPath = fileName.replace(".iStory", "") + ".xml";
                 File XMLfile = new File(filenameWithPath);
                 String filename = j.getName(XMLfile);
 
                 boolean exists = XMLfile.createNewFile();
-                if (!exists) {
-                    System.out.println("File already exists.");
-                } else {
+                if (exists) {
                     FileWriter fstream = new FileWriter(filenameWithPath);
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(XMLcontent);
@@ -451,12 +446,11 @@ public class Main extends JFrame implements PropertyChangeListener {
                     }
                     in.close();
                     XMLfile.delete();
-                    System.out.println("Temp XML-file created successfully.");
                 }
 
                 task.setProgression(Math.min(20, 100));
 
-               
+
                 ///////////
                 // MEDIAFILES
                 ///////////
@@ -483,8 +477,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
                         exists = file.isFile();
                         if (exists) {
-                            currentFileName = file.getName();
-                            System.out.println("File exists.");
+                            currentMediaItemName = file.getName();
 
                             // Get the data from the file
                             byte[] data = new byte[maxBufferSize];
@@ -493,21 +486,33 @@ public class Main extends JFrame implements PropertyChangeListener {
                             // Internal count for the databuffer
                             int count = 0;
                             // Add new file to the zip file
-                            zipOut.putNextEntry(new ZipEntry(link.getId() + System.getProperty("file.separator") + mediaItem.getFileName()));
+                            zipOut.putNextEntry(new ZipEntry(link.getId() + "/" + mediaItem.getFileName()));
                             // Fill the new file with data
                             while ((count = in.read(data, 0, maxBufferSize)) != -1) {
                                 zipOut.write(data, 0, count);
                                 progress += percent;
-                                task.setProgression((int)Math.floor(Math.min(progress, 99)));
+                                if (!task.isCancelled() || !progressMonitor.isCanceled()) {
+                                    task.setProgression((int) Math.floor(Math.min(progress, 99)));
+                                } else {
+                                    // Close the buffers
+                                    in.close();
+                                    zipOut.flush();
+                                    zipOut.close();
+                                    // Delete the corupt file
+                                    File deletedFile = new File(fileName);
+                                    if (!deletedFile.delete()) {
+                                        JOptionPane.showMessageDialog(
+                                                Main.this,
+                                                "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
+                                                "Could not delete iStory file",
+                                                JOptionPane.WARNING_MESSAGE);
+                                    }
+                                    return false;
+                                }
                             }
                             in.close();
-
-                        } else {
-                            System.out.println("File does not exist!");
                         }
                     }
-
-
                 }
                 // Save and close the buffers
                 zipOut.flush();
@@ -558,9 +563,8 @@ public class Main extends JFrame implements PropertyChangeListener {
         /**
          * Set progress
          *
-         * Own implementation of setProgress() because we need to set the
-         * progress outside SwingWorker. The function setProgress() is final
-         * protected.
+         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
+         * final protected.
          *
          * @param progress int current progress
          */
@@ -595,6 +599,7 @@ public class Main extends JFrame implements PropertyChangeListener {
          */
         @Override
         public void done() {
+
             // Exporting is canceled by user
             if (progressMonitor.isCanceled()) {
                 JOptionPane.showMessageDialog(
@@ -602,7 +607,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                         "Exporting canceled by user!",
                         "Canceled",
                         JOptionPane.WARNING_MESSAGE);
-
             } // Export succeeded
             else if (task.isDone() && task.getProgress() == 100) {
                 JOptionPane.showMessageDialog(
@@ -610,6 +614,9 @@ public class Main extends JFrame implements PropertyChangeListener {
                         "Exporting succeeded!",
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE);
+                if (close) {
+                    System.exit(0);
+                }
             }
         }
     }
@@ -625,11 +632,12 @@ public class Main extends JFrame implements PropertyChangeListener {
             int progress = (Integer) pce.getNewValue();
             // Show progress to user
             progressMonitor.setProgress(progress);
-            progressMonitor.setNote(String.format("<html><b>Completed %d%%.</b> <br /><br /> %s<br /></html>", progress, currentFileName));
-            
+            progressMonitor.setNote(String.format("<html><b>Completed %d%%.</b> <br /><br /> %s<br /></html>", progress, currentMediaItemName));
+
             // If user cancel export
             if (progressMonitor.isCanceled()) {
                 task.cancel(true);
+                progressMonitor.setProgress(0);
                 // Task.done() is called
             }
         }
