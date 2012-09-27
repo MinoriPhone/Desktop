@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -295,12 +294,8 @@ class MapListeners extends MouseInputAdapter {
         // Get mouse clicked coordinates
         Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
 
-        // ------- REINIER --------- //
-        Link linkje = linkPainter.intersects(mapViewer);
-        if (linkje != null) {
-            System.out.println(linkje.getName());
-        }
-        // ------------------------- //
+        // Get clicked link
+        Link clickedLink = linkPainter.intersects(mapViewer);
 
         // Place Node
         if (map.isButtonNodeClicked()) {
@@ -466,6 +461,10 @@ class MapListeners extends MouseInputAdapter {
                 contextMenuMap.getSetStartItem().setEnabled(false);
             }
             contextMenuMap.showContextMenuMap(evt);
+
+        } // Open media dialog if user clicks on a Link or a startNode
+        else if (clickedLink != null) {
+            openMediaDialogByLinkClick(clickedLink);
         }
     }
 
@@ -602,13 +601,54 @@ class MapListeners extends MouseInputAdapter {
     }
 
     /**
+     * TODO
+     *
+     * @param link
+     */
+    private void openMediaDialogByLinkClick(Link link) {
+
+        // Open AddMedia
+        final AddMedia popup = new AddMedia(parent, map, link);
+        popup.setVisible(true);
+
+        // Add window listener to the popup dialog window, so we
+        // can get the added MediaItems in the right order
+        popup.addWindowListener(new WindowAdapter() {
+            /**
+             * Window closed event
+             */
+            @Override
+            public void windowClosed(WindowEvent we) {
+
+                // Get all added media items in the right order!
+                ArrayList<MediaItem> items = popup.getAddedItems();
+
+                // User saved link properties
+                if (popup.isClosedBySave()) {
+
+                    // If user did not add any media to the link,
+                    if (items.isEmpty()) {
+
+                        // then show popup.
+                        JOptionPane.showMessageDialog(popup,
+                                "You didn't add any media to this Link." + "\n"
+                                + "You can still add media to this Link by clicking on this Link!", // message
+                                "Info", // title
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
      * Open AddMedia Dialog
      *
      * @param node
      * @param prevLinks
      * @param startOrLink
      */
-    protected void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink, Link currentLink) {
+    private void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink, Link currentLink) {
         if (startOrLink != 1 || !node.getStart()) {
             // Create startLink
             if (currentLink == null) {
