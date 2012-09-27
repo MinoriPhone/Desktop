@@ -13,8 +13,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -52,12 +50,154 @@ public class AddMedia extends JDialog {
     private View.Map map;
 
     /**
-     * Creates new form addMedia
+     * Constructor
      *
-     * @param parent JFrame The Main window of this application is the parent of
-     * this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can
-     * onnect this Link to
+     * @param link
+     */
+    public AddMedia(Main parent, final View.Map map, Link link) {
+        super(parent, true);
+
+        initComponents();
+
+        // Set variables
+        this.map = map;
+        this.link = link;
+        this.closedBySave = false;
+        this.callFrom = (link.getP2() == null) ? 1 : 0;
+        this.tfRouteName.setEditable(false);
+
+        // Get the size of the screen
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension dim = tk.getScreenSize();
+
+        // Determine the new location of the window
+        int x = (dim.width - (this.getSize().width)) / 2;
+        int y = (dim.height - (this.getSize().height)) / 2;
+
+        // Center the window
+        this.setLocation(x, y);
+        
+        // User is creating a startnode and not a Link
+        if (this.callFrom == 1) {
+
+            // Set title and route
+            this.lTitle.setText("Startnode Properties");
+
+            // Enable routename and disable prev links
+            this.tfRouteName.setEditable(true);
+            this.lLinks.setEnabled(false);
+
+        } // User is NOT creating a startnode, but a new link
+        else {
+            this.prevLinks = new ArrayList<Link>();
+            this.prevLinks.add(map.getStory().getParentFromLink(this.link));
+            // Check if this link has twins and add their parent to the list
+            Link twin = this.link.getTwin();
+            while(twin != null)
+            {
+                this.prevLinks.add(map.getStory().getParentFromLink(twin));
+                twin = this.link.getTwin();
+            }
+            
+            // Check if there is a link that has this link as a twin
+            twin = map.getStory().getTwins(this.link);
+            while(twin != null)
+            {
+                this.prevLinks.add(map.getStory().getParentFromLink(twin));
+                twin = map.getStory().getTwins(twin);
+            }
+            this.lLinks.setListData(this.prevLinks.toArray());
+            this.lLinks.setEnabled(false);
+        }
+
+        // List model
+        this.listModel = new DefaultListModel();
+
+        // Lists
+        this.addedItems = new ArrayList<MediaItem>();
+        this.list = new JList(this.listModel);
+        this.list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+        // ScrollPane
+        this.scrollPane = new JScrollPane(this.list);
+        this.scrollPane.setPreferredSize(new Dimension(400, 100));
+        this.pAddedMedia.add(this.scrollPane, BorderLayout.CENTER);
+
+        // Enable drag and drop
+        this.list.setDragEnabled(true);
+        this.list.setTransferHandler(new ListTransferHandler());
+
+        // Add window listener to this window
+        this.addWindowListener(new WindowAdapter() {
+            /**
+             * Add window closing event
+             *
+             * @param evt WindowEvent The window closing event
+             */
+            @Override
+            public void windowClosing(WindowEvent evt) {
+
+                // When user closed window (so without saving!)
+                if (!closedBySave) {
+
+                    // Notify user that nothing is going to be saved and
+                    // that the created link (drawing) will be deleted.
+                    Object[] options = {"Close", "Cancel"};
+                    int n = JOptionPane.showOptionDialog(null,
+                            "By pressing 'Close' the Link will be deleted and" + "\n"
+                            + "nothing will be saved. Otherwise press 'Cancel'.", // message
+                            "Deleted created Link", // title
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null, // do not use a custom Icon
+                            options, // the titles of buttons
+                            options[0]); // default button title
+
+                    // user pressed cancel
+                    if (n == 1) {
+                        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+                    } // user pressed close
+                    else {
+                        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                    }
+                }
+            }
+        });
+
+        // Add changelistener to combobox with previous links
+        this.lLinks.addListSelectionListener(new ListSelectionListener() {
+            /**
+             * Set Route name on change
+             *
+             * @param e ActionEvent
+             */
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                Object[] objArray = lLinks.getSelectedValues();
+                String tfRouteNameText = "";
+                for (Object obj : objArray) {
+                    Link link = (Link) obj;
+                    Route route = map.getStory().getRouteForLink(link);
+                    if (route != null) {
+                        if (!tfRouteNameText.equals("")) {
+                            tfRouteNameText += ", " + route.getName();
+                        } else {
+                            tfRouteNameText += route.getName();
+                        }
+                    }
+                }
+                tfRouteName.setText(tfRouteNameText);
+            }
+        });
+    }
+
+    /**
+     * Overload Constructor
+     *
+     * Creates NEW(!) form addMedia
+     *
+     * @param parent JFrame The Main window of this application is the parent of this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can onnect this Link to
      * @param link Link The Link we are creating
      * @param callFrom int If int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
@@ -186,15 +326,12 @@ public class AddMedia extends JDialog {
                 tfRouteName.setText(tfRouteNameText);
             }
         });
-
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
-     * the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
@@ -202,11 +339,9 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
-     * the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
      * @param index int The index we want to add the mediaItem at
      */
     public void addItemAtIndex(MediaItem mediaItem, int index) {
@@ -215,11 +350,9 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from
-     * the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
      */
     public void removeItem(MediaItem mediaItem) {
         this.addedItems.remove(mediaItem);
@@ -227,8 +360,7 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will
-     * be in the right order!
+     * Get all added media items. If we closed the window, then the items will be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -655,8 +787,7 @@ class ListTransferHandler extends StringTransferHandler {
     }
 
     /**
-     * Take the incoming string and wherever there is a newline, break it into a
-     * separate item in the list.
+     * Take the incoming string and wherever there is a newline, break it into a separate item in the list.
      *
      * @param c JComponent
      * @param str String
@@ -668,10 +799,8 @@ class ListTransferHandler extends StringTransferHandler {
         int index = target.getSelectedIndex();
 
         /**
-         * Prevent the user from dropping data back on itself. For example, if
-         * the user is moving items #4, #5, #6 and #7 and attempts to insert the
-         * items after item #5, this would be problematic when removing the
-         * original items. So this is not allowed.
+         * Prevent the user from dropping data back on itself. For example, if the user is moving items #4, #5, #6 and #7 and attempts
+         * to insert the items after item #5, this would be problematic when removing the original items. So this is not allowed.
          */
         if (indices != null && index >= indices[0] - 1
                 && index <= indices[indices.length - 1]) {
@@ -699,9 +828,8 @@ class ListTransferHandler extends StringTransferHandler {
     }
 
     /**
-     * If the remove argument is true, the drop has been successful and it's
-     * time to remove the selected items from the list. If the remove argument
-     * is false, it was a Copy operation and the original list is left intact.
+     * If the remove argument is true, the drop has been successful and it's time to remove the selected items from the list. If the
+     * remove argument is false, it was a Copy operation and the original list is left intact.
      *
      * @param c JComponent
      * @param remove boolean
@@ -713,9 +841,8 @@ class ListTransferHandler extends StringTransferHandler {
             DefaultListModel model = (DefaultListModel) source.getModel();
 
             /**
-             * If we are moving items around in the same list, we need to adjust
-             * the indices accordingly, since those after the insertion point
-             * have moved.
+             * If we are moving items around in the same list, we need to adjust the indices accordingly, since those after the
+             * insertion point have moved.
              */
             if (addCount > 0) {
                 for (int i = 0; i < indices.length; i++) {
