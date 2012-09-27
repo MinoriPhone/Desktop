@@ -13,8 +13,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -54,10 +52,8 @@ public class AddMedia extends JDialog {
     /**
      * Creates new form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of
-     * this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can
-     * onnect this Link to
+     * @param parent JFrame The Main window of this application is the parent of this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can onnect this Link to
      * @param link Link The Link we are creating
      * @param callFrom int If int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
@@ -190,11 +186,9 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
-     * the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
@@ -202,11 +196,9 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
-     * the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
      * @param index int The index we want to add the mediaItem at
      */
     public void addItemAtIndex(MediaItem mediaItem, int index) {
@@ -215,11 +207,9 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from
-     * the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
      */
     public void removeItem(MediaItem mediaItem) {
         this.addedItems.remove(mediaItem);
@@ -227,8 +217,7 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will
-     * be in the right order!
+     * Get all added media items. If we closed the window, then the items will be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -528,6 +517,9 @@ public class AddMedia extends JDialog {
                     }
                 }
 
+                // Set changeboolean to true
+                map.getStory().setSomethingChanged(true);
+
                 // Close this window and bring main window to the front
                 super.toFront();
                 this.dispose();
@@ -655,8 +647,7 @@ class ListTransferHandler extends StringTransferHandler {
     }
 
     /**
-     * Take the incoming string and wherever there is a newline, break it into a
-     * separate item in the list.
+     * Take the incoming string and wherever there is a newline, break it into a separate item in the list.
      *
      * @param c JComponent
      * @param str String
@@ -668,10 +659,8 @@ class ListTransferHandler extends StringTransferHandler {
         int index = target.getSelectedIndex();
 
         /**
-         * Prevent the user from dropping data back on itself. For example, if
-         * the user is moving items #4, #5, #6 and #7 and attempts to insert the
-         * items after item #5, this would be problematic when removing the
-         * original items. So this is not allowed.
+         * Prevent the user from dropping data back on itself. For example, if the user is moving items #4, #5, #6 and #7 and attempts
+         * to insert the items after item #5, this would be problematic when removing the original items. So this is not allowed.
          */
         if (indices != null && index >= indices[0] - 1
                 && index <= indices[indices.length - 1]) {
@@ -699,9 +688,8 @@ class ListTransferHandler extends StringTransferHandler {
     }
 
     /**
-     * If the remove argument is true, the drop has been successful and it's
-     * time to remove the selected items from the list. If the remove argument
-     * is false, it was a Copy operation and the original list is left intact.
+     * If the remove argument is true, the drop has been successful and it's time to remove the selected items from the list. If the
+     * remove argument is false, it was a Copy operation and the original list is left intact.
      *
      * @param c JComponent
      * @param remove boolean
@@ -713,9 +701,8 @@ class ListTransferHandler extends StringTransferHandler {
             DefaultListModel model = (DefaultListModel) source.getModel();
 
             /**
-             * If we are moving items around in the same list, we need to adjust
-             * the indices accordingly, since those after the insertion point
-             * have moved.
+             * If we are moving items around in the same list, we need to adjust the indices accordingly, since those after the
+             * insertion point have moved.
              */
             if (addCount > 0) {
                 for (int i = 0; i < indices.length; i++) {

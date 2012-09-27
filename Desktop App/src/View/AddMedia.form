@@ -76,7 +76,7 @@
                                           <Component id="bSave" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="tfLinkName" max="32767" attributes="0"/>
-                                      <Component id="jScrollPane1" pref="351" max="32767" attributes="0"/>
+                                      <Component id="jScrollPane1" pref="343" max="32767" attributes="0"/>
                                       <Component id="pAddedMedia" alignment="0" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
@@ -116,7 +116,7 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Component id="lRoute" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="104" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="102" max="32767" attributes="0"/>
                               </Group>
                               <Component id="jScrollPane1" pref="0" max="32767" attributes="0"/>
                           </Group>
