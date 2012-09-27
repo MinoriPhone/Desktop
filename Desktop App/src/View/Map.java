@@ -135,6 +135,9 @@ public class Map extends JPanel {
         nodes.add(node);
         waypointPainter.setWaypoints(nodes);
         mapViewer.repaint();
+
+        // Set changeboolean to true
+        story.setSomethingChanged(true);
     }
 
     /**
@@ -146,6 +149,9 @@ public class Map extends JPanel {
         nodes.remove(node);
         waypointPainter.setWaypoints(nodes);
         mapViewer.repaint();
+
+        // Set changeboolean to true
+        story.setSomethingChanged(true);
     }
 
     /**
@@ -510,6 +516,10 @@ class MapListeners extends MouseInputAdapter {
                 // Set the new coords and repaint
                 draggingNode.setGeoposition(geopos);
                 prev = current;
+
+                // Set changeboolean to true
+                map.getStory().setSomethingChanged(true);
+
                 mapViewer.repaint();
             }
             if (map.isButtonNodeClicked() || map.isLinkOnMouse()) {

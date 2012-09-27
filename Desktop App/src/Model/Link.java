@@ -39,6 +39,23 @@ public class Link {
     }
 
     /**
+     * Constructor
+     *
+     * @param name String
+     * @param p1 Node
+     * @param p2 Node
+     */
+    public Link(Link link, long id) {
+        this.name = link.getName();
+        this.p1 = link.getP1();
+        this.p2 = link.getP2();
+        this.links = new ArrayList<Link>();
+        this.mediaItems = link.getMediaItems();
+        this.color = Color.RED;
+        this.id = id;
+    }
+
+    /**
      * Get the first Node (position) of the Link
      *
      * @return Node first position
