@@ -19,6 +19,7 @@ public class Link {
     private ArrayList<MediaItem> mediaItems;
     private Color color;
     private long id;
+    private Link twin;
 
     /**
      * Constructor
@@ -89,6 +90,24 @@ public class Link {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Get the twin of the Link
+     *
+     * @return Link
+     */
+    public Link getTwin() {
+        return twin;
+    }
+
+    /**
+     * Set the twin of the Link
+     *
+     * @param twin Link
+     */
+    public void setTwin(Link twin) {
+        this.twin = twin;
     }
 
     /**
@@ -201,11 +220,11 @@ public class Link {
     }
 
     /**
-     * TODO 
-     * 
+     * TODO
+     *
      * @param node
      * @param prevLinks
-     * @return 
+     * @return
      */
     public ArrayList<Link> getPrevLinksForNode(Node node, ArrayList<Link> prevLinks) {
         if (this.getP2().equals(node)) {
@@ -327,13 +346,45 @@ public class Link {
 
     /**
      * Get the identifier from this link
-     * 
+     *
      * @return the id
      */
     public long getId() {
         return id;
     }
-    
+
+    /**
+     * Get the identifier from this link
+     *
+     * @return the id
+     */
+    public Link getParentFromLink(Link link, Link parent) {
+        if (this.equals(link)) {
+            return parent;
+        } else {
+            for (Link currentLink : links) {
+                return currentLink.getParentFromLink(link, this);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Get the identifier from this link
+     *
+     * @return the id
+     */
+    public Link getTwins(Link link) {
+        if (this.twin.equals(link)) {
+            return twin;
+        } else {
+            for (Link currentLink : links) {
+                return currentLink.getTwins(link);
+            }
+            return null;
+        }
+    }
+
     /**
      * Return name of this Link
      */
