@@ -470,7 +470,7 @@ class MapListeners extends MouseInputAdapter {
 
         } // Open media dialog if user clicks on a Link or a startNode
         else if (clickedLink != null) {
-            openMediaDialogByLinkClick(clickedLink);
+            //openMediaDialogByLinkClick(clickedLink);
         }
     }
 
@@ -615,41 +615,41 @@ class MapListeners extends MouseInputAdapter {
      *
      * @param link
      */
-    private void openMediaDialogByLinkClick(Link link) {
-
-        // Open AddMedia
-        final AddMedia popup = new AddMedia(parent, map, link);
-        popup.setVisible(true);
-
-        // Add window listener to the popup dialog window, so we
-        // can get the added MediaItems in the right order
-        popup.addWindowListener(new WindowAdapter() {
-            /**
-             * Window closed event
-             */
-            @Override
-            public void windowClosed(WindowEvent we) {
-
-                // Get all added media items in the right order!
-                ArrayList<MediaItem> items = popup.getAddedItems();
-
-                // User saved link properties
-                if (popup.isClosedBySave()) {
-
-                    // If user did not add any media to the link,
-                    if (items.isEmpty()) {
-
-                        // then show popup.
-                        JOptionPane.showMessageDialog(popup,
-                                "You didn't add any media to this Link." + "\n"
-                                + "You can still add media to this Link by clicking on this Link!", // message
-                                "Info", // title
-                                JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-            }
-        });
-    }
+//    private void openMediaDialogByLinkClick(Link link) {
+//
+//        // Open AddMedia
+//        final AddMedia popup = new AddMedia(parent, map, link);
+//        popup.setVisible(true);
+//
+//        // Add window listener to the popup dialog window, so we
+//        // can get the added MediaItems in the right order
+//        popup.addWindowListener(new WindowAdapter() {
+//            /**
+//             * Window closed event
+//             */
+//            @Override
+//            public void windowClosed(WindowEvent we) {
+//
+//                // Get all added media items in the right order!
+//                ArrayList<MediaItem> items = popup.getAddedItems();
+//
+//                // User saved link properties
+//                if (popup.isClosedBySave()) {
+//
+//                    // If user did not add any media to the link,
+//                    if (items.isEmpty()) {
+//
+//                        // then show popup.
+//                        JOptionPane.showMessageDialog(popup,
+//                                "You didn't add any media to this Link." + "\n"
+//                                + "You can still add media to this Link by clicking on this Link!", // message
+//                                "Info", // title
+//                                JOptionPane.INFORMATION_MESSAGE);
+//                    }
+//                }
+//            }
+//        });
+//    }
 
     /**
      * Open AddMedia Dialog
