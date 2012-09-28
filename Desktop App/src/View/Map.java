@@ -367,6 +367,7 @@ class MapListeners extends MouseInputAdapter {
                     ArrayList<Link> prevLinksForP2 = this.map.getStory().getPreviousLinksForStartNode(link.getP2());
                     boolean found = false;
                     for (Link prevP2 : prevLinksForP2) {
+                        found = false;
                         for (Link prevP1 : prevLinks) {
                             for (Link l : prevP1.getLinks()) {
                                 if (l.equals(prevP2)) {
