@@ -215,7 +215,9 @@ public class Link {
         if (this.links.size() > 0) {
             XMLString += "<links>\r\n";
             for (Link link : this.links) {
+                XMLString += "<link>\r\n";
                 XMLString += link.printXML();
+                XMLString += "</link>\r\n";
             }
             XMLString += "</links>\r\n";
         }
@@ -392,7 +394,7 @@ public class Link {
      * @return the id
      */
     public Link getTwins(Link link) {
-        if (this.twin.equals(link)) {
+        if (this.twin != null && this.twin.equals(link)) {
             return twin;
         } else {
             for (Link currentLink : links) {
