@@ -79,8 +79,8 @@ public class Main extends JFrame implements PropertyChangeListener {
         miSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
 
-        miCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        miImport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        miExport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         // Lister to prevent the application from closing when the user did something change
         this.addWindowListener(new WindowAdapter() {
@@ -140,12 +140,12 @@ public class Main extends JFrame implements PropertyChangeListener {
         miOpen = new javax.swing.JMenuItem();
         miSave = new javax.swing.JMenuItem();
         sepFile = new javax.swing.JPopupMenu.Separator();
+        miImport = new javax.swing.JMenuItem();
+        miExport = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
         miClose = new javax.swing.JMenuItem();
-        mEdit = new javax.swing.JMenu();
-        miCopy = new javax.swing.JMenuItem();
-        miPaste = new javax.swing.JMenuItem();
-        jSeparator = new javax.swing.JPopupMenu.Separator();
-        miProjectSettings = new javax.swing.JMenuItem();
+        mSettings = new javax.swing.JMenu();
+        miProject = new javax.swing.JMenuItem();
         mHelp = new javax.swing.JMenu();
         miAbout = new javax.swing.JMenuItem();
 
@@ -232,6 +232,18 @@ public class Main extends JFrame implements PropertyChangeListener {
         mFile.add(miSave);
         mFile.add(sepFile);
 
+        miImport.setText("Import");
+        mFile.add(miImport);
+
+        miExport.setText("Export");
+        miExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportActionPerformed(evt);
+            }
+        });
+        mFile.add(miExport);
+        mFile.add(jSeparator1);
+
         miClose.setText("Close");
         miClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -242,24 +254,17 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         mbMenubar.add(mFile);
 
-        mEdit.setText("Edit");
+        mSettings.setText("Settings");
 
-        miCopy.setText("Copy");
-        mEdit.add(miCopy);
-
-        miPaste.setText("Paste");
-        mEdit.add(miPaste);
-        mEdit.add(jSeparator);
-
-        miProjectSettings.setText("Project settings");
-        miProjectSettings.addActionListener(new java.awt.event.ActionListener() {
+        miProject.setText("Project");
+        miProject.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                miProjectSettingsActionPerformed(evt);
+                miProjectActionPerformed(evt);
             }
         });
-        mEdit.add(miProjectSettings);
+        mSettings.add(miProject);
 
-        mbMenubar.add(mEdit);
+        mbMenubar.add(mSettings);
 
         mHelp.setText("Help");
         mHelp.setToolTipText("");
@@ -317,17 +322,21 @@ public class Main extends JFrame implements PropertyChangeListener {
     }//GEN-LAST:event_bStartActionPerformed
 
     private void miSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveActionPerformed
-        triggerExportStory();
+        saveStory();
     }//GEN-LAST:event_miSaveActionPerformed
 
-    private void miProjectSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miProjectSettingsActionPerformed
+    private void miProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miProjectActionPerformed
         ProjectSettings projectSettings = new ProjectSettings(map);
         projectSettings.setVisible(true);
-    }//GEN-LAST:event_miProjectSettingsActionPerformed
+    }//GEN-LAST:event_miProjectActionPerformed
 
     private void miCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCloseActionPerformed
         checkChangeBeforeClose();
     }//GEN-LAST:event_miCloseActionPerformed
+
+    private void miExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miExportActionPerformed
+        triggerExportStory();
+    }//GEN-LAST:event_miExportActionPerformed
 
     /**
      * Run Main window
@@ -368,9 +377,71 @@ public class Main extends JFrame implements PropertyChangeListener {
      *
      * @return boolean
      */
+    private boolean saveStory() {
+
+        boolean XMLProject = true; // make a proj file
+
+        JFileChooser j = new JFileChooser();
+        //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        j.setSelectedFile(new File(map.getStory().getName()));
+        int dialog = j.showSaveDialog(this);
+
+        // Catch actions of the File Chooser Dialog Window
+        if (dialog == JFileChooser.APPROVE_OPTION) {
+
+            try {
+
+                String XMLcontent = this.story.printXML(XMLProject);
+                String filePathName = j.getSelectedFile().toString();
+
+                // Add ".iStory.proj  at the end of the string (only if it not exists)
+                if (!filePathName.endsWith(".iStory.proj")) {
+                    filePathName += ".iStory.proj";
+                }
+
+                ///////////
+                // XML
+                ///////////
+
+                // Create an XML-file
+                File projectFile = new File(filePathName);
+
+                // Check if the iStory file already exists
+                boolean exists = projectFile.createNewFile();
+                if (exists) {
+                    FileWriter fstream = new FileWriter(filePathName);
+                    BufferedWriter out = new BufferedWriter(fstream);
+                    out.write(XMLcontent);
+                    out.close();
+                    fstream.close();
+                    JOptionPane.showMessageDialog(
+                            Main.this,
+                            "The project has been saved",
+                            "Saved succes..",
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    return false;
+                }
+
+                // Set the changed to false to be able to close the program
+                story.setSomethingChanged(false);
+                return true;
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * TODO
+     *
+     * @return boolean
+     */
     private boolean exportStory() {
         float progress = 0f;
-
+        boolean XMLProject = false; // make a proj file
 
         JFileChooser j = new JFileChooser();
         //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -383,7 +454,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             try {
                 // Max length of the buffer
                 int maxBufferSize = 1024; // bytes
-                String XMLcontent = this.story.printXML();
+                String XMLcontent = this.story.printXML(XMLProject);
                 String fileName = j.getSelectedFile().toString();
 
                 // Add ".iStory  at the end of the string (only if it not exists)
@@ -431,6 +502,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                     FileWriter fstream = new FileWriter(filenameWithPath);
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(XMLcontent);
+                    fstream.close();
                     out.close();
                     // Get the data from the file
                     byte[] data = new byte[maxBufferSize];
@@ -536,18 +608,18 @@ public class Main extends JFrame implements PropertyChangeListener {
     private javax.swing.JButton bLink;
     private javax.swing.JButton bNode;
     private javax.swing.JButton bStart;
-    private javax.swing.JPopupMenu.Separator jSeparator;
-    private javax.swing.JMenu mEdit;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JMenu mFile;
     private javax.swing.JMenu mHelp;
+    private javax.swing.JMenu mSettings;
     private javax.swing.JMenuBar mbMenubar;
     private javax.swing.JMenuItem miAbout;
     private javax.swing.JMenuItem miClose;
-    private javax.swing.JMenuItem miCopy;
+    private javax.swing.JMenuItem miExport;
+    private javax.swing.JMenuItem miImport;
     private javax.swing.JMenuItem miNew;
     private javax.swing.JMenuItem miOpen;
-    private javax.swing.JMenuItem miPaste;
-    private javax.swing.JMenuItem miProjectSettings;
+    private javax.swing.JMenuItem miProject;
     private javax.swing.JMenuItem miSave;
     private javax.swing.JPanel pMain;
     private javax.swing.JPanel pMenu;

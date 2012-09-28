@@ -102,7 +102,7 @@ public class NodeRenderer implements WaypointRenderer<Node> {
         //g.drawOval((int) ltPoint.getX(), (int) ltPoint.getY(), (int) diff, (int) diff);
         g.setColor(Color.yellow);
         g.fillOval((int) (point.getX()-diff), (int) (point.getY()-diff), (int) diff, (int) diff);
-
+        
         //Draw node
         g.drawImage(myImg, x - myImg.getWidth() / 2, y - myImg.getHeight(), null);
 

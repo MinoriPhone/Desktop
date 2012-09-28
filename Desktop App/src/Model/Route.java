@@ -60,15 +60,15 @@ public class Route {
     /**
      * Print XML
      */
-    public String printXML() {
+    public String printXML(boolean XMLProject) {
         String XMLString = "";
         XMLString += "<route>\r\n";
-        XMLString += "<route.name>"+this.name+"</route.name>\r\n";
+        XMLString += "<route.name>" + this.name + "</route.name>\r\n";
         XMLString += "<route.link>\r\n";
-        XMLString += startLink.printXML();
+        XMLString += startLink.printXML(XMLProject);
         XMLString += "</route.link>\r\n";
         XMLString += "</route>\r\n";
         return XMLString;
-        
+
     }
 }

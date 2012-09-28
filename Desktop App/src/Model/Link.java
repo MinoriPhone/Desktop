@@ -193,30 +193,30 @@ public class Link {
     /**
      * Print XML
      */
-    public String printXML() {
+    public String printXML(boolean XMLProject) {
         String XMLString = "";
         XMLString += "<link.name>" + this.name + "</link.name>\r\n";
         XMLString += "<link.id>" + this.id + "</link.id>\r\n";
         if (p1 != null) {
             XMLString += "<from>\r\n";
-            XMLString += this.p1.printXML();
+            XMLString += this.p1.printXML(XMLProject);
             XMLString += "</from>\r\n";
         }
         if (p2 != null) {
             XMLString += "<to>\r\n";
-            XMLString += this.p2.printXML();
+            XMLString += this.p2.printXML(XMLProject);
             XMLString += "</to>\r\n";
         }
         XMLString += "<queue>\r\n";
         for (MediaItem item : this.mediaItems) {
-            XMLString += item.printXML();
+            XMLString += item.printXML(XMLProject);
         }
         XMLString += "</queue>\r\n";
         if (this.links.size() > 0) {
             XMLString += "<links>\r\n";
             for (Link link : this.links) {
                 XMLString += "<link>\r\n";
-                XMLString += link.printXML();
+                XMLString += link.printXML(XMLProject);
                 XMLString += "</link>\r\n";
             }
             XMLString += "</links>\r\n";

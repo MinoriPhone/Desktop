@@ -66,7 +66,7 @@ public class Story {
 
     /**
      * Create a new Route and add Route to the Routelist
-     * 
+     *
      * @param routeName String Name of the Route
      * @param startLink Link The startlink for this Route
      */
@@ -108,14 +108,14 @@ public class Story {
     /**
      * Print XML
      */
-    public String printXML() {
+    public String printXML(boolean XMLProject) {
         String XMLString = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n";
 
         XMLString += "<story>\r\n";
         XMLString += "<story.name>" + this.name + "</story.name>\r\n";
         XMLString += "<routes>\r\n";
         for (Route route : this.routes) {
-            XMLString += route.printXML();
+            XMLString += route.printXML(XMLProject);
         }
         XMLString += "</routes>\r\n";
         XMLString += "</story>\r\n";
@@ -162,7 +162,7 @@ public class Story {
     public Link getParentFromLink(Link link) {
         // Get all routes that are part of the given Node
         for (Route route : routes) {
-            Link parentLink = route.getStartLink().getParentFromLink(link,null);
+            Link parentLink = route.getStartLink().getParentFromLink(link, null);
             if (parentLink != null) {
                 return parentLink;
             }
@@ -215,6 +215,7 @@ public class Story {
 
     /**
      * Returns the Link Counter
+     *
      * @return the current linkCounter incremented with 1
      */
     public long getLinkCounter() {
