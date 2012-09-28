@@ -70,18 +70,23 @@ public class Image implements MediaItem {
     }
 
     @Override
-    public String printXML() {
+    public String printXML(boolean XMLProject) {
         String XMLString = "";
-        XMLString += "<image>";
-        XMLString += "<filename>"+this.fileName+"</filename>";
-        XMLString += "<duration>"+this.showDurationInSeconds+"</duration>";
-        XMLString += "</image>";
+        XMLString += "<image>\r\n";
+        if (XMLProject) {
+            XMLString += "<filename>" + this.absPath + this.fileName + "</filename>\r\n";
+        } else {
+            XMLString += "<filename>" + this.fileName + "</filename>\r\n";
+        }
+
+        XMLString += "<duration>" + this.showDurationInSeconds + "</duration>\r\n";
+        XMLString += "</image>\r\n";
         return XMLString;
     }
 
     /**
      * Get the absolute path of the file
-     * 
+     *
      * @return String absolute path
      */
     @Override
@@ -91,7 +96,7 @@ public class Image implements MediaItem {
 
     /**
      * Set the absolute path to the file
-     * 
+     *
      * @param absPath String absolute path to file
      */
     @Override

@@ -50,5 +50,5 @@ public interface MediaItem {
      * Print to XML
      *
      */
-    public String printXML();
+    public String printXML(boolean XMLProject);
 }

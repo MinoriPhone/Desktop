@@ -29,6 +29,21 @@
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="sepFile">
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="miImport">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Import"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="miExport">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Export"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miExportActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="miClose">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Close"/>
@@ -39,29 +54,17 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="mEdit">
+        <Menu class="javax.swing.JMenu" name="mSettings">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Edit"/>
+            <Property name="text" type="java.lang.String" value="Settings"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="miCopy">
+            <MenuItem class="javax.swing.JMenuItem" name="miProject">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Copy"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="miPaste">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Paste"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="miProjectSettings">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Project settings"/>
+                <Property name="text" type="java.lang.String" value="Project"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miProjectSettingsActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miProjectActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
