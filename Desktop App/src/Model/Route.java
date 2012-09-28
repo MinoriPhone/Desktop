@@ -15,6 +15,16 @@ public class Route {
      * @param name String Name of the Route
      * @param startLink Link Startlink of the Route
      */
+    public Route() {
+    }
+
+
+    /**
+     * Overload Constructor
+     *
+     * @param name String Name of the Route
+     * @param startLink Link Startlink of the Route
+     */
     public Route(String name, Link startLink) {
         this.name = name;
         this.startLink = startLink;

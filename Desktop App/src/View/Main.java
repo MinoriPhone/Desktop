@@ -1,8 +1,13 @@
 package View;
 
+import Model.ExtensionFileFilter;
+import Model.Image;
 import Model.Link;
 import Model.MediaItem;
+import Model.Node;
 import Model.Story;
+import Model.Text;
+import Model.Video;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -14,12 +19,16 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -221,6 +230,11 @@ public class Main extends JFrame implements PropertyChangeListener {
         mFile.add(miNew);
 
         miOpen.setText("Open");
+        miOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miOpenActionPerformed(evt);
+            }
+        });
         mFile.add(miOpen);
 
         miSave.setText("Save");
@@ -338,6 +352,109 @@ public class Main extends JFrame implements PropertyChangeListener {
         triggerExportStory();
     }//GEN-LAST:event_miExportActionPerformed
 
+    private void miOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miOpenActionPerformed
+        //browse
+        JFileChooser j = new JFileChooser();
+        j.addChoosableFileFilter(new ExtensionFileFilter(
+                new String[]{".proj"}, // Extensions we accept
+                "Project files (*.proj)"));
+        //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        int dialog = j.showOpenDialog(this);
+
+        // Catch actions of the File Chooser Dialog Window
+        if (dialog == JFileChooser.APPROVE_OPTION) {
+
+            // Create an XML-file
+            File projectFile = j.getSelectedFile();
+
+            try {
+                // Open the file that is the first 
+                // command line parameter
+                FileInputStream fstream = new FileInputStream(projectFile);
+                // Get the object of DataInputStream
+                DataInputStream in = new DataInputStream(fstream);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String strLine;
+                //Read File Line By Line
+                Story tempStory = null;
+                ArrayList<Link> tempLink = new ArrayList<Link>();
+                double tempLong = 0.0;
+                double tempLat = 0.0;
+                MediaItem tempMediaItem = null;
+                while ((strLine = br.readLine()) != null) {
+                    // Print the content on the console
+                    System.out.println(strLine);
+                    if (strLine.equals("<story>")) {
+                        tempStory = new Story("", panelRoutes);
+                    } else if (strLine.contains("<story.name>") && strLine.contains("</story.name>")) {
+                        tempStory.setName(strLine.substring("<story.name>".length(), strLine.length() - "</story.name>".length()));
+                    } else if (strLine.contains("<route>")) {
+                        tempStory.newEmptyRoute();
+                    } else if (strLine.contains("<route.name>") && strLine.contains("</route.name>")) {
+                        tempStory.getRoutes().get(tempStory.getRoutes().size() - 1).setName(strLine.substring("<route.name>".length(), strLine.length() - "</route.name>".length()));
+                    } else if (strLine.contains("<route.link>")) {
+                        tempLink.add(new Link());
+                        tempStory.getRoutes().get(tempStory.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
+                    }  else if (strLine.contains("</route.link>")) {
+                        tempStory.getRoutes().get(tempStory.getRoutes().size() - 1).getStartLink().getP2().setStart();
+                    } else if (strLine.contains("<link.name>") && strLine.contains("</link.name>")) {
+                        tempLink.get(tempLink.size() - 1).setName(strLine.substring("<link.name>".length(), strLine.length() - "</link.name>".length()));
+                    } else if (strLine.contains("<link.id>") && strLine.contains("</link.id>")) {
+                        tempLink.get(tempLink.size() - 1).setId(Long.parseLong(strLine.substring("<link.id>".length(), strLine.length() - "</link.id>".length())));
+                    } else if (strLine.contains("<longitude>") && strLine.contains("</longitude>")) {
+                        tempLong = Double.parseDouble(strLine.substring("<longitude>".length(), strLine.length() - "</longitude>".length()));
+                    } else if (strLine.contains("<latitude>") && strLine.contains("</latitude>")) {
+                        tempLat = Double.parseDouble(strLine.substring("<latitude>".length(), strLine.length() - "</latitude>".length()));
+                    } else if (strLine.contains("</from>")) {
+                        tempLink.get(tempLink.size() - 1).setP1(new Node(tempLong, tempLat));
+                    } else if (strLine.contains("</to>")) {
+                        tempLink.get(tempLink.size() - 1).setP2(new Node(tempLong, tempLat));
+                    } else if (strLine.contains("<video>")) {
+                        tempMediaItem = new Video();
+                    } else if (strLine.contains("<image>")) {
+                        tempMediaItem = new Image();
+                    } else if (strLine.contains("<text>")) {
+                        tempMediaItem = new Text();
+                    } else if (strLine.contains("<filename>") && strLine.contains("</filename>")) {
+                        File file = new File(strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
+                        //TODO CHECK IF FILE EXISTS
+                        tempMediaItem.setAbsolutePath(file.getAbsolutePath());
+                        tempMediaItem.setFileName(file.getName());
+                    } else if (strLine.contains("<duration>") && strLine.contains("</duration>")) {
+                        tempMediaItem.setShowDurationInSeconds(Integer.parseInt(strLine.substring("<duration>".length(), strLine.length() - "</duration>".length())));
+                    } else if (strLine.contains("</video>") || strLine.contains("</image>") || strLine.contains("</text>")) {
+                        tempLink.get(tempLink.size() - 1).getMediaItems().add(tempMediaItem);
+                    } else if (strLine.contains("<link>")) {
+                        tempLink.add(new Link());
+                    } else if (strLine.contains("</link>")) {
+                        //tempLink.get(tempLink.size() - 2).addLink(tempLink.get(tempLink.size() - 1));
+                    } 
+                }
+                //Close the input stream
+                in.close();
+            } catch (Exception e) {//Catch exception if any
+                System.err.println("Error: " + e.getMessage());
+            }
+        } else if (dialog == JFileChooser.CANCEL_OPTION) {
+            // User canceled uploaden file
+            LOGGER.log(Level.INFO, "File Chooser is canceled by user");
+        } else {
+            // Error or dialog is dismissed
+            LOGGER.log(Level.WARNING, "File Chooser returns error");
+        }
+        //uitlezen bestand
+        //story aanmaken
+        //routes aanmaken
+        //route aanmaken
+        //startlink aanmaken
+        //queue aanmaken
+        //media toevoegen aan link
+        //nodes aanmaken (en toevoegen aan renderer)
+        //links aanmaken
+        //link aanmaken (en toevoegen aan painter)
+    }//GEN-LAST:event_miOpenActionPerformed
+
     /**
      * Run Main window
      *
@@ -413,7 +530,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(XMLcontent);
                     out.close();
-                    fstream.close();
                     JOptionPane.showMessageDialog(
                             Main.this,
                             "The project has been saved",
@@ -635,8 +751,9 @@ public class Main extends JFrame implements PropertyChangeListener {
         /**
          * Set progress
          *
-         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
-         * final protected.
+         * Own implementation of setProgress() because we need to set the
+         * progress outside SwingWorker. The function setProgress() is final
+         * protected.
          *
          * @param progress int current progress
          */

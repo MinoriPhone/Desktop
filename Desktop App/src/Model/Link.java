@@ -41,6 +41,16 @@ public class Link {
     /**
      * Constructor
      *
+     */
+    public Link() {
+        this.links = new ArrayList<Link>();
+        this.mediaItems = new ArrayList<MediaItem>();
+        this.color = Color.RED;
+    }
+
+    /**
+     * Constructor
+     *
      * @param name String
      * @param p1 Node
      * @param p2 Node
@@ -108,6 +118,12 @@ public class Link {
     public String getName() {
         return name;
     }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+    
+    
 
     /**
      * Get the twin of the Link

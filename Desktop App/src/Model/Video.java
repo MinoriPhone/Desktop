@@ -15,6 +15,13 @@ public class Video implements MediaItem {
     /**
      * Constructor
      *
+     */
+    public Video() {
+    }
+
+    /**
+     * Overload Constructor
+     *
      * @param fileName String Name of the Video-file
      * @param absPath String absolute path to Text-file
      */
