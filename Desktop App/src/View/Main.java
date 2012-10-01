@@ -473,8 +473,22 @@ public class Main extends JFrame implements PropertyChangeListener {
     }//GEN-LAST:event_miOpenActionPerformed
 
     private void miNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miNewActionPerformed
-        map.Clear(story);
+        if (story.isSomethingChanged()) {
+            // Show save confirm window
+            int n = JOptionPane.showConfirmDialog(null,
+                    "You made one or several changes to the current story.\n"
+                    + "Do you want to save this before starting a new one?\n",
+                    "Save?",
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+
+            if (n == JOptionPane.YES_OPTION) {
+                saveStory();
+            } else if (n == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
         story = new Story("New Story", panelRoutes);
+        map.Clear(story);
     }//GEN-LAST:event_miNewActionPerformed
 
     /**
@@ -531,6 +545,9 @@ public class Main extends JFrame implements PropertyChangeListener {
             try {
 
                 String XMLcontent = this.story.printXML(XMLProject);
+                // Add no linked nodes at the end
+                XMLcontent += this.map.printNodeXML();
+
                 String filePathName = j.getSelectedFile().toString();
 
                 // Add ".iStory.proj  at the end of the string (only if it not exists)
@@ -547,20 +564,31 @@ public class Main extends JFrame implements PropertyChangeListener {
 
                 // Check if the iStory file already exists
                 boolean exists = projectFile.createNewFile();
-                if (exists) {
-                    FileWriter fstream = new FileWriter(filePathName);
-                    BufferedWriter out = new BufferedWriter(fstream);
-                    out.write(XMLcontent);
-                    out.close();
-                    JOptionPane.showMessageDialog(
-                            Main.this,
-                            "The project has been saved",
-                            "Saved succes..",
-                            JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    return false;
+                if (!exists) {
+                    // Confirm the save
+                    int option = JOptionPane.showConfirmDialog(null,
+                            "There is already a file with the same name in the selected folder. \n "
+                            + "Do you want to overwrite this file?",
+                            "File already exists",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        projectFile.delete();
+                    } else if (option == JOptionPane.NO_OPTION) {
+                        saveStory();
+                        return false;
+                    } else if (option == JOptionPane.CANCEL_OPTION || option == JOptionPane.CLOSED_OPTION) {
+                        return false;
+                    }
                 }
-
+                FileWriter fstream = new FileWriter(filePathName);
+                BufferedWriter out = new BufferedWriter(fstream);
+                out.write(XMLcontent);
+                out.close();
+                JOptionPane.showMessageDialog(
+                        Main.this,
+                        "The project has been saved",
+                        "Saved succes..",
+                        JOptionPane.INFORMATION_MESSAGE);
                 // Set the changed to false to be able to close the program
                 story.setSomethingChanged(false);
                 return true;
@@ -659,44 +687,45 @@ public class Main extends JFrame implements PropertyChangeListener {
 
                 task.setProgression(Math.min(15, 100));
 
-                ///////////
-                // Story image
-                ///////////
+                if (map.getStory().getImage() != null) {
+                    ///////////
+                    // Story image
+                    ///////////
 
-                File storyImage = map.getStory().getImage();
-                exists = storyImage.isFile();
-                if (exists) {
+                    File storyImage = map.getStory().getImage();
+                    exists = storyImage.isFile();
+                    if (exists) {
 
-                    // Get the data from the file
-                    byte[] data = new byte[maxBufferSize];
-                    // Create inputBuffer for the data
-                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(storyImage));
-                    // Internal count for the databuffer
-                    int count = 0;
-                    // Add new file to the zip file
-                    zipOut.putNextEntry(new ZipEntry(storyImage.getName()));
-                    // Fill the new file with data
-                    while ((count = in.read(data, 0, maxBufferSize)) != -1) {
-                        zipOut.write(data, 0, count);
-                        if (task.isCancelled() || progressMonitor.isCanceled()) {
-                            // Close the buffers
-                            in.close();
-                            zipOut.flush();
-                            zipOut.close();
-                            // Delete the corupt file
-                            if (!storyImage.delete()) {
-                                JOptionPane.showMessageDialog(
-                                        Main.this,
-                                        "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
-                                        "Could not delete iStory file",
-                                        JOptionPane.WARNING_MESSAGE);
+                        // Get the data from the file
+                        byte[] data = new byte[maxBufferSize];
+                        // Create inputBuffer for the data
+                        BufferedInputStream in = new BufferedInputStream(new FileInputStream(storyImage));
+                        // Internal count for the databuffer
+                        int count = 0;
+                        // Add new file to the zip file
+                        zipOut.putNextEntry(new ZipEntry(storyImage.getName()));
+                        // Fill the new file with data
+                        while ((count = in.read(data, 0, maxBufferSize)) != -1) {
+                            zipOut.write(data, 0, count);
+                            if (task.isCancelled() || progressMonitor.isCanceled()) {
+                                // Close the buffers
+                                in.close();
+                                zipOut.flush();
+                                zipOut.close();
+                                // Delete the corupt file
+                                if (!storyImage.delete()) {
+                                    JOptionPane.showMessageDialog(
+                                            Main.this,
+                                            "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
+                                            "Could not delete iStory file",
+                                            JOptionPane.WARNING_MESSAGE);
+                                }
+                                return false;
                             }
-                            return false;
                         }
+                        in.close();
                     }
-                    in.close();
                 }
-
                 task.setProgression(Math.min(20, 100));
 
 
