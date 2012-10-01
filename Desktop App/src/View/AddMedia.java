@@ -48,6 +48,7 @@ public class AddMedia extends JDialog {
     private Link link;
     private int callFrom;
     private View.Map map;
+    private boolean changeLink;
 
     /**
      * Constructor
@@ -65,7 +66,9 @@ public class AddMedia extends JDialog {
         this.closedBySave = false;
         this.callFrom = (link.getP2() == null) ? 1 : 0;
         this.tfRouteName.setEditable(false);
-
+        this.tfRouteName.setText(map.getStory().getRouteForLink(link).getName());
+        this.tfLinkName.setText(link.getName());
+        this.changeLink = true;
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -76,7 +79,7 @@ public class AddMedia extends JDialog {
 
         // Center the window
         this.setLocation(x, y);
-        
+
         // User is creating a startnode and not a Link
         if (this.callFrom == 1) {
 
@@ -93,16 +96,14 @@ public class AddMedia extends JDialog {
             this.prevLinks.add(map.getStory().getParentFromLink(this.link));
             // Check if this link has twins and add their parent to the list
             Link twin = this.link.getTwin();
-            while(twin != null)
-            {
+            while (twin != null) {
                 this.prevLinks.add(map.getStory().getParentFromLink(twin));
                 twin = this.link.getTwin();
             }
-            
+
             // Check if there is a link that has this link as a twin
             twin = map.getStory().getTwins(this.link);
-            while(twin != null)
-            {
+            while (twin != null) {
                 this.prevLinks.add(map.getStory().getParentFromLink(twin));
                 twin = map.getStory().getTwins(twin);
             }
@@ -123,6 +124,18 @@ public class AddMedia extends JDialog {
         this.scrollPane.setPreferredSize(new Dimension(400, 100));
         this.pAddedMedia.add(this.scrollPane, BorderLayout.CENTER);
 
+        for (MediaItem mItem : link.getMediaItems()) {
+            // Add selected file to list
+            if (mItem != null) {
+                if (mItem instanceof Video) {
+                    this.addItem((Video) mItem);
+                } else if (mItem instanceof Model.Image) {
+                    this.addItem((Model.Image) mItem);
+                } else if (mItem instanceof Text) {
+                    this.addItem((Text) mItem);
+                }
+            }
+        }
         // Enable drag and drop
         this.list.setDragEnabled(true);
         this.list.setTransferHandler(new ListTransferHandler());
@@ -196,8 +209,10 @@ public class AddMedia extends JDialog {
      *
      * Creates NEW(!) form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can onnect this Link to
+     * @param parent JFrame The Main window of this application is the parent of
+     * this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can
+     * onnect this Link to
      * @param link Link The Link we are creating
      * @param callFrom int If int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
@@ -214,7 +229,7 @@ public class AddMedia extends JDialog {
         this.link = link;
         this.callFrom = callFrom;
         this.tfRouteName.setEditable(false);
-
+        this.changeLink = false;
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -329,9 +344,11 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
+     * the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
@@ -339,9 +356,11 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
+     * the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to add
      * @param index int The index we want to add the mediaItem at
      */
     public void addItemAtIndex(MediaItem mediaItem, int index) {
@@ -350,9 +369,11 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from
+     * the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to remove
      */
     public void removeItem(MediaItem mediaItem) {
         this.addedItems.remove(mediaItem);
@@ -360,7 +381,8 @@ public class AddMedia extends JDialog {
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will be in the right order!
+     * Get all added media items. If we closed the window, then the items will
+     * be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -615,78 +637,120 @@ public class AddMedia extends JDialog {
     }//GEN-LAST:event_bBrowseActionPerformed
 
     private void bSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveActionPerformed
+        if (!changeLink) {
+            // Get selected previous Link
+            Object[] objArray = lLinks.getSelectedValues();
+            // User must give this Link a name
+            if (!tfLinkName.getText().trim().isEmpty()) {
 
-        // Get selected previous Link
-        Object[] objArray = lLinks.getSelectedValues();
-        // User must give this Link an name
-        if (!tfLinkName.getText().trim().isEmpty()) {
+                // User is creating startnode OR user must select previous link
+                if (this.callFrom == 1 || objArray.length > 0) {
 
-            // User is creating startnode OR user must select previous link
-            if (this.callFrom == 1 || objArray.length > 0) {
+                    this.closedBySave = true;
 
-                this.closedBySave = true;
+                    // Get variables we want to save
+                    String routeName = tfRouteName.getText().trim();
+                    String linkName = tfLinkName.getText().trim();
+                    ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
+                    Object[] elements = listModel.toArray();
 
-                // Get variables we want to save
-                String routeName = tfRouteName.getText().trim();
-                String linkName = tfLinkName.getText().trim();
-                ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
-                Object[] elements = listModel.toArray();
-
-                // Get all added Media Items in the right order
-                for (Object obj : elements) {
-                    for (MediaItem item : addedItems) {
-                        if (item.getFileName().equals(obj.toString())) {
-                            mediaItems.add(item);
-                            break;
+                    // Get all added Media Items in the right order
+                    for (Object obj : elements) {
+                        for (MediaItem item : addedItems) {
+                            if (item.getFileName().equals(obj.toString())) {
+                                mediaItems.add(item);
+                                break;
+                            }
                         }
                     }
-                }
 
-                // Set this link variables
-                this.link.setName(linkName);
-                this.link.setItems(mediaItems);
+                    // Set this link variables
+                    this.link.setName(linkName);
+                    this.link.setItems(mediaItems);
 
-                // User is creating a start node
-                if (this.callFrom == 1) {
+                    // User is creating a start node
+                    if (this.callFrom == 1) {
 
-                    // Create new Route
-                    map.getStory().newRoute(routeName, this.link);
+                        // Create new Route
+                        map.getStory().newRoute(routeName, this.link);
 
-                } else {
-                    // Add this link to the selected previous link (so this is the next link for that previous link)
-                    for (Object object : objArray) {
-                        Link prevLink = (Link) object;
-                        // If user selected more than one previous link, we have to make 2 new links instead of using the same one
-                        if (objArray.length > 1) {
-                            // Make a new link so the link won't be saved twice.
-                            Link newLink = new Link(this.link, map.getStory().getLinkCounter());
-                            prevLink.addLink(newLink);
-                        } else {
-                            prevLink.addLink(this.link);
+                    } else {
+                        // Add this link to the selected previous link (so this is the next link for that previous link)
+                        for (Object object : objArray) {
+                            Link prevLink = (Link) object;
+                            // If user selected more than one previous link, we have to make 2 new links instead of using the same one
+                            if (objArray.length > 1) {
+                                // Make a new link so the link won't be saved twice.
+                                Link newLink = new Link(this.link, map.getStory().getLinkCounter());
+                                prevLink.addLink(newLink);
+                            } else {
+                                prevLink.addLink(this.link);
+                            }
                         }
                     }
+
+                    // Set changeboolean to true
+                    map.getStory().setSomethingChanged(true);
+
+                    // Close this window and bring main window to the front
+                    super.toFront();
+                    this.dispose();
+
+                } // User did NOT select previous Link
+                else {
+                    JOptionPane.showMessageDialog(null,
+                            "You must select a previous Link!", // message
+                            "Info", // title
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
-
-                // Set changeboolean to true
-                map.getStory().setSomethingChanged(true);
-
-                // Close this window and bring main window to the front
-                super.toFront();
-                this.dispose();
-
-            } // User did NOT select previous Link
+            } // User did NOT give this Link a name
             else {
                 JOptionPane.showMessageDialog(null,
-                        "You must select a previous Link!", // message
+                        "You must name this Link!", // message
                         "Info", // title
                         JOptionPane.INFORMATION_MESSAGE);
             }
-        } // User did NOT give this Link a name
-        else {
-            JOptionPane.showMessageDialog(null,
-                    "You must name this Link!", // message
-                    "Info", // title
-                    JOptionPane.INFORMATION_MESSAGE);
+        }else{
+            // Get selected previous Link
+            Object[] objArray = lLinks.getSelectedValues();
+            // User must give this Link a name
+            if (!tfLinkName.getText().trim().isEmpty()) {
+
+                    this.closedBySave = true;
+
+                    // Get variables we want to save
+                    //String routeName = tfRouteName.getText().trim();
+                    String linkName = tfLinkName.getText().trim();
+                    ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
+                    Object[] elements = listModel.toArray();
+
+                    // Get all added Media Items in the right order
+                    for (Object obj : elements) {
+                        for (MediaItem item : addedItems) {
+                            if (item.getFileName().equals(obj.toString())) {
+                                mediaItems.add(item);
+                                break;
+                            }
+                        }
+                    }
+
+                    // Set this link variables
+                    this.link.setName(linkName);
+                    this.link.setItems(mediaItems);
+                    
+                    // Set changeboolean to true
+                    map.getStory().setSomethingChanged(true);
+
+                    // Close this window and bring main window to the front
+                    super.toFront();
+                    this.dispose();
+            } // User did NOT give this Link a name
+            else {
+                JOptionPane.showMessageDialog(null,
+                        "You must name this Link!", // message
+                        "Info", // title
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }//GEN-LAST:event_bSaveActionPerformed
 
@@ -797,7 +861,8 @@ class ListTransferHandler extends StringTransferHandler {
     }
 
     /**
-     * Take the incoming string and wherever there is a newline, break it into a separate item in the list.
+     * Take the incoming string and wherever there is a newline, break it into a
+     * separate item in the list.
      *
      * @param c JComponent
      * @param str String
@@ -809,8 +874,10 @@ class ListTransferHandler extends StringTransferHandler {
         int index = target.getSelectedIndex();
 
         /**
-         * Prevent the user from dropping data back on itself. For example, if the user is moving items #4, #5, #6 and #7 and attempts
-         * to insert the items after item #5, this would be problematic when removing the original items. So this is not allowed.
+         * Prevent the user from dropping data back on itself. For example, if
+         * the user is moving items #4, #5, #6 and #7 and attempts to insert the
+         * items after item #5, this would be problematic when removing the
+         * original items. So this is not allowed.
          */
         if (indices != null && index >= indices[0] - 1
                 && index <= indices[indices.length - 1]) {
@@ -838,8 +905,9 @@ class ListTransferHandler extends StringTransferHandler {
     }
 
     /**
-     * If the remove argument is true, the drop has been successful and it's time to remove the selected items from the list. If the
-     * remove argument is false, it was a Copy operation and the original list is left intact.
+     * If the remove argument is true, the drop has been successful and it's
+     * time to remove the selected items from the list. If the remove argument
+     * is false, it was a Copy operation and the original list is left intact.
      *
      * @param c JComponent
      * @param remove boolean
@@ -851,8 +919,9 @@ class ListTransferHandler extends StringTransferHandler {
             DefaultListModel model = (DefaultListModel) source.getModel();
 
             /**
-             * If we are moving items around in the same list, we need to adjust the indices accordingly, since those after the
-             * insertion point have moved.
+             * If we are moving items around in the same list, we need to adjust
+             * the indices accordingly, since those after the insertion point
+             * have moved.
              */
             if (addCount > 0) {
                 for (int i = 0; i < indices.length; i++) {
