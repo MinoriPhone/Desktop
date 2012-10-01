@@ -116,15 +116,16 @@ public class Map extends JPanel {
         this.add(mapViewer, BorderLayout.CENTER);
         mapViewer.repaint();
     }
-    
+
     /* Clear this map and all nodes and links that are painted on it and init it with a new story.
      * 
      */
-    public void Clear(Story newStory){
+    public void Clear(Story newStory) {
         nodes.clear();
         waypointPainter.setWaypoints(nodes);
         linkPainter.clearLinks();
         story = newStory;
+        mapViewer.repaint();
     }
 
     /* DO NOT TOUCH */
@@ -150,7 +151,7 @@ public class Map extends JPanel {
         // Set changeboolean to true
         story.setSomethingChanged(true);
     }
-    
+
     /**
      * Add Link to the mapViewer
      *
@@ -284,6 +285,19 @@ public class Map extends JPanel {
      */
     public void setLinkOnMouse(boolean linkOnMouse) {
         this.linkOnMouse = linkOnMouse;
+    }
+
+    public String printNodeXML() {
+        String xmlString = "";
+        xmlString += "<!-- These are extra nodes (which are not linked)  -->\r\n";
+        xmlString += "<extranodes>\r\n";
+        for (Node node : nodes) {
+            xmlString += "<node>\r\n";
+            xmlString += node.printXML(true);
+            xmlString += "</node>\r\n";
+        }
+        xmlString += "</extranodes>\r\n";
+        return xmlString;
     }
 }
 

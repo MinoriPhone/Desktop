@@ -76,6 +76,7 @@ public class ProjectSettings extends javax.swing.JFrame {
         lStoryImage.setText("Story image:");
 
         tfStoryImage.setEditable(false);
+        tfStoryImage.setMaximumSize(new java.awt.Dimension(6, 20));
 
         bImageBrowse.setText("Browse..");
         bImageBrowse.addActionListener(new java.awt.event.ActionListener() {
@@ -107,13 +108,16 @@ public class ProjectSettings extends javax.swing.JFrame {
                         .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(bSave)
                             .addGroup(pProjectSettingsLayout.createSequentialGroup()
-                                .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(tfStoryImage)
-                                    .addComponent(tfStoryName, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE))
+                                .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(tfStoryName)
+                                    .addComponent(tfStoryImage, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(bImageBrowse)))))
-                .addGap(120, 120, 120))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        pProjectSettingsLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {tfStoryImage, tfStoryName});
+
         pProjectSettingsLayout.setVerticalGroup(
             pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pProjectSettingsLayout.createSequentialGroup()
@@ -126,11 +130,11 @@ public class ProjectSettings extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfStoryImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bImageBrowse)
-                    .addComponent(lStoryImage))
+                    .addComponent(lStoryImage)
+                    .addComponent(bImageBrowse))
                 .addGap(18, 18, 18)
                 .addComponent(bSave)
-                .addContainerGap(161, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         getContentPane().add(pProjectSettings, java.awt.BorderLayout.CENTER);

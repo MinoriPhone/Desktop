@@ -143,10 +143,12 @@ public class Story {
 
         XMLString += "<story>\r\n";
         XMLString += "<story.name>" + this.name + "</story.name>\r\n";
-        if (XMLProject) {
-            XMLString += "<story.image>" + this.image + "</story.image>\r\n";
-        } else {
-            XMLString += "<story.image>" + this.image.getName() + "</story.image>\r\n";
+        if (this.image != null) {
+            if (XMLProject) {
+                XMLString += "<story.image>" + this.image.getAbsolutePath() + "</story.image>\r\n";
+            } else {
+                XMLString += "<story.image>" + this.image.getName() + "</story.image>\r\n";
+            }
         }
         XMLString += "<routes>\r\n";
         for (Route route : this.routes) {

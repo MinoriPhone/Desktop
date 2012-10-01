@@ -40,15 +40,17 @@ public class Routes extends JPanel {
             public void mouseClicked(MouseEvent event) {
                 JList list = (JList) event.getSource();
 
-                // Get index of item clicked
-                int index = list.locationToIndex(event.getPoint());
-                CheckListItem item = (CheckListItem) list.getModel().getElementAt(index);
+                if (list.getModel().getSize() > 0) {
+                    // Get index of item clicked
+                    int index = list.locationToIndex(event.getPoint());
+                    CheckListItem item = (CheckListItem) list.getModel().getElementAt(index);
 
-                // Toggle selected state
-                item.setSelected(!item.isSelected());
+                    // Toggle selected state
+                    item.setSelected(!item.isSelected());
 
-                // Repaint cell
-                list.repaint(list.getCellBounds(index, index));
+                    // Repaint cell
+                    list.repaint(list.getCellBounds(index, index));
+                }
             }
         });
         // Add ScrollPane containing the list with Routes to this JPanel
