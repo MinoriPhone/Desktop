@@ -358,6 +358,20 @@ public class Main extends JFrame implements PropertyChangeListener {
     }//GEN-LAST:event_miExportActionPerformed
 
     private void miOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miOpenActionPerformed
+        if (story.isSomethingChanged()) {
+            // Show save confirm window
+            int n = JOptionPane.showConfirmDialog(null,
+                    "You made one or several changes to the current story.\n"
+                    + "Do you want to save this before opening one?\n",
+                    "Save?",
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+
+            if (n == JOptionPane.YES_OPTION) {
+                saveStory();
+            } else if (n == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
         //browse
         JFileChooser j = new JFileChooser();
         j.addChoosableFileFilter(new ExtensionFileFilter(
@@ -443,6 +457,9 @@ public class Main extends JFrame implements PropertyChangeListener {
                     } else if (strLine.contains("</link>")) {
                         tempLink.get(tempLink.size() - 2).addLink(tempLink.get(tempLink.size() - 1));
                         tempLink.remove(tempLink.size() - 1);
+                    } else if (strLine.contains("</node>")) {
+                        Node nod = new Node(tempLat, tempLong);
+                        map.addNode(nod);
                     }
                 }
 
