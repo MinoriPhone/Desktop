@@ -227,6 +227,11 @@ public class Main extends JFrame implements PropertyChangeListener {
         mFile.setText("File");
 
         miNew.setText("New");
+        miNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miNewActionPerformed(evt);
+            }
+        });
         mFile.add(miNew);
 
         miOpen.setText("Open");
@@ -396,7 +401,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                     } else if (strLine.contains("<route.link>")) {
                         tempLink.add(new Link());
                         tempStory.getRoutes().get(tempStory.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
-                    }  else if (strLine.contains("</route.link>")) {
+                    } else if (strLine.contains("</route.link>")) {
                         tempStory.getRoutes().get(tempStory.getRoutes().size() - 1).getStartLink().getP2().setStart();
                     } else if (strLine.contains("<link.name>") && strLine.contains("</link.name>")) {
                         tempLink.get(tempLink.size() - 1).setName(strLine.substring("<link.name>".length(), strLine.length() - "</link.name>".length()));
@@ -429,7 +434,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         tempLink.add(new Link());
                     } else if (strLine.contains("</link>")) {
                         //tempLink.get(tempLink.size() - 2).addLink(tempLink.get(tempLink.size() - 1));
-                    } 
+                    }
                 }
                 //Close the input stream
                 in.close();
@@ -454,6 +459,11 @@ public class Main extends JFrame implements PropertyChangeListener {
         //links aanmaken
         //link aanmaken (en toevoegen aan painter)
     }//GEN-LAST:event_miOpenActionPerformed
+
+    private void miNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miNewActionPerformed
+        map.Clear(story);
+        story = new Story("New Story", panelRoutes);
+    }//GEN-LAST:event_miNewActionPerformed
 
     /**
      * Run Main window
@@ -635,6 +645,46 @@ public class Main extends JFrame implements PropertyChangeListener {
                     XMLfile.delete();
                 }
 
+                task.setProgression(Math.min(15, 100));
+
+                ///////////
+                // Story image
+                ///////////
+
+                File storyImage = map.getStory().getImage();
+                exists = storyImage.isFile();
+                if (exists) {
+
+                    // Get the data from the file
+                    byte[] data = new byte[maxBufferSize];
+                    // Create inputBuffer for the data
+                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(storyImage));
+                    // Internal count for the databuffer
+                    int count = 0;
+                    // Add new file to the zip file
+                    zipOut.putNextEntry(new ZipEntry(storyImage.getName()));
+                    // Fill the new file with data
+                    while ((count = in.read(data, 0, maxBufferSize)) != -1) {
+                        zipOut.write(data, 0, count);
+                        if (task.isCancelled() || progressMonitor.isCanceled()) {
+                            // Close the buffers
+                            in.close();
+                            zipOut.flush();
+                            zipOut.close();
+                            // Delete the corupt file
+                            if (!storyImage.delete()) {
+                                JOptionPane.showMessageDialog(
+                                        Main.this,
+                                        "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
+                                        "Could not delete iStory file",
+                                        JOptionPane.WARNING_MESSAGE);
+                            }
+                            return false;
+                        }
+                    }
+                    in.close();
+                }
+
                 task.setProgression(Math.min(20, 100));
 
 
@@ -750,9 +800,8 @@ public class Main extends JFrame implements PropertyChangeListener {
         /**
          * Set progress
          *
-         * Own implementation of setProgress() because we need to set the
-         * progress outside SwingWorker. The function setProgress() is final
-         * protected.
+         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
+         * final protected.
          *
          * @param progress int current progress
          */
