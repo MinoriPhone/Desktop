@@ -122,8 +122,6 @@ public class Link {
     public void setId(long id) {
         this.id = id;
     }
-    
-    
 
     /**
      * Get the twin of the Link
@@ -373,7 +371,9 @@ public class Link {
             return true;
         } else {
             for (Link currentLink : links) {
-                return currentLink.getRouteForLink(link);
+                if (currentLink.getRouteForLink(link)) {
+                    return true;
+                }
             }
             return false;
         }

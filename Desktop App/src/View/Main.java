@@ -388,7 +388,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                 MediaItem tempMediaItem = null;
                 while ((strLine = br.readLine()) != null) {
                     // Print the content on the console
-                    System.out.println(strLine);
                     if (strLine.equals("<story>")) {
                         story = new Story("", panelRoutes);
                         map.Clear(story);
