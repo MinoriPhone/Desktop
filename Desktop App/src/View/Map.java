@@ -114,6 +114,17 @@ public class Map extends JPanel {
 
         // Add map to this JPanel
         this.add(mapViewer, BorderLayout.CENTER);
+        mapViewer.repaint();
+    }
+    
+    /* Clear this map and all nodes and links that are painted on it and init it with a new story.
+     * 
+     */
+    public void Clear(Story newStory){
+        nodes.clear();
+        waypointPainter.setWaypoints(nodes);
+        linkPainter.clearLinks();
+        story = newStory;
     }
 
     /* DO NOT TOUCH */
@@ -134,6 +145,19 @@ public class Map extends JPanel {
     public void addNode(Node node) {
         nodes.add(node);
         waypointPainter.setWaypoints(nodes);
+        mapViewer.repaint();
+
+        // Set changeboolean to true
+        story.setSomethingChanged(true);
+    }
+    
+    /**
+     * Add Link to the mapViewer
+     *
+     * @param link Link The Link we want to add to the mapViewer
+     */
+    public void addLink(Link link) {
+        linkPainter.addLink(link);
         mapViewer.repaint();
 
         // Set changeboolean to true
@@ -334,7 +358,7 @@ class MapListeners extends MouseInputAdapter {
 
                     // Add link to the first node
                     Link link = new Link(null, clickedNode, null, map.getStory().getLinkCounter());
-                    linkPainter.addLink(link);
+                    map.addLink(link);
 
                 } else {
                     JOptionPane.showMessageDialog(null, "There is no route leading to this node.");
@@ -443,7 +467,7 @@ class MapListeners extends MouseInputAdapter {
                     public void actionPerformed(ActionEvent ae) {
                         map.setLinkOnMouse(true);
                         Link link = new Link(null, currentNode, null, map.getStory().getLinkCounter());
-                        linkPainter.addLink(link);
+                        map.addLink(link);
                     }
                 });
             } else {

@@ -45,6 +45,15 @@ public class LinkPainter implements Painter<JXMapViewer> {
     /**
      * TODO
      *
+     * @param link
+     */
+    public void clearLinks() {
+        this.links.clear();
+    }
+
+    /**
+     * TODO
+     *
      * @return
      */
     public Link getLastLink() {

@@ -382,7 +382,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                 BufferedReader br = new BufferedReader(new InputStreamReader(in));
                 String strLine;
                 //Read File Line By Line
-                Story tempStory = null;
                 ArrayList<Link> tempLink = new ArrayList<Link>();
                 double tempLong = 0.0;
                 double tempLat = 0.0;
@@ -391,18 +390,20 @@ public class Main extends JFrame implements PropertyChangeListener {
                     // Print the content on the console
                     System.out.println(strLine);
                     if (strLine.equals("<story>")) {
-                        tempStory = new Story("", panelRoutes);
+                        story = new Story("", panelRoutes);
+                        map.Clear(story);
                     } else if (strLine.contains("<story.name>") && strLine.contains("</story.name>")) {
-                        tempStory.setName(strLine.substring("<story.name>".length(), strLine.length() - "</story.name>".length()));
+                        story.setName(strLine.substring("<story.name>".length(), strLine.length() - "</story.name>".length()));
                     } else if (strLine.contains("<route>")) {
-                        tempStory.newEmptyRoute();
+                        story.newEmptyRoute();
                     } else if (strLine.contains("<route.name>") && strLine.contains("</route.name>")) {
-                        tempStory.getRoutes().get(tempStory.getRoutes().size() - 1).setName(strLine.substring("<route.name>".length(), strLine.length() - "</route.name>".length()));
+                        story.getRoutes().get(story.getRoutes().size() - 1).setName(strLine.substring("<route.name>".length(), strLine.length() - "</route.name>".length()));
+                        panelRoutes.refreshList(story.getRoutes());
                     } else if (strLine.contains("<route.link>")) {
                         tempLink.add(new Link());
-                        tempStory.getRoutes().get(tempStory.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
+                        story.getRoutes().get(story.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
                     } else if (strLine.contains("</route.link>")) {
-                        tempStory.getRoutes().get(tempStory.getRoutes().size() - 1).getStartLink().getP2().setStart();
+                        story.getRoutes().get(story.getRoutes().size() - 1).getStartLink().getP2().setStart();
                     } else if (strLine.contains("<link.name>") && strLine.contains("</link.name>")) {
                         tempLink.get(tempLink.size() - 1).setName(strLine.substring("<link.name>".length(), strLine.length() - "</link.name>".length()));
                     } else if (strLine.contains("<link.id>") && strLine.contains("</link.id>")) {
@@ -412,9 +413,11 @@ public class Main extends JFrame implements PropertyChangeListener {
                     } else if (strLine.contains("<latitude>") && strLine.contains("</latitude>")) {
                         tempLat = Double.parseDouble(strLine.substring("<latitude>".length(), strLine.length() - "</latitude>".length()));
                     } else if (strLine.contains("</from>")) {
-                        tempLink.get(tempLink.size() - 1).setP1(new Node(tempLong, tempLat));
+                        tempLink.get(tempLink.size() - 1).setP1(tempLink.get(tempLink.size() - 2).getP2());
                     } else if (strLine.contains("</to>")) {
-                        tempLink.get(tempLink.size() - 1).setP2(new Node(tempLong, tempLat));
+                        Node nod = new Node(tempLat, tempLong);
+                        tempLink.get(tempLink.size() - 1).setP2(nod);
+                        map.addNode(nod);
                     } else if (strLine.contains("<video>")) {
                         tempMediaItem = new Video();
                     } else if (strLine.contains("<image>")) {
@@ -424,18 +427,27 @@ public class Main extends JFrame implements PropertyChangeListener {
                     } else if (strLine.contains("<filename>") && strLine.contains("</filename>")) {
                         File file = new File(strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
                         //TODO CHECK IF FILE EXISTS
-                        tempMediaItem.setAbsolutePath(file.getAbsolutePath());
-                        tempMediaItem.setFileName(file.getName());
+                        if (file.exists()) {
+                            tempMediaItem.setAbsolutePath(file.getPath().substring(0, file.getPath().length() - file.getName().length()));
+                            tempMediaItem.setFileName(file.getName());
+                        } else {
+                            System.out.println("file bestaat niet");
+                        }
                     } else if (strLine.contains("<duration>") && strLine.contains("</duration>")) {
                         tempMediaItem.setShowDurationInSeconds(Integer.parseInt(strLine.substring("<duration>".length(), strLine.length() - "</duration>".length())));
                     } else if (strLine.contains("</video>") || strLine.contains("</image>") || strLine.contains("</text>")) {
                         tempLink.get(tempLink.size() - 1).getMediaItems().add(tempMediaItem);
                     } else if (strLine.contains("<link>")) {
-                        tempLink.add(new Link());
+                        Link link = new Link();
+                        tempLink.add(link);
+                        map.addLink(link);
                     } else if (strLine.contains("</link>")) {
-                        //tempLink.get(tempLink.size() - 2).addLink(tempLink.get(tempLink.size() - 1));
+                        tempLink.get(tempLink.size() - 2).addLink(tempLink.get(tempLink.size() - 1));
+                        tempLink.remove(tempLink.size() - 1);
                     }
                 }
+
+                story.setSomethingChanged(false);
                 //Close the input stream
                 in.close();
             } catch (Exception e) {//Catch exception if any
