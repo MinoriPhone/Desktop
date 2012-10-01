@@ -502,7 +502,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                     FileWriter fstream = new FileWriter(filenameWithPath);
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(XMLcontent);
-                    fstream.close();
                     out.close();
                     // Get the data from the file
                     byte[] data = new byte[maxBufferSize];
