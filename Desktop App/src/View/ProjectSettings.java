@@ -4,8 +4,11 @@
  */
 package View;
 
+import Model.ExtensionFileFilter;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -24,7 +27,7 @@ public class ProjectSettings extends javax.swing.JFrame {
     public ProjectSettings(Map map) {
         initComponents();
         this.map = map;
-        
+
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -37,6 +40,11 @@ public class ProjectSettings extends javax.swing.JFrame {
 
         // Set the storyname
         tfStoryName.setText(map.getStory().getName());
+
+        // Set the storyimage
+        if (map.getStory().getImage() != null) {
+            tfStoryImage.setText(map.getStory().getImage().getAbsolutePath());
+        }
     }
 
     /**
@@ -50,7 +58,10 @@ public class ProjectSettings extends javax.swing.JFrame {
         pProjectSettings = new javax.swing.JPanel();
         lTitle = new javax.swing.JLabel();
         lStoryName = new javax.swing.JLabel();
+        lStoryImage = new javax.swing.JLabel();
         tfStoryName = new javax.swing.JTextField();
+        tfStoryImage = new javax.swing.JTextField();
+        bImageBrowse = new javax.swing.JButton();
         bSave = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -61,6 +72,17 @@ public class ProjectSettings extends javax.swing.JFrame {
         lTitle.setText("Project settings");
 
         lStoryName.setText("Story name:");
+
+        lStoryImage.setText("Story image:");
+
+        tfStoryImage.setEditable(false);
+
+        bImageBrowse.setText("Browse..");
+        bImageBrowse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bImageBrowseActionPerformed(evt);
+            }
+        });
 
         bSave.setText("Save");
         bSave.addActionListener(new java.awt.event.ActionListener() {
@@ -78,12 +100,19 @@ public class ProjectSettings extends javax.swing.JFrame {
                 .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lTitle)
                     .addGroup(pProjectSettingsLayout.createSequentialGroup()
-                        .addComponent(lStoryName)
+                        .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lStoryName)
+                            .addComponent(lStoryImage))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(bSave)
-                            .addComponent(tfStoryName, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(199, Short.MAX_VALUE))
+                            .addGroup(pProjectSettingsLayout.createSequentialGroup()
+                                .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(tfStoryImage)
+                                    .addComponent(tfStoryName, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bImageBrowse)))))
+                .addGap(120, 120, 120))
         );
         pProjectSettingsLayout.setVerticalGroup(
             pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -95,8 +124,13 @@ public class ProjectSettings extends javax.swing.JFrame {
                     .addComponent(lStoryName)
                     .addComponent(tfStoryName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pProjectSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfStoryImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bImageBrowse)
+                    .addComponent(lStoryImage))
+                .addGap(18, 18, 18)
                 .addComponent(bSave)
-                .addContainerGap(202, Short.MAX_VALUE))
+                .addContainerGap(161, Short.MAX_VALUE))
         );
 
         getContentPane().add(pProjectSettings, java.awt.BorderLayout.CENTER);
@@ -111,16 +145,37 @@ public class ProjectSettings extends javax.swing.JFrame {
         } else {
             this.map.getStory().setName("NewStory");
         }
-        
+
         dispose();
 
     }//GEN-LAST:event_bSaveActionPerformed
 
+    private void bImageBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bImageBrowseActionPerformed
+
+        JFileChooser j = new JFileChooser();
+        // Add Image filter to the chooser
+        j.addChoosableFileFilter(new ExtensionFileFilter(
+                new String[]{".JPG", ".JPEG", ".PNG", ".BMP"},
+                "Images (*.JPG|JPEG|PNG|BMP)"));
+
+        int dialog = j.showOpenDialog(this);
+
+        // The user selected an imagefile
+        if (dialog == JFileChooser.APPROVE_OPTION) {
+
+            File projectFile = j.getSelectedFile();
+            map.getStory().setImage(projectFile);
+            tfStoryImage.setText(map.getStory().getImage().getAbsolutePath());
+        }
+    }//GEN-LAST:event_bImageBrowseActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bImageBrowse;
     private javax.swing.JButton bSave;
+    private javax.swing.JLabel lStoryImage;
     private javax.swing.JLabel lStoryName;
     private javax.swing.JLabel lTitle;
     private javax.swing.JPanel pProjectSettings;
+    private javax.swing.JTextField tfStoryImage;
     private javax.swing.JTextField tfStoryName;
     // End of variables declaration//GEN-END:variables
 }

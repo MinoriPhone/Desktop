@@ -45,7 +45,7 @@ public class Map extends JPanel {
 
     // Variables
     private static final Logger LOGGER = Logger.getLogger(Map.class.getName());
-    private JXMapViewer mapViewer;
+    public JXMapViewer mapViewer;
     private WaypointPainter<Node> waypointPainter;
     private LinkPainter linkPainter;
     private List<Painter<JXMapViewer>> painters;

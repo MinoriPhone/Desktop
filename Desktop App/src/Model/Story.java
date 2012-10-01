@@ -1,6 +1,7 @@
 package Model;
 
 import View.Routes;
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -10,6 +11,7 @@ public class Story {
 
     // Variables
     private String name;
+    private File image;
     private ArrayList<Route> routes;
     private Routes routesPanel;
     private boolean somethingChanged;
@@ -44,6 +46,24 @@ public class Story {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Get the image from the story
+     *
+     * @return the image file
+     */
+    public File getImage() {
+        return image;
+    }
+
+    /**
+     * Set the story image file
+     *
+     * @param image The story image file
+     */
+    public void setImage(File image) {
+        this.image = image;
     }
 
     /**
@@ -86,7 +106,6 @@ public class Story {
         routesPanel.refreshList(routes);
     }
 
-    
     /**
      * Get a Link with the correct Endnode
      *
@@ -124,6 +143,11 @@ public class Story {
 
         XMLString += "<story>\r\n";
         XMLString += "<story.name>" + this.name + "</story.name>\r\n";
+        if (XMLProject) {
+            XMLString += "<story.image>" + this.image + "</story.image>\r\n";
+        } else {
+            XMLString += "<story.image>" + this.image.getName() + "</story.image>\r\n";
+        }
         XMLString += "<routes>\r\n";
         for (Route route : this.routes) {
             XMLString += route.printXML(XMLProject);
