@@ -14,6 +14,12 @@ public class Text implements MediaItem {
 
     /**
      * Constructor
+     */
+    public Text() {
+    }
+
+    /**
+     * Overload Constructor
      *
      * @param fileName String Name of the Text-file
      * @param absPath String absolute path to Text-file

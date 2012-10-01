@@ -77,6 +77,17 @@ public class Story {
     }
 
     /**
+     * Create a new empty Route and add Route to the Routelist
+     *
+     */
+    public void newEmptyRoute() {
+        Route route = new Route();
+        routes.add(route);
+        routesPanel.refreshList(routes);
+    }
+
+    
+    /**
      * Get a Link with the correct Endnode
      *
      * @param endNode the Node which the Link has as an end

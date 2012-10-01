@@ -75,6 +75,8 @@ public class FileChooser {
             return new Model.Image(fileName + "." + extension, abspath, 0);
         } else if (extension.equals("avi") || extension.equals("m4v") || extension.equals("mov") || extension.equals("mp4")) {
             return new Video(fileName + "." + extension, abspath);
+        } else if(extension.equals("proj")){
+            
         }
         return null;
     }

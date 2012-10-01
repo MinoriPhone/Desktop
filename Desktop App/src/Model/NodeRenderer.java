@@ -95,14 +95,14 @@ public class NodeRenderer implements WaypointRenderer<Node> {
 
         GeoPosition leftTop = new GeoPosition(node.getPosition().getLatitude() + radius, node.getPosition().getLongitude() - radius);
         //GeoPosition rightBottom = new GeoPosition(node.getGeoposition().getLatitude()-radius, node.getGeoposition().getLongitude()+radius);
-        
+       
         //Point2D ltPoint = viewer.getTileFactory().geoToPixel(leftTop, viewer.getZoom());
-        double diff = 20;
+        double diff = 20/viewer.getZoom();
 
         //g.drawOval((int) ltPoint.getX(), (int) ltPoint.getY(), (int) diff, (int) diff);
         g.setColor(Color.yellow);
-        g.fillOval((int) (point.getX()-diff), (int) (point.getY()-diff), (int) diff, (int) diff);
-        
+        g.fillOval((int) (point.getX()-diff), (int) (point.getY()-diff), (int) diff*2, (int) diff*2);
+
         //Draw node
         g.drawImage(myImg, x - myImg.getWidth() / 2, y - myImg.getHeight(), null);
 

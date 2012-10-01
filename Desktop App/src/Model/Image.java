@@ -14,6 +14,12 @@ public class Image implements MediaItem {
 
     /**
      * Constructor
+     */
+    public Image() {
+    }
+
+    /**
+     * Overload Constructor
      *
      * @param fileName String Name of the Image-file
      * @param absPath String absolute path to Image-file
