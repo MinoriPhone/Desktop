@@ -498,6 +498,7 @@ class MapListeners extends MouseInputAdapter {
                 contextMenuMap.getCreateLinkItem().setEnabled(false);
             }
             if (!currentNode.getStart()) {
+                contextMenuMap.getChangeLinkItem().setEnabled(false);
                 contextMenuMap.getSetStartItem().addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent ae) {
@@ -507,6 +508,13 @@ class MapListeners extends MouseInputAdapter {
                 });
             } else {
                 contextMenuMap.getSetStartItem().setEnabled(false);
+                contextMenuMap.getChangeLinkItem().addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        Link clickedLink = map.getStory().getStartLinkForNode(currentNode);
+                        openMediaDialogByLinkClick(clickedLink);
+                    }
+                });
             }
             contextMenuMap.showContextMenuMap(evt);
 

@@ -127,6 +127,21 @@ public class Story {
     }
 
     /**
+     * Get the startLink for this node
+     *
+     * @param endNode the Node which the Link has as a start
+     */
+    public Link getStartLinkForNode(Node endNode) {
+        for (Route route : routes) {
+            if(route.getStartLink().getP2().equals(endNode))
+            {
+                return route.getStartLink();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get previous links for this given Node
      *
      * @param startNode the Node which the user just clicked for creating a Link

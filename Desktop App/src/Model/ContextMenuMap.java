@@ -10,6 +10,7 @@ public class ContextMenuMap extends JPopupMenu {
     JMenuItem deleteItem;
     JMenuItem setStartItem;
     JMenuItem createLinkItem;
+    JMenuItem changeLinkItem;
 
     /**
      * Constructor
@@ -17,10 +18,12 @@ public class ContextMenuMap extends JPopupMenu {
     public ContextMenuMap() {
         deleteItem = new JMenuItem("Delete node");
         setStartItem = new JMenuItem("Make start");
-        createLinkItem = new JMenuItem("Create Link");
+        createLinkItem = new JMenuItem("Create link");
+        changeLinkItem = new JMenuItem("Change start");
         add(deleteItem);
         add(setStartItem);
         add(createLinkItem);
+        add(changeLinkItem);
     }
 
     /**
@@ -85,4 +88,13 @@ public class ContextMenuMap extends JPopupMenu {
     public void setCreateLinkItem(JMenuItem createLinkItem) {
         this.createLinkItem = createLinkItem;
     }
+
+    public JMenuItem getChangeLinkItem() {
+        return changeLinkItem;
+    }
+
+    public void setChangeLinkItem(JMenuItem changeLinkItem) {
+        this.changeLinkItem = changeLinkItem;
+    }
+    
 }
