@@ -17,6 +17,7 @@ import javax.swing.JFileChooser;
 public class ProjectSettings extends javax.swing.JFrame {
 
     private Map map;
+    private Main main;
 
     public ProjectSettings() {
     }
@@ -24,10 +25,10 @@ public class ProjectSettings extends javax.swing.JFrame {
     /**
      * Creates new form ProjectSettings
      */
-    public ProjectSettings(Map map) {
+    public ProjectSettings(Main main, Map map) {
         initComponents();
         this.map = map;
-
+        this.main = main;
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -147,9 +148,13 @@ public class ProjectSettings extends javax.swing.JFrame {
         if (!tfStoryName.getText().equals("")) {
             this.map.getStory().setName(tfStoryName.getText());
         } else {
-            this.map.getStory().setName("NewStory");
+            this.map.getStory().setName("New Story");
         }
-
+        if (map.getStory().isSomethingChanged()) {
+            main.setTitle("iStory designer - " + tfStoryName.getText() + "*");
+        } else {
+            main.setTitle("iStory designer - " + tfStoryName.getText());
+        }
         dispose();
 
     }//GEN-LAST:event_bSaveActionPerformed
