@@ -255,12 +255,12 @@ public class Story {
 
         // Add a astrix at the end of the title (to indicates that the story is not saved)
         if (somethingChanged) {
-            if (!main.getTitle().endsWith("*")) {
-                main.setTitle(main.getTitle() + "*");
+            if (!main.getTitle().startsWith("*")) {
+                main.setTitle("*" + main.getTitle());
             }
         } else {
-            if (main.getTitle().endsWith("*")) {
-                main.setTitle(main.getTitle().substring(0, main.getTitle().length() - 1));
+            if (main.getTitle().startsWith("*")) {
+                main.setTitle(main.getTitle().replaceFirst("\\*", ""));
             }
         }
     }

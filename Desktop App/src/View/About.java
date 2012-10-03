@@ -10,9 +10,6 @@ import javax.swing.JFrame;
  */
 public class About extends JFrame {
 
-    // Variables
-    private Application app;
-
     /**
      * Creates new form About
      */
@@ -30,11 +27,8 @@ public class About extends JFrame {
         // Center the window
         this.setLocation(x, y);
 
-        // Get Object with all Application mete data
-        app = new Application();
-
         // Set meta data application
-        lVersionCode.setText(String.valueOf(app.getVersion()));
+        lVersionCode.setText(String.valueOf(Application.getVersion()));
     }
 
     /* DO NOT TOUCH */

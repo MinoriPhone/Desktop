@@ -1,5 +1,6 @@
 package View;
 
+import Model.Application;
 import Model.ExtensionFileFilter;
 import Model.Image;
 import Model.Link;
@@ -53,7 +54,8 @@ public class Main extends JFrame implements PropertyChangeListener {
     private ProgressMonitor progressMonitor;
     private Task task;
     private boolean close = false;
-    String currentMediaItemName;
+    private String currentMediaItemName;
+    private final String defaultStoryName;
 
     /**
      * Creates new form Main
@@ -71,12 +73,16 @@ public class Main extends JFrame implements PropertyChangeListener {
         // Center the window
         this.setLocation(x, y);
 
+        // Change title
+        defaultStoryName = "New Story";
+        this.setTitle(defaultStoryName + " - iStory designer " + Application.getVersion());
+
         // Add Routes
         panelRoutes = new Routes();
         pMenu.add(panelRoutes, BorderLayout.CENTER);
 
         // Create a story
-        story = new Story("New Story", panelRoutes, this);
+        story = new Story(defaultStoryName, panelRoutes, this);
 
         // Add Map
         map = new Map(story, this);
@@ -132,6 +138,15 @@ public class Main extends JFrame implements PropertyChangeListener {
         task.execute();
     }
 
+    /**
+     * Returns the default story name
+     *
+     * @return the default story name
+     */
+    public String getDefaultStoryName() {
+        return defaultStoryName;
+    }
+
     /* DO NOT TOUCH */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -159,7 +174,6 @@ public class Main extends JFrame implements PropertyChangeListener {
         miAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("iStory designer - New Story");
         setMinimumSize(new java.awt.Dimension(1024, 768));
         setName("fMain"); // NOI18N
 
@@ -492,11 +506,11 @@ public class Main extends JFrame implements PropertyChangeListener {
                 return;
             }
         }
-        String storyName = JOptionPane.showInputDialog("Name of the new story", "New Story");
+        String storyName = JOptionPane.showInputDialog("Name of the new story", defaultStoryName);
         if (storyName != null) {
             if (!storyName.equals("")) {
                 story = new Story(storyName, panelRoutes, this);
-                this.setTitle("iStory designer - " + storyName);
+                this.setTitle(storyName + " - iStory designer " + Application.getVersion());
                 map.Clear(story);
                 return;
             }
@@ -820,6 +834,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
+        } else if (dialog == JFileChooser.CANCEL_OPTION) {
+            return true;
         }
         return false;
     }

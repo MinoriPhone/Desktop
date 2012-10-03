@@ -6,14 +6,14 @@ package Model;
 public class Application {
 
     // Variables
-    private double version = 0.3;
+    private static double version = 0.5;
 
     /**
      * Get the current version of this application
      *
      * @return double The current application version
      */
-    public double getVersion() {
+    public static double getVersion() {
         return version;
     }
 }

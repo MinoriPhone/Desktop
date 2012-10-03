@@ -4,6 +4,7 @@
  */
 package View;
 
+import Model.Application;
 import Model.ExtensionFileFilter;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -148,12 +149,14 @@ public class ProjectSettings extends javax.swing.JFrame {
         if (!tfStoryName.getText().equals("")) {
             this.map.getStory().setName(tfStoryName.getText());
         } else {
-            this.map.getStory().setName("New Story");
+            this.map.getStory().setName(main.getDefaultStoryName());
         }
+        
+        // Add an astrix if the story has been changed
         if (map.getStory().isSomethingChanged()) {
-            main.setTitle("iStory designer - " + tfStoryName.getText() + "*");
+            main.setTitle("*"+tfStoryName.getText() + " - iStory designer " + Application.getVersion());
         } else {
-            main.setTitle("iStory designer - " + tfStoryName.getText());
+            main.setTitle(tfStoryName.getText() + " - iStory designer " + Application.getVersion());
         }
         dispose();
 
