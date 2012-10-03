@@ -28,7 +28,7 @@ public class Image implements MediaItem {
     public Image(String fileName, String absPath, int showDurationInSeconds) {
         this.fileName = fileName;
         this.absPath = absPath;
-        this.showDurationInSeconds = showDurationInSeconds;
+        this.setShowDurationInSeconds(showDurationInSeconds);
     }
 
     /**

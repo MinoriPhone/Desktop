@@ -292,9 +292,12 @@ public class Map extends JPanel {
         xmlString += "<!-- These are extra nodes (which are not linked)  -->\r\n";
         xmlString += "<extranodes>\r\n";
         for (Node node : nodes) {
-            xmlString += "<node>\r\n";
-            xmlString += node.printXML(true);
-            xmlString += "</node>\r\n";
+            //check if the node doesn't have any routes
+            if (story.getRoutesFromNode(node).isEmpty()) {
+                xmlString += "<node>\r\n";
+                xmlString += node.printXML(true);
+                xmlString += "</node>\r\n";
+            }
         }
         xmlString += "</extranodes>\r\n";
         return xmlString;

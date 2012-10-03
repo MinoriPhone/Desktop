@@ -377,7 +377,6 @@ public class Main extends JFrame implements PropertyChangeListener {
         j.addChoosableFileFilter(new ExtensionFileFilter(
                 new String[]{".proj"}, // Extensions we accept
                 "Project files (*.proj)"));
-        //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
         int dialog = j.showOpenDialog(this);
 
@@ -439,12 +438,12 @@ public class Main extends JFrame implements PropertyChangeListener {
                         tempMediaItem = new Text();
                     } else if (strLine.contains("<filename>") && strLine.contains("</filename>")) {
                         File file = new File(strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
-                        //TODO CHECK IF FILE EXISTS
+                        //Check if file exists
                         if (file.exists()) {
                             tempMediaItem.setAbsolutePath(file.getPath().substring(0, file.getPath().length() - file.getName().length()));
                             tempMediaItem.setFileName(file.getName());
                         } else {
-                            System.out.println("file bestaat niet");
+                            System.err.println("file does not exist");
                         }
                     } else if (strLine.contains("<duration>") && strLine.contains("</duration>")) {
                         tempMediaItem.setShowDurationInSeconds(Integer.parseInt(strLine.substring("<duration>".length(), strLine.length() - "</duration>".length())));
@@ -476,16 +475,6 @@ public class Main extends JFrame implements PropertyChangeListener {
             // Error or dialog is dismissed
             LOGGER.log(Level.WARNING, "File Chooser returns error");
         }
-        //uitlezen bestand
-        //story aanmaken
-        //routes aanmaken
-        //route aanmaken
-        //startlink aanmaken
-        //queue aanmaken
-        //media toevoegen aan link
-        //nodes aanmaken (en toevoegen aan renderer)
-        //links aanmaken
-        //link aanmaken (en toevoegen aan painter)
     }//GEN-LAST:event_miOpenActionPerformed
 
     private void miNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miNewActionPerformed
@@ -504,6 +493,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             }
         }
         story = new Story("New Story", panelRoutes);
+        panelRoutes.refreshList(story.getRoutes());
         map.Clear(story);
     }//GEN-LAST:event_miNewActionPerformed
 

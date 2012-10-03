@@ -13,6 +13,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -29,6 +31,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -57,7 +61,7 @@ public class AddMedia extends JDialog {
      */
     public AddMedia(Main parent, final View.Map map, Link link) {
         super(parent, true);
-
+        
         initComponents();
 
         // Set variables
@@ -89,7 +93,7 @@ public class AddMedia extends JDialog {
             // Enable routename and disable prev links
             this.tfRouteName.setEditable(true);
             this.lLinks.setEnabled(false);
-
+            
         } // User is NOT creating a startnode, but a new link
         else {
             this.prevLinks = new ArrayList<Link>();
@@ -123,7 +127,7 @@ public class AddMedia extends JDialog {
         this.scrollPane = new JScrollPane(this.list);
         this.scrollPane.setPreferredSize(new Dimension(400, 100));
         this.pAddedMedia.add(this.scrollPane, BorderLayout.CENTER);
-
+        
         for (MediaItem mItem : link.getMediaItems()) {
             // Add selected file to list
             if (mItem != null) {
@@ -139,6 +143,23 @@ public class AddMedia extends JDialog {
         // Enable drag and drop
         this.list.setDragEnabled(true);
         this.list.setTransferHandler(new ListTransferHandler());
+        this.list.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList) evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    int index = list.locationToIndex(evt.getPoint());
+                    Object obj = listModel.get(index);
+                    for (MediaItem item : addedItems) {
+                        if (item.getFileName().equals(obj.toString())) {
+                            if (item instanceof Model.Image || item instanceof Text) {
+                                enterDuration(item);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        });
 
         // Add window listener to this window
         this.addWindowListener(new WindowAdapter() {
@@ -219,7 +240,7 @@ public class AddMedia extends JDialog {
      */
     public AddMedia(Main parent, final View.Map map, ArrayList<Link> prevLinks, Link link, int callFrom) {
         super(parent, true);
-
+        
         initComponents();
 
         // Set variables
@@ -250,7 +271,7 @@ public class AddMedia extends JDialog {
             // Enable routename and disable prev links
             this.tfRouteName.setEditable(true);
             this.lLinks.setEnabled(false);
-
+            
         } // User is NOT creating a startnode, but a new link
         else {
             // Add routes to combobox
@@ -277,6 +298,23 @@ public class AddMedia extends JDialog {
         // Enable drag and drop
         this.list.setDragEnabled(true);
         this.list.setTransferHandler(new ListTransferHandler());
+        this.list.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList) evt.getSource();
+                if (evt.getClickCount() == 2) {
+                    int index = list.locationToIndex(evt.getPoint());
+                    Object obj = listModel.get(index);
+                    for (MediaItem item : addedItems) {
+                        if (item.getFileName().equals(obj.toString())) {
+                            if (item instanceof Model.Image || item instanceof Text) {
+                                enterDuration(item);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        });
 
 
         // Add window listener to this window
@@ -411,6 +449,27 @@ public class AddMedia extends JDialog {
      */
     public boolean isClosedBySave() {
         return closedBySave;
+    }
+
+    /**
+     * Get close status of this window
+     *
+     * @return boolean
+     */
+    public void enterDuration(MediaItem mItem) {
+        String n = JOptionPane.showInputDialog("Enter the duration of the file in seconds", mItem.getShowDurationInSeconds());
+        if (n != null) {
+            if (!n.equals("")) {
+                try {
+                    mItem.setShowDurationInSeconds(Integer.parseInt(n));
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "The value entered is not a number");
+                    enterDuration(mItem);
+                }
+            } else {
+                enterDuration(mItem);
+            }
+        }
     }
 
     /* DO NOT TOUCH */
@@ -622,6 +681,8 @@ public class AddMedia extends JDialog {
                 if (mItem instanceof Video) {
                     this.addItem((Video) mItem);
                 } else if (mItem instanceof Model.Image) {
+                    enterDuration(mItem);
+                    
                     this.addItem((Model.Image) mItem);
                 } else if (mItem instanceof Text) {
                     this.addItem((Text) mItem);
@@ -635,7 +696,7 @@ public class AddMedia extends JDialog {
             LOGGER.log(Level.WARNING, "File Chooser returns error");
         }
     }//GEN-LAST:event_bBrowseActionPerformed
-
+    
     private void bSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveActionPerformed
         if (!changeLink) {
             // Get selected previous Link
@@ -645,7 +706,7 @@ public class AddMedia extends JDialog {
 
                 // User is creating startnode OR user must select previous link
                 if (this.callFrom == 1 || objArray.length > 0) {
-
+                    
                     this.closedBySave = true;
 
                     // Get variables we want to save
@@ -673,7 +734,7 @@ public class AddMedia extends JDialog {
 
                         // Create new Route
                         map.getStory().newRoute(routeName, this.link);
-
+                        
                     } else {
                         // Add this link to the selected previous link (so this is the next link for that previous link)
                         for (Object object : objArray) {
@@ -695,7 +756,7 @@ public class AddMedia extends JDialog {
                     // Close this window and bring main window to the front
                     super.toFront();
                     this.dispose();
-
+                    
                 } // User did NOT select previous Link
                 else {
                     JOptionPane.showMessageDialog(null,
@@ -710,40 +771,40 @@ public class AddMedia extends JDialog {
                         "Info", // title
                         JOptionPane.INFORMATION_MESSAGE);
             }
-        }else{
+        } else {
             // Get selected previous Link
             Object[] objArray = lLinks.getSelectedValues();
             // User must give this Link a name
             if (!tfLinkName.getText().trim().isEmpty()) {
+                
+                this.closedBySave = true;
 
-                    this.closedBySave = true;
+                // Get variables we want to save
+                //String routeName = tfRouteName.getText().trim();
+                String linkName = tfLinkName.getText().trim();
+                ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
+                Object[] elements = listModel.toArray();
 
-                    // Get variables we want to save
-                    //String routeName = tfRouteName.getText().trim();
-                    String linkName = tfLinkName.getText().trim();
-                    ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
-                    Object[] elements = listModel.toArray();
-
-                    // Get all added Media Items in the right order
-                    for (Object obj : elements) {
-                        for (MediaItem item : addedItems) {
-                            if (item.getFileName().equals(obj.toString())) {
-                                mediaItems.add(item);
-                                break;
-                            }
+                // Get all added Media Items in the right order
+                for (Object obj : elements) {
+                    for (MediaItem item : addedItems) {
+                        if (item.getFileName().equals(obj.toString())) {
+                            mediaItems.add(item);
+                            break;
                         }
                     }
+                }
 
-                    // Set this link variables
-                    this.link.setName(linkName);
-                    this.link.setItems(mediaItems);
-                    
-                    // Set changeboolean to true
-                    map.getStory().setSomethingChanged(true);
+                // Set this link variables
+                this.link.setName(linkName);
+                this.link.setItems(mediaItems);
 
-                    // Close this window and bring main window to the front
-                    super.toFront();
-                    this.dispose();
+                // Set changeboolean to true
+                map.getStory().setSomethingChanged(true);
+
+                // Close this window and bring main window to the front
+                super.toFront();
+                this.dispose();
             } // User did NOT give this Link a name
             else {
                 JOptionPane.showMessageDialog(null,
@@ -753,11 +814,11 @@ public class AddMedia extends JDialog {
             }
         }
     }//GEN-LAST:event_bSaveActionPerformed
-
+    
     private void tfRouteNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfRouteNameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tfRouteNameActionPerformed
-
+    
     private void bUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bUpActionPerformed
         ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
         for (Object fileName : list.getSelectedValues()) {
@@ -778,9 +839,9 @@ public class AddMedia extends JDialog {
                 list.setSelectedIndices(indices);
             }
         }
-
+        
     }//GEN-LAST:event_bUpActionPerformed
-
+    
     private void bDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDownActionPerformed
         ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
         for (Object fileName : list.getSelectedValues()) {
@@ -846,9 +907,9 @@ class ListTransferHandler extends StringTransferHandler {
         JList list = (JList) c;
         indices = list.getSelectedIndices();
         Object[] values = list.getSelectedValues();
-
+        
         StringBuilder buff = new StringBuilder();
-
+        
         for (int i = 0; i < values.length; i++) {
             Object val = values[i];
             buff.append(val == null ? "" : val.toString());
@@ -856,7 +917,7 @@ class ListTransferHandler extends StringTransferHandler {
                 buff.append("\n");
             }
         }
-
+        
         return buff.toString();
     }
 
@@ -884,7 +945,7 @@ class ListTransferHandler extends StringTransferHandler {
             indices = null;
             return;
         }
-
+        
         int max = listModel.getSize();
         if (index < 0) {
             index = max;
@@ -894,11 +955,11 @@ class ListTransferHandler extends StringTransferHandler {
                 index = max;
             }
         }
-
+        
         addIndex = index;
         String[] values = str.split("\n");
         addCount = values.length;
-
+        
         for (int i = 0; i < values.length; i++) {
             listModel.add(index++, values[i]);
         }
@@ -930,13 +991,13 @@ class ListTransferHandler extends StringTransferHandler {
                     }
                 }
             }
-
+            
             for (int i = indices.length - 1; i >= 0; i--) {
                 model.remove(indices[i]);
             }
-
+            
         }
-
+        
         indices = null;
         addCount = 0;
         addIndex = -1;
@@ -947,23 +1008,23 @@ class ListTransferHandler extends StringTransferHandler {
  * Custom TransferHandler for handling strings while dragging and dropping
  */
 abstract class StringTransferHandler extends TransferHandler {
-
+    
     protected abstract String exportString(JComponent c);
-
+    
     protected abstract void importString(JComponent c, String str);
-
+    
     protected abstract void cleanup(JComponent c, boolean remove);
-
+    
     @Override
     protected Transferable createTransferable(JComponent c) {
         return new StringSelection(exportString(c));
     }
-
+    
     @Override
     public int getSourceActions(JComponent c) {
         return COPY_OR_MOVE;
     }
-
+    
     @Override
     public boolean importData(JComponent c, Transferable t) {
         if (canImport(c, t.getTransferDataFlavors())) {
@@ -977,12 +1038,12 @@ abstract class StringTransferHandler extends TransferHandler {
         }
         return false;
     }
-
+    
     @Override
     protected void exportDone(JComponent c, Transferable data, int action) {
         cleanup(c, action == MOVE);
     }
-
+    
     @Override
     public boolean canImport(JComponent c, DataFlavor[] flavors) {
         for (int i = 0; i < flavors.length; i++) {
