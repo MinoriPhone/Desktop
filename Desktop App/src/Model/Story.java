@@ -1,5 +1,6 @@
 package Model;
 
+import View.Main;
 import View.Routes;
 import java.io.File;
 import java.util.ArrayList;
@@ -16,15 +17,17 @@ public class Story {
     private Routes routesPanel;
     private boolean somethingChanged;
     private long linkCounter;
+    private Main main;
 
     /**
      * Constructor
      */
-    public Story(String name, Routes routesPanel) {
+    public Story(String name, Routes routesPanel, Main main) {
         this.name = name;
         this.routes = new ArrayList<Route>();
         this.routesPanel = routesPanel;
         this.linkCounter = 0;
+        this.main = main;
         somethingChanged = false;
     }
 
@@ -34,9 +37,10 @@ public class Story {
      * @param name The we want to set for this Story
      * @param routes A list of all the existing routes
      */
-    public Story(String name, ArrayList<Route> routes) {
+    public Story(String name, ArrayList<Route> routes, Main main) {
         this.name = name;
         this.routes = routes;
+        this.main = main;
     }
 
     /**
@@ -248,6 +252,17 @@ public class Story {
      */
     public void setSomethingChanged(boolean somethingChanged) {
         this.somethingChanged = somethingChanged;
+
+        // Add a astrix at the end of the title (to indicates that the story is not saved)
+        if (somethingChanged) {
+            if (!main.getTitle().endsWith("*")) {
+                main.setTitle(main.getTitle() + "*");
+            }
+        } else {
+            if (main.getTitle().endsWith("*")) {
+                main.setTitle(main.getTitle().substring(0, main.getTitle().length() - 1));
+            }
+        }
     }
 
     /**

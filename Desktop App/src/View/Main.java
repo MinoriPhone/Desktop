@@ -76,7 +76,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         pMenu.add(panelRoutes, BorderLayout.CENTER);
 
         // Create a story
-        story = new Story("New Story", panelRoutes);
+        story = new Story("New Story", panelRoutes, this);
 
         // Add Map
         map = new Map(story, this);
@@ -159,7 +159,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         miAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("iStory designer");
+        setTitle("iStory designer - New Story");
         setMinimumSize(new java.awt.Dimension(1024, 768));
         setName("fMain"); // NOI18N
 
@@ -345,7 +345,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     }//GEN-LAST:event_miSaveActionPerformed
 
     private void miProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miProjectActionPerformed
-        ProjectSettings projectSettings = new ProjectSettings(map);
+        ProjectSettings projectSettings = new ProjectSettings(this, map);
         projectSettings.setVisible(true);
     }//GEN-LAST:event_miProjectActionPerformed
 
@@ -402,7 +402,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                 while ((strLine = br.readLine()) != null) {
                     // Print the content on the console
                     if (strLine.equals("<story>")) {
-                        story = new Story("", panelRoutes);
+                        story = new Story("", panelRoutes, this);
                         map.Clear(story);
                     } else if (strLine.contains("<story.name>") && strLine.contains("</story.name>")) {
                         story.setName(strLine.substring("<story.name>".length(), strLine.length() - "</story.name>".length()));
@@ -492,9 +492,16 @@ public class Main extends JFrame implements PropertyChangeListener {
                 return;
             }
         }
-        story = new Story("New Story", panelRoutes);
-        panelRoutes.refreshList(story.getRoutes());
-        map.Clear(story);
+        String storyName = JOptionPane.showInputDialog("Name of the new story", "New Story");
+        if (storyName != null) {
+            if (!storyName.equals("")) {
+                story = new Story(storyName, panelRoutes, this);
+                this.setTitle("iStory designer - " + storyName);
+                map.Clear(story);
+                return;
+            }
+        }
+        miNewActionPerformed(evt);
     }//GEN-LAST:event_miNewActionPerformed
 
     /**
