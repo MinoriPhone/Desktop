@@ -1,6 +1,5 @@
 package Model;
 
-import java.io.File;
 import javax.swing.JFileChooser;
 
 /**
@@ -21,8 +20,8 @@ public class FileChooser {
 
         // Add Text filter to the chooser
         chooser.addChoosableFileFilter(new ExtensionFileFilter(
-                new String[]{".RTF", ".TXT"}, // Extensions we accept
-                "Text Documents (*.RTF|TXT)")); // 'Files of Type' 
+                new String[]{".RTF", ".TXT", ".HTM", ".HTML"}, // Extensions we accept
+                "Text Documents (*.RTF|TXT|HTM|HTML)")); // 'Files of Type' 
 
         // Add Image filter to the chooser
         chooser.addChoosableFileFilter(new ExtensionFileFilter(
@@ -36,7 +35,7 @@ public class FileChooser {
 
         // Add a filter with all the supported files
         chooser.addChoosableFileFilter(new ExtensionFileFilter(
-                new String[]{".RTF", ".TXT", ".JPG", ".JPEG", ".PNG", ".BMP", ".AVI", ".M4V", ".MOV", ".MP4"},
+                new String[]{".RTF", ".TXT", ".HTM", ".HTML", ".JPG", ".JPEG", ".PNG", ".BMP", ".AVI", ".M4V", ".MOV", ".MP4"},
                 "All supported files"));
 
         // Turn off 'All Files' capability of file chooser, so only our custom filter is used.
@@ -69,14 +68,12 @@ public class FileChooser {
         String abspath = filePath.substring(0, filePath.length() - fileName.length() - extension.length() - 1);
 
         // Return Media Item object (Video, Image or Text)
-        if (extension.equals("rtf") || extension.equals("txt")) {
+        if (extension.equals("rtf") || extension.equals("txt") || extension.equals("htm") || extension.equals("html")) {
             return new Text(fileName + "." + extension, abspath, 0);
         } else if (extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png") || extension.equals("bmp")) {
             return new Model.Image(fileName + "." + extension, abspath, 0);
         } else if (extension.equals("avi") || extension.equals("m4v") || extension.equals("mov") || extension.equals("mp4")) {
             return new Video(fileName + "." + extension, abspath);
-        } else if(extension.equals("proj")){
-            
         }
         return null;
     }

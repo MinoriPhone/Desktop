@@ -28,11 +28,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -56,6 +61,11 @@ public class Main extends JFrame implements PropertyChangeListener {
     private boolean close = false;
     private String currentMediaItemName;
     private final String defaultStoryName;
+    
+    private enum TaskOptions {
+        
+        IMPORT, EXPORT
+    };
 
     /**
      * Creates new form Main
@@ -93,7 +103,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         miOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
-
+        
         miImport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miExport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
@@ -108,7 +118,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         // Revalidate JPanels
         this.pack();
     }
-
+    
     private void checkChangeBeforeClose() {
         if (story.isSomethingChanged()) {
 
@@ -118,10 +128,10 @@ public class Main extends JFrame implements PropertyChangeListener {
                     + "Do you want to save this before closing the program?\n",
                     "Save?",
                     JOptionPane.YES_NO_CANCEL_OPTION);
-
+            
             if (n == JOptionPane.YES_OPTION) {
                 close = true;
-                triggerExportStory();
+                saveStory();
             } else if (n == JOptionPane.NO_OPTION) {
                 System.exit(0);
             }
@@ -129,13 +139,23 @@ public class Main extends JFrame implements PropertyChangeListener {
             System.exit(0);
         }
     }
-
-    private void triggerExportStory() {
-        progressMonitor = new ProgressMonitor(Main.this, "Exporting iStory..", "", 0, 100);
-        progressMonitor.setProgress(0);
-        task = new Task();
-        task.addPropertyChangeListener(this);
-        task.execute();
+    
+    private void triggerProgressTask(TaskOptions taskOption) {
+        if (taskOption == TaskOptions.EXPORT) {
+            progressMonitor = new ProgressMonitor(Main.this, "Exporting iStory..", "", 0, 100);
+            progressMonitor.setProgress(0);
+            task = new Task();
+            task.setTaskOption(TaskOptions.EXPORT);
+            task.addPropertyChangeListener(this);
+            task.execute();
+        } else if (taskOption == TaskOptions.IMPORT) {
+            progressMonitor = new ProgressMonitor(Main.this, "Importing iStory..", "", 0, 100);
+            progressMonitor.setProgress(0);
+            task = new Task();
+            task.setTaskOption(TaskOptions.IMPORT);
+            task.addPropertyChangeListener(this);
+            task.execute();
+        }
     }
 
     /**
@@ -266,6 +286,11 @@ public class Main extends JFrame implements PropertyChangeListener {
         mFile.add(sepFile);
 
         miImport.setText("Import");
+        miImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miImportActionPerformed(evt);
+            }
+        });
         mFile.add(miImport);
 
         miExport.setText("Export");
@@ -339,38 +364,38 @@ public class Main extends JFrame implements PropertyChangeListener {
         this.map.setButtonLinkClicked(false);
         this.map.setButtonStartClicked(false);
     }//GEN-LAST:event_bNodeActionPerformed
-
+    
     private void bLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLinkActionPerformed
         // Add link to a node
         this.map.setButtonNodeClicked(false);
         this.map.setButtonLinkClicked(true);
         this.map.setButtonStartClicked(false);
     }//GEN-LAST:event_bLinkActionPerformed
-
+    
     private void bStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bStartActionPerformed
         // Add startlink to node
         this.map.setButtonNodeClicked(false);
         this.map.setButtonLinkClicked(false);
         this.map.setButtonStartClicked(true);
     }//GEN-LAST:event_bStartActionPerformed
-
+    
     private void miSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miSaveActionPerformed
         saveStory();
     }//GEN-LAST:event_miSaveActionPerformed
-
+    
     private void miProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miProjectActionPerformed
         ProjectSettings projectSettings = new ProjectSettings(this, map);
         projectSettings.setVisible(true);
     }//GEN-LAST:event_miProjectActionPerformed
-
+    
     private void miCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCloseActionPerformed
         checkChangeBeforeClose();
     }//GEN-LAST:event_miCloseActionPerformed
-
+    
     private void miExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miExportActionPerformed
-        triggerExportStory();
+        triggerProgressTask(TaskOptions.EXPORT);
     }//GEN-LAST:event_miExportActionPerformed
-
+    
     private void miOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miOpenActionPerformed
         if (story.isSomethingChanged()) {
             // Show save confirm window
@@ -379,7 +404,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                     + "Do you want to save this before opening one?\n",
                     "Save?",
                     JOptionPane.YES_NO_CANCEL_OPTION);
-
+            
             if (n == JOptionPane.YES_OPTION) {
                 saveStory();
             } else if (n == JOptionPane.CANCEL_OPTION) {
@@ -391,7 +416,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         j.addChoosableFileFilter(new ExtensionFileFilter(
                 new String[]{".proj"}, // Extensions we accept
                 "Project files (*.proj)"));
-
+        
         int dialog = j.showOpenDialog(this);
 
         // Catch actions of the File Chooser Dialog Window
@@ -399,7 +424,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
             // Create an XML-file
             File projectFile = j.getSelectedFile();
-
+            
             try {
                 // Open the file that is the first 
                 // command line parameter
@@ -475,7 +500,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         map.addNode(nod);
                     }
                 }
-
+                
                 story.setSomethingChanged(false);
                 //Close the input stream
                 in.close();
@@ -490,7 +515,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             LOGGER.log(Level.WARNING, "File Chooser returns error");
         }
     }//GEN-LAST:event_miOpenActionPerformed
-
+    
     private void miNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miNewActionPerformed
         if (story.isSomethingChanged()) {
             // Show save confirm window
@@ -499,7 +524,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                     + "Do you want to save this before starting a new one?\n",
                     "Save?",
                     JOptionPane.YES_NO_CANCEL_OPTION);
-
+            
             if (n == JOptionPane.YES_OPTION) {
                 saveStory();
             } else if (n == JOptionPane.CANCEL_OPTION) {
@@ -517,6 +542,10 @@ public class Main extends JFrame implements PropertyChangeListener {
         }
         miNewActionPerformed(evt);
     }//GEN-LAST:event_miNewActionPerformed
+    
+    private void miImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miImportActionPerformed
+        triggerProgressTask(TaskOptions.IMPORT);
+    }//GEN-LAST:event_miImportActionPerformed
 
     /**
      * Run Main window
@@ -558,7 +587,7 @@ public class Main extends JFrame implements PropertyChangeListener {
      * @return boolean
      */
     private boolean saveStory() {
-
+        
         boolean XMLProject = true; // make a proj file
 
         JFileChooser j = new JFileChooser();
@@ -568,13 +597,13 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         // Catch actions of the File Chooser Dialog Window
         if (dialog == JFileChooser.APPROVE_OPTION) {
-
+            
             try {
-
+                
                 String XMLcontent = this.story.printXML(XMLProject);
                 // Add no linked nodes at the end
                 XMLcontent += this.map.printNodeXML();
-
+                
                 String filePathName = j.getSelectedFile().toString();
 
                 // Add ".iStory.proj  at the end of the string (only if it not exists)
@@ -643,7 +672,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         // Catch actions of the File Chooser Dialog Window
         if (dialog == JFileChooser.APPROVE_OPTION) {
-
+            
             try {
                 // Max length of the buffer
                 int maxBufferSize = 1024; // bytes
@@ -689,7 +718,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                 String filenameWithPath = fileName.replace(".iStory", "") + ".xml";
                 File XMLfile = new File(filenameWithPath);
                 String filename = j.getName(XMLfile);
-
+                
                 boolean exists = XMLfile.createNewFile();
                 if (exists) {
                     FileWriter fstream = new FileWriter(filenameWithPath);
@@ -711,9 +740,9 @@ public class Main extends JFrame implements PropertyChangeListener {
                     in.close();
                     XMLfile.delete();
                 }
-
+                
                 task.setProgression(Math.min(15, 100));
-
+                
                 if (map.getStory().getImage() != null) {
                     ///////////
                     // Story image
@@ -765,7 +794,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
                 // Get total of filesize
                 for (Link link : story.getAllLinks()) {
-
+                    
                     for (MediaItem mediaItem : link.getMediaItems()) {
                         File tempFile = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
                         // Filesize
@@ -776,11 +805,14 @@ public class Main extends JFrame implements PropertyChangeListener {
 
                 // Loop over all links to get the  mediafiles
                 for (Link link : story.getAllLinks()) {
-
+                    
+                    zipOut.putNextEntry(new ZipEntry(link.getId() + "/"));
+                    
                     for (MediaItem mediaItem : link.getMediaItems()) {
                         // Get the file from the location
                         File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
                         exists = file.isFile();
+                        
                         if (exists) {
                             currentMediaItemName = file.getName();
 
@@ -790,8 +822,9 @@ public class Main extends JFrame implements PropertyChangeListener {
                             BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
                             // Internal count for the databuffer
                             int count = 0;
-                            // Add new file to the zip file
+                            // Add new file to the zip file                            
                             zipOut.putNextEntry(new ZipEntry(link.getId() + "/" + mediaItem.getFileName()));
+
                             // Fill the new file with data
                             while ((count = in.read(data, 0, maxBufferSize)) != -1) {
                                 zipOut.write(data, 0, count);
@@ -823,12 +856,191 @@ public class Main extends JFrame implements PropertyChangeListener {
                 zipOut.flush();
                 zipOut.close();
                 System.out.println("Your file is zipped");
-
+                
                 task.setProgression(Math.min(99, 100));
                 task.setProgression(100);
 
                 // Set the changed to false to be able to close the program
                 story.setSomethingChanged(false);
+                return true;
+            } catch (IOException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
+        } else if (dialog == JFileChooser.CANCEL_OPTION) {
+            return true;
+        }
+        return false;
+    }
+    
+    public float copyInputStream(InputStream in, OutputStream out, float progress, float percent, int maxBufferSize)
+            throws IOException {
+        byte[] buffer = new byte[maxBufferSize];
+        int len;
+        
+        while ((len = in.read(buffer)) >= 0) {
+            out.write(buffer, 0, len);
+            progress += percent;
+            task.setProgression((int) Math.floor(Math.min(progress, 99)));
+        }
+        
+        in.close();
+        out.close();
+        return progress;
+    }
+    
+    public boolean importStory() throws IOException {
+        float progress = 10f;
+        
+        JFileChooser j = new JFileChooser();
+        j.setAcceptAllFileFilterUsed(false);
+        j.addChoosableFileFilter(new ExtensionFileFilter(
+                new String[]{".iStory"}, // Extensions we accept
+                "Project files (*.iStory)"));
+        //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int dialog = j.showOpenDialog(this);
+
+        // Catch actions of the File Chooser Dialog Window
+        if (dialog == JFileChooser.APPROVE_OPTION) {
+            
+            try {
+                
+                JFileChooser importLocationChooser = new JFileChooser();
+                importLocationChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int importDialog = importLocationChooser.showOpenDialog(this);
+                String pad;
+                String selectedZipFileName = j.getSelectedFile().getName().replace(".iStory", "");
+
+                
+                // Catch actions of the File Chooser Dialog Window
+                if (importDialog == JFileChooser.APPROVE_OPTION) {
+                    new File(importLocationChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + selectedZipFileName).mkdir();
+                    pad = importLocationChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + selectedZipFileName + System.getProperty("file.separator");
+                } else {
+                    return false;
+                }
+
+                // Max length of the buffer
+                int maxBufferSize = 1024; // bytes
+                File selectedFile = j.getSelectedFile();
+                ZipFile importZipFile = new ZipFile(selectedFile);
+
+                // entries = importZipFile.entries();
+                task.setProgression((int) Math.floor(Math.min(progress, 99)));
+                float percent = (90f / (selectedFile.length() / maxBufferSize));
+                
+                ZipInputStream zipinputstream = new ZipInputStream(
+                        new FileInputStream(selectedFile));
+                ZipEntry entry = zipinputstream.getNextEntry();
+                while (entry != null) {
+                    if (entry.isDirectory()) {
+                        // Assume directories are stored parents first then children.
+                        System.err.println("Extracting directory: " + pad + entry.getName());
+                        // This is not robust, just for demonstration purposes.
+                        (new File(pad + entry.getName())).mkdir();
+                        entry = zipinputstream.getNextEntry();
+                        continue;
+                    }
+                    currentMediaItemName = entry.getName();
+                    System.err.println("Extracting file: " + pad + entry.getName());
+                    progress = copyInputStream(importZipFile.getInputStream(entry),
+                            new BufferedOutputStream(new FileOutputStream(pad + entry.getName())), progress, percent, maxBufferSize);
+                    entry = zipinputstream.getNextEntry();
+                }
+                
+                importZipFile.close();
+
+
+                ////////////////////////////
+
+                task.setProgression(Math.min(100, 100));
+                
+                
+                try {
+                // Open the file that is the first 
+                // command line parameter
+                FileInputStream fstream = new FileInputStream(pad + selectedZipFileName + ".xml");
+                // Get the object of DataInputStream
+                DataInputStream in = new DataInputStream(fstream);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String strLine;
+                //Read File Line By Line
+                ArrayList<Link> tempLink = new ArrayList<Link>();
+                double tempLong = 0.0;
+                double tempLat = 0.0;
+                MediaItem tempMediaItem = null;
+                while ((strLine = br.readLine()) != null) {
+                    // Print the content on the console
+                    if (strLine.equals("<story>")) {
+                        story = new Story("", panelRoutes, this);
+                        map.Clear(story);
+                    } else if (strLine.contains("<story.name>") && strLine.contains("</story.name>")) {
+                        story.setName(strLine.substring("<story.name>".length(), strLine.length() - "</story.name>".length()));
+                    } else if (strLine.contains("<route>")) {
+                        story.newEmptyRoute();
+                    } else if (strLine.contains("<route.name>") && strLine.contains("</route.name>")) {
+                        story.getRoutes().get(story.getRoutes().size() - 1).setName(strLine.substring("<route.name>".length(), strLine.length() - "</route.name>".length()));
+                        panelRoutes.refreshList(story.getRoutes());
+                    } else if (strLine.contains("<route.link>")) {
+                        tempLink.add(new Link());
+                        story.getRoutes().get(story.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
+                    } else if (strLine.contains("</route.link>")) {
+                        story.getRoutes().get(story.getRoutes().size() - 1).getStartLink().getP2().setStart();
+                    } else if (strLine.contains("<link.name>") && strLine.contains("</link.name>")) {
+                        tempLink.get(tempLink.size() - 1).setName(strLine.substring("<link.name>".length(), strLine.length() - "</link.name>".length()));
+                    } else if (strLine.contains("<link.id>") && strLine.contains("</link.id>")) {
+                        tempLink.get(tempLink.size() - 1).setId(Long.parseLong(strLine.substring("<link.id>".length(), strLine.length() - "</link.id>".length())));
+                    } else if (strLine.contains("<longitude>") && strLine.contains("</longitude>")) {
+                        tempLong = Double.parseDouble(strLine.substring("<longitude>".length(), strLine.length() - "</longitude>".length()));
+                    } else if (strLine.contains("<latitude>") && strLine.contains("</latitude>")) {
+                        tempLat = Double.parseDouble(strLine.substring("<latitude>".length(), strLine.length() - "</latitude>".length()));
+                    } else if (strLine.contains("</from>")) {
+                        tempLink.get(tempLink.size() - 1).setP1(tempLink.get(tempLink.size() - 2).getP2());
+                    } else if (strLine.contains("</to>")) {
+                        Node nod = new Node(tempLat, tempLong);
+                        tempLink.get(tempLink.size() - 1).setP2(nod);
+                        map.addNode(nod);
+                    } else if (strLine.contains("<video>")) {
+                        tempMediaItem = new Video();
+                    } else if (strLine.contains("<image>")) {
+                        tempMediaItem = new Image();
+                    } else if (strLine.contains("<text>")) {
+                        tempMediaItem = new Text();
+                    } else if (strLine.contains("<filename>") && strLine.contains("</filename>")) {
+                        File file = new File(pad + tempLink.get(tempLink.size()-1).getId() + System.getProperty("file.separator") + strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
+                        //Check if file exists
+                        if (file.exists()) {
+                            tempMediaItem.setAbsolutePath(file.getPath().substring(0, file.getPath().length() - file.getName().length()));
+                            tempMediaItem.setFileName(file.getName());
+                        } else {
+                            System.err.println("file does not exist");
+                        }
+                    } else if (strLine.contains("<duration>") && strLine.contains("</duration>")) {
+                        tempMediaItem.setShowDurationInSeconds(Integer.parseInt(strLine.substring("<duration>".length(), strLine.length() - "</duration>".length())));
+                    } else if (strLine.contains("</video>") || strLine.contains("</image>") || strLine.contains("</text>")) {
+                        tempLink.get(tempLink.size() - 1).getMediaItems().add(tempMediaItem);
+                    } else if (strLine.contains("<link>")) {
+                        Link link = new Link();
+                        tempLink.add(link);
+                        map.addLink(link);
+                    } else if (strLine.contains("</link>")) {
+                        tempLink.get(tempLink.size() - 2).addLink(tempLink.get(tempLink.size() - 1));
+                        tempLink.remove(tempLink.size() - 1);
+                    } else if (strLine.contains("</node>")) {
+                        Node nod = new Node(tempLat, tempLong);
+                        map.addNode(nod);
+                    }
+                }
+                
+                story.setSomethingChanged(false);
+                //Close the input stream
+                in.close();
+            } catch (Exception e) {//Catch exception if any
+                System.err.println("Error: " + e.getMessage());
+            }
+                
+                
+                
                 return true;
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -866,6 +1078,8 @@ public class Main extends JFrame implements PropertyChangeListener {
      * Progressbar for exporting a story
      */
     class Task extends SwingWorker<Void, Void> {
+        
+        private TaskOptions taskOption;
 
         /**
          * Set progress
@@ -886,17 +1100,31 @@ public class Main extends JFrame implements PropertyChangeListener {
          * @throws InterruptedException
          */
         @Override
-        public Void doInBackground() {
-            if (!exportStory()) {
+        public Void doInBackground() throws IOException {
+            if (taskOption == TaskOptions.EXPORT) {
+                if (!exportStory()) {
 
-                //TODO Delete corrupted file
+                    //TODO Delete corrupted file
 
-                // Show popup to user that exporting failed
-                JOptionPane.showMessageDialog(
-                        Main.this,
-                        "Exporting failed!",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                    // Show popup to user that exporting failed
+                    JOptionPane.showMessageDialog(
+                            Main.this,
+                            "Exporting failed!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            } else if (taskOption == TaskOptions.IMPORT) {
+                if (!importStory()) {
+
+                    //TODO Delete corrupted file
+
+                    // Show popup to user that exporting failed
+                    JOptionPane.showMessageDialog(
+                            Main.this,
+                            "Importing failed!",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
             return null;
         }
@@ -906,25 +1134,49 @@ public class Main extends JFrame implements PropertyChangeListener {
          */
         @Override
         public void done() {
-
-            // Exporting is canceled by user
-            if (progressMonitor.isCanceled()) {
-                JOptionPane.showMessageDialog(
-                        Main.this,
-                        "Exporting canceled by user!",
-                        "Canceled",
-                        JOptionPane.WARNING_MESSAGE);
-            } // Export succeeded
-            else if (task.isDone() && task.getProgress() == 100) {
-                JOptionPane.showMessageDialog(
-                        Main.this,
-                        "Exporting succeeded!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
-                if (close) {
-                    System.exit(0);
+            if (taskOption == TaskOptions.EXPORT) {
+                // Exporting is canceled by user
+                if (progressMonitor.isCanceled()) {
+                    JOptionPane.showMessageDialog(
+                            Main.this,
+                            "Exporting canceled by user!",
+                            "Canceled",
+                            JOptionPane.WARNING_MESSAGE);
+                } // Export succeeded
+                else if (task.isDone() && task.getProgress() == 100) {
+                    JOptionPane.showMessageDialog(
+                            Main.this,
+                            "Exporting succeeded!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    if (close) {
+                        System.exit(0);
+                    }
+                }
+            } else if (taskOption == TaskOptions.IMPORT) {
+                // Exporting is canceled by user
+                if (progressMonitor.isCanceled()) {
+                    JOptionPane.showMessageDialog(
+                            Main.this,
+                            "Importing canceled by user!",
+                            "Canceled",
+                            JOptionPane.WARNING_MESSAGE);
+                } // Export succeeded
+                else if (task.isDone() && task.getProgress() == 100) {
+                    JOptionPane.showMessageDialog(
+                            Main.this,
+                            "Importing succeeded!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    if (close) {
+                        System.exit(0);
+                    }
                 }
             }
+        }
+        
+        private void setTaskOption(TaskOptions taskOption) {
+            this.taskOption = taskOption;
         }
     }
 
