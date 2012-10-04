@@ -459,6 +459,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         tempLink.get(tempLink.size() - 1).setName(strLine.substring("<link.name>".length(), strLine.length() - "</link.name>".length()));
                     } else if (strLine.contains("<link.id>") && strLine.contains("</link.id>")) {
                         tempLink.get(tempLink.size() - 1).setId(Long.parseLong(strLine.substring("<link.id>".length(), strLine.length() - "</link.id>".length())));
+                        story.setLinkCounter(tempLink.get(tempLink.size() - 1).getId());
                     } else if (strLine.contains("<longitude>") && strLine.contains("</longitude>")) {
                         tempLong = Double.parseDouble(strLine.substring("<longitude>".length(), strLine.length() - "</longitude>".length()));
                     } else if (strLine.contains("<latitude>") && strLine.contains("</latitude>")) {
@@ -990,6 +991,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         tempLink.get(tempLink.size() - 1).setName(strLine.substring("<link.name>".length(), strLine.length() - "</link.name>".length()));
                     } else if (strLine.contains("<link.id>") && strLine.contains("</link.id>")) {
                         tempLink.get(tempLink.size() - 1).setId(Long.parseLong(strLine.substring("<link.id>".length(), strLine.length() - "</link.id>".length())));
+                        story.setLinkCounter(tempLink.get(tempLink.size() - 1).getId());
                     } else if (strLine.contains("<longitude>") && strLine.contains("</longitude>")) {
                         tempLong = Double.parseDouble(strLine.substring("<longitude>".length(), strLine.length() - "</longitude>".length()));
                     } else if (strLine.contains("<latitude>") && strLine.contains("</latitude>")) {

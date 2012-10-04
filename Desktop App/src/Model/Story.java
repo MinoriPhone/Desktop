@@ -289,4 +289,12 @@ public class Story {
         linkCounter++;
         return linkCounter;
     }
+    
+    /**
+     * Set the linkcounter manually
+     *
+     */
+    public void setLinkCounter(long linkCounter) {
+        this.linkCounter = linkCounter;
+    }
 }
