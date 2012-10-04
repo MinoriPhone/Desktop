@@ -682,9 +682,9 @@ public class AddMedia extends JDialog {
                     this.addItem((Video) mItem);
                 } else if (mItem instanceof Model.Image) {
                     enterDuration(mItem);
-                    
                     this.addItem((Model.Image) mItem);
                 } else if (mItem instanceof Text) {
+                    enterDuration(mItem);
                     this.addItem((Text) mItem);
                 }
             }
