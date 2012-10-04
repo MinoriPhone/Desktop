@@ -538,6 +538,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                 story = new Story(storyName, panelRoutes, this);
                 this.setTitle(storyName + " - iStory designer " + Application.getVersion());
                 map.Clear(story);
+                panelRoutes.refreshList(story.getRoutes());
                 return;
             }
         }
