@@ -516,6 +516,21 @@ class MapListeners extends MouseInputAdapter {
                     }
                 });
             }
+            contextMenuMap.getChangeRadiusItem().addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    String n = JOptionPane.showInputDialog("Enter the duration of the file in seconds", currentNode.getRadius());
+                    if (n != null) {
+                        if (!n.equals("")) {
+                            try {
+                               currentNode.setRadius(Double.parseDouble(n));
+                            } catch (NumberFormatException e) {
+                                JOptionPane.showMessageDialog(map, "The value entered is not a number");
+                            }
+                        }
+                    }
+                }
+            });
             contextMenuMap.showContextMenuMap(evt);
 
         } // Open media dialog if user clicks on a Link or a startNode
