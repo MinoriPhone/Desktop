@@ -26,20 +26,19 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 /**
  * Popup Window for adding media to a link
  */
-public class AddMedia extends JDialog {
+public final class AddMedia extends JDialog {
 
     // Variables
     private static final Logger LOGGER = Logger.getLogger(AddMedia.class.getName());
@@ -55,13 +54,15 @@ public class AddMedia extends JDialog {
     private boolean changeLink;
 
     /**
-     * Constructor
+     * Creates form addMedia
      *
-     * @param link
+     * @param parent JFrame The Main window of this application is the parent of this window
+     * @param map Instance of Class View.Map
+     * @param link Link The Link we are creating
      */
     public AddMedia(Main parent, final View.Map map, Link link) {
         super(parent, true);
-        
+
         initComponents();
 
         // Set variables
@@ -93,7 +94,7 @@ public class AddMedia extends JDialog {
             // Enable routename and disable prev links
             this.tfRouteName.setEditable(true);
             this.lLinks.setEnabled(false);
-            
+
         } // User is NOT creating a startnode, but a new link
         else {
             this.prevLinks = new ArrayList<Link>();
@@ -127,7 +128,8 @@ public class AddMedia extends JDialog {
         this.scrollPane = new JScrollPane(this.list);
         this.scrollPane.setPreferredSize(new Dimension(400, 100));
         this.pAddedMedia.add(this.scrollPane, BorderLayout.CENTER);
-        
+
+        // MediaItems
         for (MediaItem mItem : link.getMediaItems()) {
             // Add selected file to list
             if (mItem != null) {
@@ -140,21 +142,25 @@ public class AddMedia extends JDialog {
                 }
             }
         }
+
         // Enable drag and drop
         this.list.setDragEnabled(true);
         this.list.setTransferHandler(new ListTransferHandler());
         this.list.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent evt) {
                 JList list = (JList) evt.getSource();
                 if (evt.getClickCount() == 2) {
                     int index = list.locationToIndex(evt.getPoint());
                     Object obj = listModel.get(index);
                     for (MediaItem item : addedItems) {
-                        if (item.getFileName().equals(obj.toString())) {
-                            if (item instanceof Model.Image || item instanceof Text) {
-                                enterDuration(item);
+                        if (item instanceof Model.Image || item instanceof Text) {
+                            if ((item.getFileName() + "   " + item.getShowDurationInSeconds() + " seconds").equals(obj.toString())) {
+                                if (item instanceof Model.Image || item instanceof Text) {
+                                    enterDuration(item);
+                                    break;
+                                }
                             }
-                            break;
                         }
                     }
                 }
@@ -230,17 +236,15 @@ public class AddMedia extends JDialog {
      *
      * Creates NEW(!) form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of
-     * this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can
-     * onnect this Link to
+     * @param parent JFrame The Main window of this application is the parent of this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can connect this Link to
      * @param link Link The Link we are creating
-     * @param callFrom int If int = 1, we are creating a startnode (Link)
+     * @param callFrom int if int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
      */
     public AddMedia(Main parent, final View.Map map, ArrayList<Link> prevLinks, Link link, int callFrom) {
         super(parent, true);
-        
+
         initComponents();
 
         // Set variables
@@ -251,6 +255,7 @@ public class AddMedia extends JDialog {
         this.callFrom = callFrom;
         this.tfRouteName.setEditable(false);
         this.changeLink = false;
+
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -271,15 +276,16 @@ public class AddMedia extends JDialog {
             // Enable routename and disable prev links
             this.tfRouteName.setEditable(true);
             this.lLinks.setEnabled(false);
-            
+
         } // User is NOT creating a startnode, but a new link
         else {
-            // Add routes to combobox
-            // this is an empty Link for checking if the user selected a previous Link
-            //this.lLinks.addItem(new Link("", null, null, map.getStory().getLinkCounter())); 
+            // Remove JTextField 'tfRouteName'
+            BorderLayout layout = (BorderLayout) pRouteName.getLayout();
+            pRouteName.remove(layout.getLayoutComponent(BorderLayout.CENTER));
+            pRouteName.revalidate();
+
+            // Set perious links in list
             this.lLinks.setListData(this.prevLinks.toArray());
-            //for (Link l : this.prevLinks) {
-            //}
         }
 
         // List model
@@ -299,17 +305,20 @@ public class AddMedia extends JDialog {
         this.list.setDragEnabled(true);
         this.list.setTransferHandler(new ListTransferHandler());
         this.list.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent evt) {
                 JList list = (JList) evt.getSource();
                 if (evt.getClickCount() == 2) {
                     int index = list.locationToIndex(evt.getPoint());
                     Object obj = listModel.get(index);
                     for (MediaItem item : addedItems) {
-                        if (item.getFileName().equals(obj.toString())) {
-                            if (item instanceof Model.Image || item instanceof Text) {
-                                enterDuration(item);
+                        if (item instanceof Model.Image || item instanceof Text) {
+                            if ((item.getFileName() + "   " + item.getShowDurationInSeconds() + " seconds").equals(obj.toString())) {
+                                if (item instanceof Model.Image || item instanceof Text) {
+                                    enterDuration(item);
+                                    break;
+                                }
                             }
-                            break;
                         }
                     }
                 }
@@ -376,51 +385,59 @@ public class AddMedia extends JDialog {
                         }
                     }
                 }
-                tfRouteName.setText(tfRouteNameText);
+
+                // Set route name as JLabel with a JLabel
+                pRouteName.add(new JLabel(tfRouteNameText), BorderLayout.CENTER);
+                pRouteName.revalidate();
             }
         });
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
-     * the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
-        this.listModel.addElement(mediaItem.getFileName());
+        if (mediaItem instanceof Model.Image || mediaItem instanceof Text) {
+            this.listModel.addElement(mediaItem.getFileName() + "   " + mediaItem.getShowDurationInSeconds() + " seconds");
+        } else {
+            this.listModel.addElement(mediaItem.getFileName());
+        }
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
-     * the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
      * @param index int The index we want to add the mediaItem at
      */
     public void addItemAtIndex(MediaItem mediaItem, int index) {
         this.addedItems.add(mediaItem);
-        this.listModel.add(index, mediaItem.getFileName());
+        if (mediaItem instanceof Model.Image || mediaItem instanceof Text) {
+            this.listModel.add(index, mediaItem.getFileName() + "   " + mediaItem.getShowDurationInSeconds() + " seconds");
+        } else {
+            this.listModel.add(index, mediaItem.getFileName());
+        }
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from
-     * the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
      */
     public void removeItem(MediaItem mediaItem) {
         this.addedItems.remove(mediaItem);
-        this.listModel.removeElement(mediaItem.getFileName());
+        if (mediaItem instanceof Model.Image || mediaItem instanceof Text) {
+            this.listModel.removeElement(mediaItem.getFileName() + "   " + mediaItem.getShowDurationInSeconds() + " seconds");
+        } else {
+            this.listModel.removeElement(mediaItem.getFileName());
+        }
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will
-     * be in the right order!
+     * Get all added media items. If we closed the window, then the items will be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -489,14 +506,15 @@ public class AddMedia extends JDialog {
         bSave = new javax.swing.JButton();
         lRoute = new javax.swing.JLabel();
         lSpaceBottom = new javax.swing.JLabel();
-        tfRouteName = new javax.swing.JTextField();
-        lRouteName = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         lLinks = new javax.swing.JList();
         bUp = new javax.swing.JButton();
         bDown = new javax.swing.JButton();
         lSpaceMediaUp = new javax.swing.JLabel();
         lSpaceMediaDown = new javax.swing.JLabel();
+        pRouteName = new javax.swing.JPanel();
+        lRouteName = new javax.swing.JLabel();
+        tfRouteName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -531,17 +549,6 @@ public class AddMedia extends JDialog {
         lRoute.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         lRoute.setText("Previous link:");
 
-        tfRouteName.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        tfRouteName.setToolTipText("");
-        tfRouteName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfRouteNameActionPerformed(evt);
-            }
-        });
-
-        lRouteName.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        lRouteName.setText("Route name:");
-
         jScrollPane1.setViewportView(lLinks);
 
         bUp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/arrow-up.png"))); // NOI18N
@@ -558,6 +565,27 @@ public class AddMedia extends JDialog {
             }
         });
 
+        pRouteName.setMaximumSize(new java.awt.Dimension(0, 40));
+        pRouteName.setMinimumSize(new java.awt.Dimension(0, 40));
+        pRouteName.setPreferredSize(new java.awt.Dimension(0, 40));
+        pRouteName.setLayout(new java.awt.BorderLayout());
+
+        lRouteName.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        lRouteName.setText("Route name:  ");
+        pRouteName.add(lRouteName, java.awt.BorderLayout.LINE_START);
+
+        tfRouteName.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        tfRouteName.setToolTipText("");
+        tfRouteName.setMaximumSize(new java.awt.Dimension(0, 40));
+        tfRouteName.setMinimumSize(new java.awt.Dimension(0, 40));
+        tfRouteName.setPreferredSize(new java.awt.Dimension(0, 40));
+        tfRouteName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfRouteNameActionPerformed(evt);
+            }
+        });
+        pRouteName.add(tfRouteName, java.awt.BorderLayout.CENTER);
+
         org.jdesktop.layout.GroupLayout pMainLayout = new org.jdesktop.layout.GroupLayout(pMain);
         pMain.setLayout(pMainLayout);
         pMainLayout.setHorizontalGroup(
@@ -573,34 +601,32 @@ public class AddMedia extends JDialog {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(lSpaceTop, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, pMainLayout.createSequentialGroup()
-                                .add(8, 8, 8)
-                                .add(lRouteName)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(tfRouteName))
                             .add(pMainLayout.createSequentialGroup()
                                 .add(6, 6, 6)
-                                .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                    .add(lRoute)
-                                    .add(lLinkName)
-                                    .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, bDown, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, bUp, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .add(lSpaceMediaUp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(lSpaceMediaDown, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(pRouteName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .add(pMainLayout.createSequentialGroup()
-                                        .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                            .add(lSpaceBottom, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .add(pMainLayout.createSequentialGroup()
-                                                .add(bBrowse)
-                                                .add(0, 0, Short.MAX_VALUE)))
+                                        .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                            .add(lRoute)
+                                            .add(lLinkName)
+                                            .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, bDown, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, bUp, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .add(lSpaceMediaUp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                            .add(lSpaceMediaDown, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(bSave))
-                                    .add(tfLinkName)
-                                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
-                                    .add(pAddedMedia, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                        .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(pMainLayout.createSequentialGroup()
+                                                .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                    .add(lSpaceBottom, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                    .add(pMainLayout.createSequentialGroup()
+                                                        .add(bBrowse)
+                                                        .add(0, 0, Short.MAX_VALUE)))
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(bSave))
+                                            .add(tfLinkName)
+                                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
+                                            .add(pAddedMedia, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(lSpaceRight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
@@ -618,9 +644,7 @@ public class AddMedia extends JDialog {
                     .add(pMainLayout.createSequentialGroup()
                         .add(lSpaceTop, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(lRouteName)
-                            .add(tfRouteName, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 40, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(pRouteName, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(lLinkName)
@@ -629,7 +653,7 @@ public class AddMedia extends JDialog {
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(pMainLayout.createSequentialGroup()
                                 .add(lRoute)
-                                .add(0, 104, Short.MAX_VALUE))
+                                .add(0, 102, Short.MAX_VALUE))
                             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .add(18, 18, 18)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -642,7 +666,7 @@ public class AddMedia extends JDialog {
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(lSpaceMediaDown, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(pAddedMedia, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 192, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED, 14, Short.MAX_VALUE)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(pMainLayout.createSequentialGroup()
                                 .add(bBrowse, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -696,7 +720,7 @@ public class AddMedia extends JDialog {
             LOGGER.log(Level.WARNING, "File Chooser returns error");
         }
     }//GEN-LAST:event_bBrowseActionPerformed
-    
+
     private void bSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveActionPerformed
         if (!changeLink) {
             // Get selected previous Link
@@ -706,7 +730,7 @@ public class AddMedia extends JDialog {
 
                 // User is creating startnode OR user must select previous link
                 if (this.callFrom == 1 || objArray.length > 0) {
-                    
+
                     this.closedBySave = true;
 
                     // Get variables we want to save
@@ -734,7 +758,7 @@ public class AddMedia extends JDialog {
 
                         // Create new Route
                         map.getStory().newRoute(routeName, this.link);
-                        
+
                     } else {
                         // Add this link to the selected previous link (so this is the next link for that previous link)
                         for (Object object : objArray) {
@@ -756,7 +780,7 @@ public class AddMedia extends JDialog {
                     // Close this window and bring main window to the front
                     super.toFront();
                     this.dispose();
-                    
+
                 } // User did NOT select previous Link
                 else {
                     JOptionPane.showMessageDialog(null,
@@ -772,15 +796,12 @@ public class AddMedia extends JDialog {
                         JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
-            // Get selected previous Link
-            Object[] objArray = lLinks.getSelectedValues();
             // User must give this Link a name
             if (!tfLinkName.getText().trim().isEmpty()) {
-                
+
                 this.closedBySave = true;
 
                 // Get variables we want to save
-                //String routeName = tfRouteName.getText().trim();
                 String linkName = tfLinkName.getText().trim();
                 ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
                 Object[] elements = listModel.toArray();
@@ -814,11 +835,11 @@ public class AddMedia extends JDialog {
             }
         }
     }//GEN-LAST:event_bSaveActionPerformed
-    
+
     private void tfRouteNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfRouteNameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tfRouteNameActionPerformed
-    
+
     private void bUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bUpActionPerformed
         ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
         for (Object fileName : list.getSelectedValues()) {
@@ -839,9 +860,9 @@ public class AddMedia extends JDialog {
                 list.setSelectedIndices(indices);
             }
         }
-        
+
     }//GEN-LAST:event_bUpActionPerformed
-    
+
     private void bDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDownActionPerformed
         ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
         for (Object fileName : list.getSelectedValues()) {
@@ -881,6 +902,7 @@ public class AddMedia extends JDialog {
     private javax.swing.JLabel lTitle;
     private javax.swing.JPanel pAddedMedia;
     private javax.swing.JPanel pMain;
+    private javax.swing.JPanel pRouteName;
     private javax.swing.JTextField tfLinkName;
     private javax.swing.JTextField tfRouteName;
     // End of variables declaration//GEN-END:variables
@@ -907,9 +929,9 @@ class ListTransferHandler extends StringTransferHandler {
         JList list = (JList) c;
         indices = list.getSelectedIndices();
         Object[] values = list.getSelectedValues();
-        
+
         StringBuilder buff = new StringBuilder();
-        
+
         for (int i = 0; i < values.length; i++) {
             Object val = values[i];
             buff.append(val == null ? "" : val.toString());
@@ -917,13 +939,12 @@ class ListTransferHandler extends StringTransferHandler {
                 buff.append("\n");
             }
         }
-        
+
         return buff.toString();
     }
 
     /**
-     * Take the incoming string and wherever there is a newline, break it into a
-     * separate item in the list.
+     * Take the incoming string and wherever there is a newline, break it into a separate item in the list.
      *
      * @param c JComponent
      * @param str String
@@ -935,17 +956,15 @@ class ListTransferHandler extends StringTransferHandler {
         int index = target.getSelectedIndex();
 
         /**
-         * Prevent the user from dropping data back on itself. For example, if
-         * the user is moving items #4, #5, #6 and #7 and attempts to insert the
-         * items after item #5, this would be problematic when removing the
-         * original items. So this is not allowed.
+         * Prevent the user from dropping data back on itself. For example, if the user is moving items #4, #5, #6 and #7 and attempts
+         * to insert the items after item #5, this would be problematic when removing the original items. So this is not allowed.
          */
         if (indices != null && index >= indices[0] - 1
                 && index <= indices[indices.length - 1]) {
             indices = null;
             return;
         }
-        
+
         int max = listModel.getSize();
         if (index < 0) {
             index = max;
@@ -955,20 +974,19 @@ class ListTransferHandler extends StringTransferHandler {
                 index = max;
             }
         }
-        
+
         addIndex = index;
         String[] values = str.split("\n");
         addCount = values.length;
-        
+
         for (int i = 0; i < values.length; i++) {
             listModel.add(index++, values[i]);
         }
     }
 
     /**
-     * If the remove argument is true, the drop has been successful and it's
-     * time to remove the selected items from the list. If the remove argument
-     * is false, it was a Copy operation and the original list is left intact.
+     * If the remove argument is true, the drop has been successful and it's time to remove the selected items from the list. If the
+     * remove argument is false, it was a Copy operation and the original list is left intact.
      *
      * @param c JComponent
      * @param remove boolean
@@ -980,9 +998,8 @@ class ListTransferHandler extends StringTransferHandler {
             DefaultListModel model = (DefaultListModel) source.getModel();
 
             /**
-             * If we are moving items around in the same list, we need to adjust
-             * the indices accordingly, since those after the insertion point
-             * have moved.
+             * If we are moving items around in the same list, we need to adjust the indices accordingly, since those after the
+             * insertion point have moved.
              */
             if (addCount > 0) {
                 for (int i = 0; i < indices.length; i++) {
@@ -991,13 +1008,13 @@ class ListTransferHandler extends StringTransferHandler {
                     }
                 }
             }
-            
+
             for (int i = indices.length - 1; i >= 0; i--) {
                 model.remove(indices[i]);
             }
-            
+
         }
-        
+
         indices = null;
         addCount = 0;
         addIndex = -1;
@@ -1008,23 +1025,23 @@ class ListTransferHandler extends StringTransferHandler {
  * Custom TransferHandler for handling strings while dragging and dropping
  */
 abstract class StringTransferHandler extends TransferHandler {
-    
+
     protected abstract String exportString(JComponent c);
-    
+
     protected abstract void importString(JComponent c, String str);
-    
+
     protected abstract void cleanup(JComponent c, boolean remove);
-    
+
     @Override
     protected Transferable createTransferable(JComponent c) {
         return new StringSelection(exportString(c));
     }
-    
+
     @Override
     public int getSourceActions(JComponent c) {
         return COPY_OR_MOVE;
     }
-    
+
     @Override
     public boolean importData(JComponent c, Transferable t) {
         if (canImport(c, t.getTransferDataFlavors())) {
@@ -1038,12 +1055,12 @@ abstract class StringTransferHandler extends TransferHandler {
         }
         return false;
     }
-    
+
     @Override
     protected void exportDone(JComponent c, Transferable data, int action) {
         cleanup(c, action == MOVE);
     }
-    
+
     @Override
     public boolean canImport(JComponent c, DataFlavor[] flavors) {
         for (int i = 0; i < flavors.length; i++) {
