@@ -3,9 +3,12 @@ package Model;
 import Plugins.jxmap.swingx.JXMapViewer;
 import Plugins.jxmap.swingx.mapviewer.GeoPosition;
 import Plugins.jxmap.swingx.mapviewer.WaypointRenderer;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -22,6 +25,8 @@ public class NodeRenderer implements WaypointRenderer<Node> {
     private final Map<Color, BufferedImage> map = new HashMap<Color, BufferedImage>();
     //private final Font font = new Font("Lucida Sans", Font.BOLD, 10);
     private BufferedImage origImage;
+    private Color RadiusFillColor = new Color(130, 28, 255, 65);
+    private Color RadiusStrokeColor = new Color(130, 28, 255, 130);
 
     /**
      * Uses a default waypoint image
@@ -90,18 +95,17 @@ public class NodeRenderer implements WaypointRenderer<Node> {
         int x = (int) point.getX();
         int y = (int) point.getY();
 
-        // Paint radius
-        double radius = 0.0002;
-
-        GeoPosition leftTop = new GeoPosition(node.getPosition().getLatitude() + radius, node.getPosition().getLongitude() - radius);
-        //GeoPosition rightBottom = new GeoPosition(node.getGeoposition().getLatitude()-radius, node.getGeoposition().getLongitude()+radius);
-       
-        //Point2D ltPoint = viewer.getTileFactory().geoToPixel(leftTop, viewer.getZoom());
-        double diff = 20/viewer.getZoom();
-
+        // meters / (meter / pixel) = pixels
+        double diff = node.getRadius()/viewer.getMeterPerPixel();
+        
         //g.drawOval((int) ltPoint.getX(), (int) ltPoint.getY(), (int) diff, (int) diff);
-        g.setColor(Color.yellow);
+        g.setColor(RadiusFillColor);
+        g.setStroke(new BasicStroke(2));
         g.fillOval((int) (point.getX()-diff), (int) (point.getY()-diff), (int) diff*2, (int) diff*2);
+        g.setColor(RadiusStrokeColor);
+        g.drawOval((int) (point.getX()-diff), (int) (point.getY()-diff), (int) diff*2, (int) diff*2);
+        Point2D point2 = new Point((int)(point.getX()), (int)(point.getY()-diff));
+        GeoPosition leftTop = viewer.getTileFactory().pixelToGeo(point2, viewer.getZoom());
 
         //Draw node
         g.drawImage(myImg, x - myImg.getWidth() / 2, y - myImg.getHeight(), null);

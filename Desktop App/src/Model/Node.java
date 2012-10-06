@@ -12,6 +12,7 @@ public class Node extends DefaultWaypoint {
 
     private Color color = Color.BLUE;
     private String label;
+    private Double radius;
 
     /**
      * Constructor with doubles
@@ -21,6 +22,7 @@ public class Node extends DefaultWaypoint {
      */
     public Node(double latitude, double longitude) {
         super(new GeoPosition(latitude, longitude)); // Creates a waypoint with the geoposition        
+        this.radius = 25.0;
     }
 
     /**
@@ -29,7 +31,8 @@ public class Node extends DefaultWaypoint {
      * @param geoposition The jxMapView geoposition
      */
     public Node(GeoPosition geoposition) {
-        super(geoposition); // Creates a waypoint with the geoposition        
+        super(geoposition); // Creates a waypoint with the geoposition           
+        this.radius = 25.0;
     }
 
     /**
@@ -88,7 +91,7 @@ public class Node extends DefaultWaypoint {
     public Boolean getStart() {
         if (this.color == Color.GREEN && this.label == "S") {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -96,6 +99,18 @@ public class Node extends DefaultWaypoint {
     public void setEnd() {
         this.color = Color.RED;
         this.label = "E";
+    }
+
+    public Double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(Double radius) {
+        if (radius <= 500) {
+            this.radius = radius;
+        } else {
+            this.radius = 500.0;
+        }
     }
 
     /**

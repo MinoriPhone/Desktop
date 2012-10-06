@@ -11,6 +11,7 @@ public class ContextMenuMap extends JPopupMenu {
     JMenuItem setStartItem;
     JMenuItem createLinkItem;
     JMenuItem changeLinkItem;
+    JMenuItem changeRadiusItem;
 
     /**
      * Constructor
@@ -20,10 +21,12 @@ public class ContextMenuMap extends JPopupMenu {
         setStartItem = new JMenuItem("Make start");
         createLinkItem = new JMenuItem("Create link");
         changeLinkItem = new JMenuItem("Change start");
+        changeRadiusItem = new JMenuItem("Change radius");
         add(deleteItem);
         add(setStartItem);
         add(createLinkItem);
         add(changeLinkItem);
+        add(changeRadiusItem);
     }
 
     /**
@@ -95,6 +98,14 @@ public class ContextMenuMap extends JPopupMenu {
 
     public void setChangeLinkItem(JMenuItem changeLinkItem) {
         this.changeLinkItem = changeLinkItem;
+    }
+
+    public JMenuItem getChangeRadiusItem() {
+        return changeRadiusItem;
+    }
+
+    public void setChangeRadiusItem(JMenuItem changeRadiusItem) {
+        this.changeRadiusItem = changeRadiusItem;
     }
     
 }

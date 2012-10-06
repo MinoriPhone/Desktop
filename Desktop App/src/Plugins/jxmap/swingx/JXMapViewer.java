@@ -23,6 +23,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -36,21 +37,29 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
- * A tile oriented map component that can easily be used with tile sources on the web like Google and Yahoo maps, satellite data such
- * as NASA imagery, and also with file based sources like pre-processed NASA images. A known map provider can be used with the
- * SLMapServerInfo, which will connect to a 2km resolution version of NASA's Blue Marble Next Generation imagery.
+ * A tile oriented map component that can easily be used with tile sources on
+ * the web like Google and Yahoo maps, satellite data such as NASA imagery, and
+ * also with file based sources like pre-processed NASA images. A known map
+ * provider can be used with the SLMapServerInfo, which will connect to a 2km
+ * resolution version of NASA's Blue Marble Next Generation imagery.
  *
  * @see SLMapServerInfo for more information.
  *
- * Note, the JXMapViewer has three center point properties. The <B>addressLocation</B> property represents an abstract center of the
- * map. This would usually be something like the first item in a search result. It is a {@link GeoPosition}. The <b>centerPosition</b>
- * property represents the current center point of the map. If the user pans the map then the centerPosition point will change but the
- * <B>addressLocation</B> will not. Calling <B>recenterToAddressLocation()</B> will move the map back to that center address. The
- * <B>center</B> property represents the same point as the centerPosition property, but as a Point2D in pixel space instead of a
- * GeoPosition in lat/long space. Note that the center property is a Point2D in the entire world bitmap, not in the portion of the map
- * currently visible. You can use the <B>getViewportBounds()</B> method to find the portion of the map currently visible and adjust
- * your calculations accordingly. Changing the <B>center</B> property will change the <B>centerPosition</B> property and vice versa.
- * All three properties are bound.
+ * Note, the JXMapViewer has three center point properties. The
+ * <B>addressLocation</B> property represents an abstract center of the map.
+ * This would usually be something like the first item in a search result. It is
+ * a {@link GeoPosition}. The <b>centerPosition</b> property represents the
+ * current center point of the map. If the user pans the map then the
+ * centerPosition point will change but the <B>addressLocation</B> will not.
+ * Calling <B>recenterToAddressLocation()</B> will move the map back to that
+ * center address. The <B>center</B> property represents the same point as the
+ * centerPosition property, but as a Point2D in pixel space instead of a
+ * GeoPosition in lat/long space. Note that the center property is a Point2D in
+ * the entire world bitmap, not in the portion of the map currently visible. You
+ * can use the <B>getViewportBounds()</B> method to find the portion of the map
+ * currently visible and adjust your calculations accordingly. Changing the
+ * <B>center</B> property will change the <B>centerPosition</B> property and
+ * vice versa. All three properties are bound.
  * @author Joshua.Marinacci@sun.com
  * @see org.jdesktop.swingx.mapviewer.bmng.SLMapServerInfo
  */
@@ -59,35 +68,43 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     private static final long serialVersionUID = -3530746298586937321L;
     private final boolean isNegativeYAllowed = true; // maybe rename to isNorthBounded and isSouthBounded?
     /**
-     * The zoom level. Generally a value between 1 and 15 (TODO Is this true for all the mapping worlds? What does this mean if some
-     * mapping system doesn't support the zoom level?
+     * The zoom level. Generally a value between 1 and 15 (TODO Is this true for
+     * all the mapping worlds? What does this mean if some mapping system
+     * doesn't support the zoom level?
      */
     private int zoomLevel = 1;
     /**
-     * The position, in <I>map coordinates</I> of the center point. This is defined as the distance from the top and left edges of the
-     * map in pixels. Dragging the map component will change the center position. Zooming in/out will cause the center to be
-     * recalculated so as to remain in the center of the new "map".
+     * The position, in <I>map coordinates</I> of the center point. This is
+     * defined as the distance from the top and left edges of the map in pixels.
+     * Dragging the map component will change the center position. Zooming
+     * in/out will cause the center to be recalculated so as to remain in the
+     * center of the new "map".
      */
     private Point2D center = new Point2D.Double(0, 0);
     /**
-     * Indicates whether or not to draw the borders between tiles. Defaults to false. TODO Generally not very nice looking, very much a
-     * product of testing Consider whether this should really be a property or not.
+     * Indicates whether or not to draw the borders between tiles. Defaults to
+     * false. TODO Generally not very nice looking, very much a product of
+     * testing Consider whether this should really be a property or not.
      */
     private boolean drawTileBorders = false;
     /**
-     * Factory used by this component to grab the tiles necessary for painting the map.
+     * Factory used by this component to grab the tiles necessary for painting
+     * the map.
      */
     private TileFactory factory;
     /**
-     * The position in latitude/longitude of the "address" being mapped. This is a special coordinate that, when moved, will cause the
-     * map to be moved as well. It is separate from "center" in that "center" tracks the current center (in pixels) of the viewport
-     * whereas this will not change when panning or zooming. Whenever the addressLocation is changed, however, the map will be
-     * repositioned.
+     * The position in latitude/longitude of the "address" being mapped. This is
+     * a special coordinate that, when moved, will cause the map to be moved as
+     * well. It is separate from "center" in that "center" tracks the current
+     * center (in pixels) of the viewport whereas this will not change when
+     * panning or zooming. Whenever the addressLocation is changed, however, the
+     * map will be repositioned.
      */
     private GeoPosition addressLocation;
     /**
-     * The overlay to delegate to for painting the "foreground" of the map component. This would include painting waypoints, day/night,
-     * etc. Also receives mouse events.
+     * The overlay to delegate to for painting the "foreground" of the map
+     * component. This would include painting waypoints, day/night, etc. Also
+     * receives mouse events.
      */
     private Painter<? super JXMapViewer> overlay;
     private boolean designTime;
@@ -141,7 +158,8 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Indicate that the component is being used at design time, such as in a visual editor like NetBeans' Matisse
+     * Indicate that the component is being used at design time, such as in a
+     * visual editor like NetBeans' Matisse
      *
      * @param b indicates if the component is being used at design time
      */
@@ -151,7 +169,8 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Indicates whether the component is being used at design time, such as in a visual editor like NetBeans' Matisse
+     * Indicates whether the component is being used at design time, such as in
+     * a visual editor like NetBeans' Matisse
      *
      * @return boolean indicating if the component is being used at design time
      */
@@ -254,8 +273,9 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Sets the map overlay. This is a Painter<JXMapViewer> which will paint on top of the map. It can be used to draw waypoints,
-     * lines, or static overlays like text messages.
+     * Sets the map overlay. This is a Painter<JXMapViewer> which will paint on
+     * top of the map. It can be used to draw waypoints, lines, or static
+     * overlays like text messages.
      *
      * @param overlay the map overlay to use
      */
@@ -296,7 +316,8 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Returns the bounds of the viewport in pixels. This can be used to transform points into the world bitmap coordinate space.
+     * Returns the bounds of the viewport in pixels. This can be used to
+     * transform points into the world bitmap coordinate space.
      *
      * @return the bounds in <em>pixels</em> of the "view" of this map
      */
@@ -355,7 +376,8 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Gets the current address location of the map. This property does not change when the user pans the map. This property is bound.
+     * Gets the current address location of the map. This property does not
+     * change when the user pans the map. This property is bound.
      *
      * @return the current map location (address)
      */
@@ -377,7 +399,8 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Re-centers the map to have the current address location be at the center of the map, accounting for the map's width and height.
+     * Re-centers the map to have the current address location be at the center
+     * of the map, accounting for the map's width and height.
      */
     public void recenterToAddressLocation() {
         setCenter(getTileFactory().geoToPixel(getAddressLocation(), getZoom()));
@@ -450,7 +473,8 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * A property for an image which will be display when an image is still loading.
+     * A property for an image which will be display when an image is still
+     * loading.
      *
      * @return the current property value
      */
@@ -459,7 +483,8 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * A property for an image which will be display when an image is still loading.
+     * A property for an image which will be display when an image is still
+     * loading.
      *
      * @param loadingImage the new property value
      */
@@ -468,7 +493,8 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Gets the current pixel center of the map. This point is in the global bitmap coordinate system, not as lat/longs.
+     * Gets the current pixel center of the map. This point is in the global
+     * bitmap coordinate system, not as lat/longs.
      *
      * @return the current center of the map as a pixel value
      */
@@ -551,8 +577,10 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Calculates a zoom level so that all points in the specified set will be visible on screen. This is useful if you have a bunch of
-     * points in an area like a city and you want to zoom out so that the entire city and it's points are visible without panning.
+     * Calculates a zoom level so that all points in the specified set will be
+     * visible on screen. This is useful if you have a bunch of points in an
+     * area like a city and you want to zoom out so that the entire city and
+     * it's points are visible without panning.
      *
      * @param positions A set of GeoPositions to calculate the new zoom from
      */
@@ -655,8 +683,9 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Converts the specified GeoPosition to a point in the JXMapViewer's local coordinate space. This method is especially useful when
-     * drawing lat/long positions on the map.
+     * Converts the specified GeoPosition to a point in the JXMapViewer's local
+     * coordinate space. This method is especially useful when drawing lat/long
+     * positions on the map.
      *
      * @param pos a GeoPosition on the map
      * @return the point in the local coordinate space of the map
@@ -670,8 +699,9 @@ public final class JXMapViewer extends JPanel implements DesignMode {
     }
 
     /**
-     * Converts the specified Point2D in the JXMapViewer's local coordinate space to a GeoPosition on the map. This method is
-     * especially useful for determining the GeoPosition under the mouse cursor.
+     * Converts the specified Point2D in the JXMapViewer's local coordinate
+     * space to a GeoPosition on the map. This method is especially useful for
+     * determining the GeoPosition under the mouse cursor.
      *
      * @param pt a point in the local coordinate space of the map
      * @return the point converted to a GeoPosition
@@ -691,5 +721,34 @@ public final class JXMapViewer extends JPanel implements DesignMode {
      */
     public boolean isNegativeYAllowed() {
         return isNegativeYAllowed;
+    }
+
+    /**
+     * Gets the meter per pixel.
+     *
+     * @return the meter per pixel
+     * @author Jason Huntley
+     */
+    public double getMeterPerPixel() {
+        Point2D from = new Point(5, 5);
+        Point2D to = new Point(6,5);
+
+        double pDistance = to.distance(from);
+
+        GeoPosition originCoord = convertPointToGeoPosition(from);
+        GeoPosition centerCoord = convertPointToGeoPosition(to);
+        double d2r = Math.PI / 180;
+
+        double dlong = (centerCoord.getLongitude() - originCoord.getLongitude()) * d2r;
+        double dlat = (centerCoord.getLatitude() - originCoord.getLatitude()) * d2r;
+        double a =
+                Math.pow(Math.sin(dlat / 2.0), 2)
+                + Math.cos(centerCoord.getLatitude() * d2r)
+                * Math.cos(originCoord.getLatitude() * d2r)
+                * Math.pow(Math.sin(dlong / 2.0), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double mDistance = (6367 * c) * 1000;
+
+        return mDistance / pDistance;
     }
 }
