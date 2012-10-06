@@ -11,7 +11,8 @@ public class Text implements MediaItem {
     private String fileName;
     private String absPath;
     private int showDurationInSeconds;
-
+    private Link shortcut;
+ 
     /**
      * Constructor
      */
@@ -24,11 +25,13 @@ public class Text implements MediaItem {
      * @param fileName String Name of the Text-file
      * @param absPath String absolute path to Text-file
      * @param showDurationInSeconds String The number of seconds for how long we want to show the Text
+     * @param shortcut Link the link to the main MediaItem
      */
     public Text(String fileName, String absPath, int showDurationInSeconds) {
         this.fileName = fileName;
         this.absPath = absPath;
         this.setShowDurationInSeconds(showDurationInSeconds);
+        this.shortcut = null;
     }
 
     /**
@@ -80,6 +83,10 @@ public class Text implements MediaItem {
         String XMLString = "";
         XMLString += "<message>\r\n";
 
+        if (shortcut != null) {
+            XMLString += "<shortcut>" + this.shortcut.getId() + "</shortcut>\r\n";
+        }
+
         // Full pathnames or just the file names
         if (XMLProject) {
             XMLString += "<filename>" + this.absPath + this.fileName + "</filename>\r\n";
@@ -110,5 +117,15 @@ public class Text implements MediaItem {
     @Override
     public void setAbsolutePath(String absPath) {
         this.absPath = absPath;
+    }
+
+    @Override
+    public void setShortcut(Link isShortcut) {
+        this.shortcut = isShortcut;
+    }
+
+    @Override
+    public Link getShortcut() {
+        return this.shortcut;
     }
 }

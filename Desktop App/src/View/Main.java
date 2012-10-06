@@ -32,7 +32,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -61,6 +63,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     private boolean close = false;
     private String currentMediaItemName;
     private final String defaultStoryName;
+    private HashMap<MediaItem, Link> exportMediaItems;
 
     private enum TaskOptions {
 
@@ -82,6 +85,9 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         // Center the window
         this.setLocation(x, y);
+
+        // Set the exportMediaItem for the export
+        exportMediaItems = new HashMap<MediaItem, Link>();
 
         // Change title
         defaultStoryName = "New Story";
@@ -682,7 +688,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             try {
                 // Max length of the buffer
                 int maxBufferSize = 1024; // bytes
-                String XMLcontent = this.story.printXML(XMLProject);
+
                 String fileName = j.getSelectedFile().toString();
 
                 // Add ".iStory  at the end of the string (only if it not exists)
@@ -714,40 +720,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         return false;
                     }
                 }
-                task.setProgression(Math.min(10, 100));
 
-                ///////////
-                // XML
-                ///////////
-
-                // Create an XML-file
-                String filenameWithPath = fileName.replace(".iStory", "") + ".xml";
-                File XMLfile = new File(filenameWithPath);
-                String filename = j.getName(XMLfile);
-
-                boolean exists = XMLfile.createNewFile();
-                if (exists) {
-                    FileWriter fstream = new FileWriter(filenameWithPath);
-                    BufferedWriter out = new BufferedWriter(fstream);
-                    out.write(XMLcontent);
-                    out.close();
-                    // Get the data from the file
-                    byte[] data = new byte[maxBufferSize];
-                    // Create inputBuffer for the data
-                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(filenameWithPath));
-                    // Internal count for the databuffer
-                    int count = 0;
-                    // Add new file to the zip file
-                    zipOut.putNextEntry(new ZipEntry(filename));
-                    // Fill the new file with data
-                    while ((count = in.read(data, 0, maxBufferSize)) != -1) {
-                        zipOut.write(data, 0, count);
-                    }
-                    in.close();
-                    XMLfile.delete();
-                }
-
-                task.setProgression(Math.min(15, 100));
 
                 if (map.getStory().getImage() != null) {
                     ///////////
@@ -755,7 +728,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                     ///////////
 
                     File storyImage = map.getStory().getImage();
-                    exists = storyImage.isFile();
+                    boolean exists = storyImage.isFile();
                     if (exists) {
 
                         // Get the data from the file
@@ -788,25 +761,79 @@ public class Main extends JFrame implements PropertyChangeListener {
                         in.close();
                     }
                 }
-                task.setProgression(Math.min(20, 100));
-
+                task.setProgression(Math.min(10, 100));
 
                 ///////////
                 // MEDIAFILES
                 ///////////
-                progress = 20f;
+                progress = 10f;
                 float storyFilesSize = 0f;
 
-
+                boolean exportShortCut = false;
                 // Get total of filesize
                 for (Link link : story.getAllLinks()) {
 
                     for (MediaItem mediaItem : link.getMediaItems()) {
                         File tempFile = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
-                        // Filesize
-                        storyFilesSize += tempFile.length() / maxBufferSize;
+
+                        // Check an add shortcuts for performance
+                        if (exportMediaItems.isEmpty()) {
+                            exportMediaItems.put(mediaItem, link);
+                        } else {
+                            for (MediaItem currentMediaItem : exportMediaItems.keySet()) {
+
+                                String mediaPathFile = mediaItem.getAbsolutePath() + mediaItem.getFileName();
+                                String currentMediaPathFile = currentMediaItem.getAbsolutePath() + currentMediaItem.getFileName();
+
+                                if (mediaPathFile.equals(currentMediaPathFile)) {
+                                    mediaItem.setShortcut(exportMediaItems.get(currentMediaItem));
+                                    exportShortCut = true;
+                                    break;
+                                }
+                            }
+                            if (!exportShortCut) {
+                                // Filesize (only if it's not a shortcut)
+                                storyFilesSize += tempFile.length() / maxBufferSize;
+                                exportMediaItems.put(mediaItem, link);
+                            }
+                            exportShortCut = false;
+                        }
                     }
                 }
+
+                ///////////
+                // XML
+                ///////////
+
+                // Create an XML-file
+                String filenameWithPath = fileName.replace(".iStory", "") + ".xml";
+                File XMLfile = new File(filenameWithPath);
+                String filename = j.getName(XMLfile);
+                String XMLcontent = this.story.printXML(XMLProject);
+
+                boolean exists = XMLfile.createNewFile();
+                if (exists) {
+                    FileWriter fstream = new FileWriter(filenameWithPath);
+                    BufferedWriter out = new BufferedWriter(fstream);
+                    out.write(XMLcontent);
+                    out.close();
+                    // Get the data from the file
+                    byte[] data = new byte[maxBufferSize];
+                    // Create inputBuffer for the data
+                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(filenameWithPath));
+                    // Internal count for the databuffer
+                    int count = 0;
+                    // Add new file to the zip file
+                    zipOut.putNextEntry(new ZipEntry(filename));
+                    // Fill the new file with data
+                    while ((count = in.read(data, 0, maxBufferSize)) != -1) {
+                        zipOut.write(data, 0, count);
+                    }
+                    in.close();
+                    XMLfile.delete();
+                }
+                task.setProgression(Math.min(20, 100));
+
                 float percent = (80f / storyFilesSize);
 
                 // Loop over all links to get the  mediafiles
@@ -820,41 +847,46 @@ public class Main extends JFrame implements PropertyChangeListener {
                         exists = file.isFile();
 
                         if (exists) {
-                            currentMediaItemName = file.getName();
+                            // check if it's not a shortcut
+                            if (mediaItem.getShortcut() == null) {
 
-                            // Get the data from the file
-                            byte[] data = new byte[maxBufferSize];
-                            // Create inputBuffer for the data
-                            BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-                            // Internal count for the databuffer
-                            int count = 0;
-                            // Add new file to the zip file                            
-                            zipOut.putNextEntry(new ZipEntry(link.getId() + "/" + mediaItem.getFileName()));
+                                currentMediaItemName = file.getName();
 
-                            // Fill the new file with data
-                            while ((count = in.read(data, 0, maxBufferSize)) != -1) {
-                                zipOut.write(data, 0, count);
-                                progress += percent;
-                                if (!task.isCancelled() || !progressMonitor.isCanceled()) {
-                                    task.setProgression((int) Math.floor(Math.min(progress, 99)));
-                                } else {
-                                    // Close the buffers
-                                    in.close();
-                                    zipOut.flush();
-                                    zipOut.close();
-                                    // Delete the corupt file
-                                    File deletedFile = new File(fileName);
-                                    if (!deletedFile.delete()) {
-                                        JOptionPane.showMessageDialog(
-                                                Main.this,
-                                                "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
-                                                "Could not delete iStory file",
-                                                JOptionPane.WARNING_MESSAGE);
+                                // Get the data from the file
+                                byte[] data = new byte[maxBufferSize];
+                                // Create inputBuffer for the data
+                                BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+                                // Internal count for the databuffer
+                                int count = 0;
+                                // Add new file to the zip file                            
+                                zipOut.putNextEntry(new ZipEntry(link.getId() + "/" + mediaItem.getFileName()));
+
+                                // Fill the new file with data
+                                while ((count = in.read(data, 0, maxBufferSize)) != -1) {
+                                    zipOut.write(data, 0, count);
+                                    progress += percent;
+                                    if (!task.isCancelled() || !progressMonitor.isCanceled()) {
+                                        task.setProgression((int) Math.floor(Math.min(progress, 99)));
+                                    } else {
+                                        // Close the buffers
+                                        in.close();
+                                        zipOut.flush();
+                                        zipOut.close();
+                                        // Delete the corupt file
+                                        File deletedFile = new File(fileName);
+                                        if (!deletedFile.delete()) {
+                                            JOptionPane.showMessageDialog(
+                                                    Main.this,
+                                                    "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
+                                                    "Could not delete iStory file",
+                                                    JOptionPane.WARNING_MESSAGE);
+                                        }
+                                        exportMediaItems.clear();
+                                        return false;
                                     }
-                                    return false;
                                 }
+                                in.close();
                             }
-                            in.close();
                         }
                     }
                 }
