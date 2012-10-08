@@ -342,7 +342,7 @@ class MapListeners extends MouseInputAdapter {
         Point2D coord = new Point2D.Double(evt.getX(), evt.getY());
 
         // Get clicked link
-        Link clickedLink = linkPainter.intersects(mapViewer);
+        final ArrayList<Link> clickedLinks = linkPainter.intersects(mapViewer);
 
         // Place Node
         if (map.isButtonNodeClicked()) {
@@ -523,7 +523,7 @@ class MapListeners extends MouseInputAdapter {
                     if (n != null) {
                         if (!n.equals("")) {
                             try {
-                               currentNode.setRadius(Double.parseDouble(n));
+                                currentNode.setRadius(Double.parseDouble(n));
                             } catch (NumberFormatException e) {
                                 JOptionPane.showMessageDialog(map, "The value entered is not a number");
                             }
@@ -534,8 +534,22 @@ class MapListeners extends MouseInputAdapter {
             contextMenuMap.showContextMenuMap(evt);
 
         } // Open media dialog if user clicks on a Link or a startNode
-        else if (clickedLink != null) {
-            openMediaDialogByLinkClick(clickedLink);
+        else if (!clickedLinks.isEmpty()) {
+            if (clickedLinks.size() > 1) {
+                ContextMenuMap contextMenuMap = new ContextMenuMap(clickedLinks);
+                for (int i = 0; i < contextMenuMap.getMenuItems().size(); i++) {
+                    final int a = i;
+                    contextMenuMap.getMenuItems().get(i).addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent ae) {
+                            openMediaDialogByLinkClick(clickedLinks.get(a));
+                        }
+                    });
+                }
+                contextMenuMap.showContextMenuMap(evt);
+            } else {
+                openMediaDialogByLinkClick(clickedLinks.get(0));
+            }
         }
     }
 
