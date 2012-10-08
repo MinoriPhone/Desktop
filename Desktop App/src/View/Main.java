@@ -92,18 +92,19 @@ public class Main extends JFrame implements PropertyChangeListener {
         // Change title
         defaultStoryName = "New Story";
         this.setTitle(defaultStoryName + " - iStory designer " + Application.getVersion());
-
+        
         // Add Routes
         panelRoutes = new Routes();
         pMenu.add(panelRoutes, BorderLayout.CENTER);
 
         // Create a story
         story = new Story(defaultStoryName, panelRoutes, this);
-
+        
         // Add Map
         map = new Map(story, this);
+        panelRoutes.addStory(story);
         pMain.add(this.map, BorderLayout.CENTER);
-
+        
         // Add accelerators
         miNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

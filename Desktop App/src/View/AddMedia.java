@@ -772,6 +772,8 @@ public final class AddMedia extends JDialog {
                                 prevLink.addLink(this.link);
                             }
                         }
+                        // Refresh routes list (treeview)
+                        map.getStory().repaint();
                     }
 
                     // Set changeboolean to true

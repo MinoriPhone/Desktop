@@ -297,4 +297,8 @@ public class Story {
     public void setLinkCounter(long linkCounter) {
         this.linkCounter = linkCounter;
     }
+    
+    public void repaint(){
+        routesPanel.refreshList(routes);
+    }
 }
