@@ -64,9 +64,9 @@ public class Routes extends JPanel {
         treeModel = new DefaultTreeModel(storyNode);
 
         tree = new JTree(treeModel);
-
         add(tree);
     }
+        
 
     void appendChilds(Link parentLink, DefaultMutableTreeNode parentTreeNode) {
 
