@@ -1,6 +1,7 @@
 package View;
 
 import Model.FileChooser;
+import Model.Image;
 import Model.Link;
 import Model.MediaItem;
 import Model.MediaItemTableModel;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
 import javax.swing.JComponent;
@@ -30,6 +32,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -47,7 +50,7 @@ public final class AddMedia extends JDialog {
     private static final Logger LOGGER = Logger.getLogger(AddMedia.class.getName());
     private JScrollPane spAddedMedia;
     private JTable tAddedMedia;
-    private MediaItemTableModel tableModel;
+    private DefaultTableModel tableModel;
     private ArrayList<MediaItem> addedItems;
     private DefaultListModel listModel;
     private ArrayList<Link> prevLinks;
@@ -60,7 +63,8 @@ public final class AddMedia extends JDialog {
     /**
      * Creates form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of this window
+     * @param parent JFrame The Main window of this application is the parent of
+     * this window
      * @param map Instance of Class View.Map
      * @param link Link The Link we are creating
      */
@@ -79,9 +83,23 @@ public final class AddMedia extends JDialog {
         this.tfLinkName.setText(link.getName());
         this.changeLink = true;
         this.addedItems = new ArrayList<MediaItem>();
-        this.spAddedMedia = new JScrollPane();
-        this.tAddedMedia = new JTable();
-        this.tableModel = new MediaItemTableModel();
+        this.tableModel = new DefaultTableModel();
+        this.tableModel.addColumn("Absolute path to file");
+        this.tableModel.addColumn("Filename and type");
+        this.tableModel.addColumn("Duration in seconds");
+
+        this.tAddedMedia = new JTable(this.tableModel);
+        this.tAddedMedia.getTableHeader().setReorderingAllowed(false);
+        this.tAddedMedia.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+        this.spAddedMedia = new JScrollPane(this.tAddedMedia);
+        spAddedMedia.setPreferredSize(new Dimension(400, 100));
+
+        this.tAddedMedia.setDragEnabled(true);
+        this.tAddedMedia.setTransferHandler(new TableTransferHandler());
+
+        this.pAddedMedia.add(spAddedMedia, BorderLayout.CENTER);
+        this.pAddedMedia.setBorder(BorderFactory.createTitledBorder("Table"));
 
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
@@ -127,7 +145,7 @@ public final class AddMedia extends JDialog {
         }
 
         // Generate JTable so we can add MediaItems to it
-        generateTable();
+        //generateTable();
 
         // MediaItems
         for (MediaItem mItem : link.getMediaItems()) {
@@ -215,8 +233,10 @@ public final class AddMedia extends JDialog {
      *
      * Creates form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can connect this Link to
+     * @param parent JFrame The Main window of this application is the parent of
+     * this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can
+     * connect this Link to
      * @param link Link The Link we are creating
      * @param callFrom int if int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
@@ -235,9 +255,23 @@ public final class AddMedia extends JDialog {
         this.tfRouteName.setEditable(false);
         this.changeLink = false;
         this.addedItems = new ArrayList<MediaItem>();
-        this.spAddedMedia = new JScrollPane();
-        this.tAddedMedia = new JTable();
-        this.tableModel = new MediaItemTableModel();
+        this.tableModel = new DefaultTableModel();
+        this.tableModel.addColumn("Absolute path to file");
+        this.tableModel.addColumn("Filename and type");
+        this.tableModel.addColumn("Duration in seconds");
+
+        this.tAddedMedia = new JTable(this.tableModel);
+        this.tAddedMedia.getTableHeader().setReorderingAllowed(false);
+        this.tAddedMedia.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+        this.spAddedMedia = new JScrollPane(this.tAddedMedia);
+        spAddedMedia.setPreferredSize(new Dimension(400, 100));
+
+        this.tAddedMedia.setDragEnabled(true);
+        this.tAddedMedia.setTransferHandler(new TableTransferHandler());
+
+        this.pAddedMedia.add(spAddedMedia, BorderLayout.CENTER);
+        this.pAddedMedia.setBorder(BorderFactory.createTitledBorder("Table"));
 
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
@@ -272,7 +306,7 @@ public final class AddMedia extends JDialog {
         }
 
         // Generate JTable so we can add MediaItems to it
-        generateTable();
+        //generateTable();
 
         // Add window listener to this window
         this.addWindowListener(new WindowAdapter() {
@@ -351,14 +385,22 @@ public final class AddMedia extends JDialog {
         this.tAddedMedia.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                JTable thisTable = (JTable) e.getSource();
+                MediaItem item = getAddedItemByFilenameAndAbsPath(String.valueOf(thisTable.getModel().getValueAt(thisTable.getSelectedRow(), 1)), String.valueOf(thisTable.getModel().getValueAt(thisTable.getSelectedRow(), 0)));
+                if(item instanceof Text || item instanceof Image)
+                {
+                    enterDuration(item, thisTable.getSelectedRow());
+                }
             }
         });
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
+     * the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
@@ -368,19 +410,22 @@ public final class AddMedia extends JDialog {
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from
+     * the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to remove
      */
-    public void removeItem(MediaItem mediaItem) {
+    public void removeItem(MediaItem mediaItem, int row) {
         this.addedItems.remove(mediaItem);
 
         // Remove from table
-        removeMediaItemFromTable(mediaItem);
+        removeMediaItemFromTable(row);
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will be in the right order!
+     * Get all added media items. If we closed the window, then the items will
+     * be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -393,9 +438,9 @@ public final class AddMedia extends JDialog {
      *
      * @return MediaItem
      */
-    public MediaItem getAddedItemByFilename(String fileName) {
+    public MediaItem getAddedItemByFilenameAndAbsPath(String fileName, String absPath) {
         for (MediaItem mediaItem : addedItems) {
-            if (mediaItem.getFileName().equals(fileName)) {
+            if (mediaItem.getFileName().equals(fileName) && mediaItem.getAbsolutePath().equals(absPath)) {
                 return mediaItem;
             }
         }
@@ -416,18 +461,19 @@ public final class AddMedia extends JDialog {
      *
      * @return boolean
      */
-    public void enterDuration(MediaItem mItem) {
+    public void enterDuration(MediaItem mItem, int row) {
         String n = JOptionPane.showInputDialog("Enter the duration of the file in seconds", mItem.getShowDurationInSeconds());
         if (n != null) {
             if (!n.equals("")) {
                 try {
                     mItem.setShowDurationInSeconds(Integer.parseInt(n));
+                    this.tableModel.setValueAt(Integer.parseInt(n), row, 2);
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(this, "The value entered is not a number");
-                    enterDuration(mItem);
+                    enterDuration(mItem, row);
                 }
             } else {
-                enterDuration(mItem);
+                enterDuration(mItem, row);
             }
         }
     }
@@ -438,38 +484,39 @@ public final class AddMedia extends JDialog {
     private void generateTable() {
 
         // Create and set model for JTable
-        this.tAddedMedia.setModel(this.tableModel);
+        //this.tAddedMedia.setModel(this.tableModel);
         this.tAddedMedia.getTableHeader().setReorderingAllowed(false);
         this.tAddedMedia.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        this.tAddedMedia.setColumnSelectionAllowed(false);
-        this.tAddedMedia.setCellSelectionEnabled(false);
-        this.tAddedMedia.setRowSelectionAllowed(true);
-        this.tAddedMedia.revalidate();
-
-        // Enable Drag and Drop
-        this.tAddedMedia.setDragEnabled(true);
-        this.tAddedMedia.setTransferHandler(new TableTransferHandler());
+        //  this.tAddedMedia.setColumnSelectionAllowed(false);
+        //this.tAddedMedia.setCellSelectionEnabled(false);
+        //this.tAddedMedia.setRowSelectionAllowed(true);
+        //this.tAddedMedia.revalidate();
 
         // Add JTable to JScrollpane
         this.spAddedMedia.add(this.tAddedMedia);
         this.spAddedMedia.setPreferredSize(new Dimension(400, 100));
 
+        // Enable Drag and Drop
+        this.tAddedMedia.setDragEnabled(true);
+        this.tAddedMedia.setTransferHandler(new TableTransferHandler());
+
         // Add scrollpane to AddedMedia JPanel
         this.pAddedMedia.add(this.spAddedMedia, BorderLayout.CENTER);
+        this.pAddedMedia.setBorder(BorderFactory.createTitledBorder("Table"));
     }
 
     /**
      * Add new MediaItem to table
      */
     private void addMediaItemToTable(MediaItem item) {
-        this.tableModel.addRow(item);
+        this.tableModel.addRow(new String[]{item.getAbsolutePath(), item.getFileName(), String.valueOf(item.getShowDurationInSeconds())});
     }
 
     /**
      * Remove MediaItem from table
      */
-    private void removeMediaItemFromTable(MediaItem item) {
-        this.tableModel.removeRow(item);
+    private void removeMediaItemFromTable(int row) {
+        this.tableModel.removeRow(row);
     }
 
     /* DO NOT TOUCH */
@@ -660,11 +707,11 @@ public final class AddMedia extends JDialog {
                 if (mItem instanceof Video) {
                     this.addItem((Video) mItem);
                 } else if (mItem instanceof Model.Image) {
-                    enterDuration(mItem);
                     this.addItem((Model.Image) mItem);
+                    enterDuration(mItem, this.tableModel.getRowCount()-1);
                 } else if (mItem instanceof Text) {
-                    enterDuration(mItem);
                     this.addItem((Text) mItem);
+                    enterDuration(mItem, this.tableModel.getRowCount()-1);
                 }
             }
         } else if (dialog == JFileChooser.CANCEL_OPTION) {
@@ -692,16 +739,12 @@ public final class AddMedia extends JDialog {
                     String routeName = tfRouteName.getText().trim();
                     String linkName = tfLinkName.getText().trim();
                     ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
-                    Object[] elements = listModel.toArray();
+
 
                     // Get all added Media Items in the right order
-                    for (Object obj : elements) {
-                        for (MediaItem item : addedItems) {
-                            if (item.getFileName().equals(obj.toString())) {
-                                mediaItems.add(item);
-                                break;
-                            }
-                        }
+                    for (int i = 0; i < this.tAddedMedia.getRowCount(); i++) {
+                        MediaItem item = getAddedItemByFilenameAndAbsPath(String.valueOf(this.tAddedMedia.getModel().getValueAt(i, 1)), String.valueOf(this.tAddedMedia.getModel().getValueAt(i, 0)));
+                        mediaItems.add(item);
                     }
 
                     // Set this link variables
@@ -761,16 +804,11 @@ public final class AddMedia extends JDialog {
                 // Get variables we want to save
                 String linkName = tfLinkName.getText().trim();
                 ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
-                Object[] elements = listModel.toArray();
 
                 // Get all added Media Items in the right order
-                for (Object obj : elements) {
-                    for (MediaItem item : addedItems) {
-                        if (item.getFileName().equals(obj.toString())) {
-                            mediaItems.add(item);
-                            break;
-                        }
-                    }
+                for (int i = 0; i < this.tAddedMedia.getRowCount(); i++) {
+                    MediaItem item = getAddedItemByFilenameAndAbsPath(String.valueOf(this.tAddedMedia.getModel().getValueAt(i, 1)), String.valueOf(this.tAddedMedia.getModel().getValueAt(i, 0)));
+                    mediaItems.add(item);
                 }
 
                 // Set this link variables

@@ -129,7 +129,7 @@ public class Node extends DefaultWaypoint {
         String XMLString = "";
         XMLString += "<longitude>" + this.getGeoposition().getLongitude() + "</longitude>\r\n";
         XMLString += "<latitude>" + this.getGeoposition().getLatitude() + "</latitude>\r\n";
-        XMLString += "<radius>" + this.getRadius() + "</radius>\r\n"; 
+        XMLString += "<radius>" + this.getRadius() + "</radius>\r\n";
         return XMLString;
     }
 }

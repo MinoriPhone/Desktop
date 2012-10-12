@@ -69,7 +69,7 @@
                                                   <Component id="bSave" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                               <Component id="tfLinkName" max="32767" attributes="0"/>
-                                              <Component id="jScrollPane1" pref="899" max="32767" attributes="0"/>
+                                              <Component id="jScrollPane1" pref="891" max="32767" attributes="0"/>
                                               <Component id="pAddedMedia" alignment="0" max="32767" attributes="0"/>
                                           </Group>
                                       </Group>
@@ -110,18 +110,18 @@
                                   <Component id="lRoute" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="0" pref="129" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="jScrollPane1" pref="147" max="32767" attributes="0"/>
+                              <Component id="jScrollPane1" pref="146" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Component id="lSpaceMediaUp" min="-2" pref="13" max="-2" attributes="0"/>
-                                  <EmptySpace pref="197" max="32767" attributes="0"/>
+                                  <EmptySpace pref="196" max="32767" attributes="0"/>
                                   <Component id="lSpaceMediaDown" min="-2" pref="9" max="-2" attributes="0"/>
                               </Group>
                               <Component id="pAddedMedia" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace type="unrelated" pref="42" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" pref="41" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Component id="bBrowse" min="-2" pref="37" max="-2" attributes="0"/>

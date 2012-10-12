@@ -16,6 +16,7 @@ public class MediaItemTableModel extends AbstractTableModel {
      * @param list ArrayList<MediaItem>
      */
     public MediaItemTableModel() {
+        mediaItemList = new ArrayList<MediaItem>();
     }
 
     @Override
