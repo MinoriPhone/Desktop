@@ -92,19 +92,19 @@ public class Main extends JFrame implements PropertyChangeListener {
         // Change title
         defaultStoryName = "New Story";
         this.setTitle(defaultStoryName + " - iStory designer " + Application.getVersion());
-        
+
         // Add Routes
         panelRoutes = new Routes();
         pMenu.add(panelRoutes, BorderLayout.CENTER);
 
         // Create a story
         story = new Story(defaultStoryName, panelRoutes, this);
-        
+
         // Add Map
         map = new Map(story, this);
         panelRoutes.addStory(story);
         pMain.add(this.map, BorderLayout.CENTER);
-        
+
         // Add accelerators
         miNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -950,15 +950,30 @@ public class Main extends JFrame implements PropertyChangeListener {
                 String pad;
                 String selectedZipFileName = j.getSelectedFile().getName().replace(".iStory", "");
 
+                File folder = new File(importLocationChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + selectedZipFileName);
 
                 // Catch actions of the File Chooser Dialog Window
                 if (importDialog == JFileChooser.APPROVE_OPTION) {
-                    new File(importLocationChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + selectedZipFileName).mkdir();
-                    pad = importLocationChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + selectedZipFileName + System.getProperty("file.separator");
-                } else {
-                    return false;
-                }
 
+                    if (folder.isDirectory()) {
+                        // Overwrite check
+                        int option = JOptionPane.showConfirmDialog(null,
+                                "There is already a story folder with the same name in the selected folder. \n "
+                                + "Do you want to overwrite this folder?",
+                                "File already exists",
+                                JOptionPane.YES_NO_CANCEL_OPTION);
+                        if (option == JOptionPane.YES_OPTION) {
+                            folder.delete();
+                        } else if (option == JOptionPane.NO_OPTION) {
+                            importStory();
+                            return false;
+                        } else if (option == JOptionPane.CANCEL_OPTION || option == JOptionPane.CLOSED_OPTION) {
+                            return false;
+                        }
+                    }
+                }
+                folder.mkdir();
+                pad = importLocationChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + selectedZipFileName + System.getProperty("file.separator");
                 // Max length of the buffer
                 int maxBufferSize = 1024; // bytes
                 File selectedFile = j.getSelectedFile();

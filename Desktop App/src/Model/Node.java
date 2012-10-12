@@ -89,7 +89,7 @@ public class Node extends DefaultWaypoint {
     }
 
     public Boolean getStart() {
-        if (this.color == Color.GREEN && this.label == "S") {
+        if (this.color == Color.GREEN && this.label.equals("S")) {
             return true;
         } else {
             return false;
