@@ -40,7 +40,8 @@ public class About extends JFrame {
         lVersion = new javax.swing.JLabel();
         lVersionCode = new javax.swing.JLabel();
         lCreators = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        lNames = new javax.swing.JLabel();
+        lLogo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About");
@@ -56,8 +57,10 @@ public class About extends JFrame {
         lCreators.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         lCreators.setText("Developed by:");
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
-        jLabel1.setText("<html> Reinier van der Hoeven<br /> Tim Klaversma<br />Jeffrey van der Leije<br /> Gido Manders");
+        lNames.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        lNames.setText("<html> Reinier van der Hoeven<br /> Tim Klaversma<br />Jeffrey van der Leije<br /> Gido Manders");
+
+        lLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/logo_about.png"))); // NOI18N
 
         javax.swing.GroupLayout pAboutLayout = new javax.swing.GroupLayout(pAbout);
         pAbout.setLayout(pAboutLayout);
@@ -65,27 +68,32 @@ public class About extends JFrame {
             pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pAboutLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lCreators)
-                    .addComponent(lVersion))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lVersionCode, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(187, Short.MAX_VALUE))
+                    .addGroup(pAboutLayout.createSequentialGroup()
+                        .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lCreators)
+                            .addComponent(lVersion))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lNames, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lVersionCode, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(lLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pAboutLayout.setVerticalGroup(
             pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pAboutLayout.createSequentialGroup()
-                .addGap(76, 76, 76)
+                .addContainerGap()
+                .addComponent(lLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lVersion)
                     .addComponent(lVersionCode, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lCreators)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(138, Short.MAX_VALUE))
+                    .addComponent(lNames, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         getContentPane().add(pAbout, java.awt.BorderLayout.CENTER);
@@ -93,8 +101,9 @@ public class About extends JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lCreators;
+    private javax.swing.JLabel lLogo;
+    private javax.swing.JLabel lNames;
     private javax.swing.JLabel lVersion;
     private javax.swing.JLabel lVersionCode;
     private javax.swing.JPanel pAbout;
