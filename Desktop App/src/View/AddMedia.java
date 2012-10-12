@@ -3,6 +3,7 @@ package View;
 import Model.FileChooser;
 import Model.Link;
 import Model.MediaItem;
+import Model.MediaItemTableModel;
 import Model.Route;
 import Model.Text;
 import Model.Video;
@@ -23,17 +24,19 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Popup Window for adding media to a link
@@ -42,10 +45,11 @@ public final class AddMedia extends JDialog {
 
     // Variables
     private static final Logger LOGGER = Logger.getLogger(AddMedia.class.getName());
+    private JScrollPane spAddedMedia;
+    private JTable tAddedMedia;
+    private MediaItemTableModel tableModel;
     private ArrayList<MediaItem> addedItems;
     private DefaultListModel listModel;
-    private JList list;
-    private JScrollPane scrollPane;
     private ArrayList<Link> prevLinks;
     private boolean closedBySave;
     private Link link;
@@ -74,6 +78,11 @@ public final class AddMedia extends JDialog {
         this.tfRouteName.setText(map.getStory().getRouteForLink(link).getName());
         this.tfLinkName.setText(link.getName());
         this.changeLink = true;
+        this.addedItems = new ArrayList<MediaItem>();
+        this.spAddedMedia = new JScrollPane();
+        this.tAddedMedia = new JTable();
+        this.tableModel = new MediaItemTableModel();
+
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -99,6 +108,7 @@ public final class AddMedia extends JDialog {
         else {
             this.prevLinks = new ArrayList<Link>();
             this.prevLinks.add(map.getStory().getParentFromLink(this.link));
+
             // Check if this link has twins and add their parent to the list
             Link twin = this.link.getTwin();
             while (twin != null) {
@@ -116,18 +126,8 @@ public final class AddMedia extends JDialog {
             this.lLinks.setEnabled(false);
         }
 
-        // List model
-        this.listModel = new DefaultListModel();
-
-        // Lists
-        this.addedItems = new ArrayList<MediaItem>();
-        this.list = new JList(this.listModel);
-        this.list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
-        // ScrollPane
-        this.scrollPane = new JScrollPane(this.list);
-        this.scrollPane.setPreferredSize(new Dimension(400, 100));
-        this.pAddedMedia.add(this.scrollPane, BorderLayout.CENTER);
+        // Generate JTable so we can add MediaItems to it
+        generateTable();
 
         // MediaItems
         for (MediaItem mItem : link.getMediaItems()) {
@@ -142,30 +142,6 @@ public final class AddMedia extends JDialog {
                 }
             }
         }
-
-        // Enable drag and drop
-        this.list.setDragEnabled(true);
-        this.list.setTransferHandler(new ListTransferHandler());
-        this.list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                JList list = (JList) evt.getSource();
-                if (evt.getClickCount() == 2) {
-                    int index = list.locationToIndex(evt.getPoint());
-                    Object obj = listModel.get(index);
-                    for (MediaItem item : addedItems) {
-                        if (item instanceof Model.Image || item instanceof Text) {
-                            if ((item.getFileName() + "   " + item.getShowDurationInSeconds() + " seconds").equals(obj.toString())) {
-                                if (item instanceof Model.Image || item instanceof Text) {
-                                    enterDuration(item);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
 
         // Add window listener to this window
         this.addWindowListener(new WindowAdapter() {
@@ -203,6 +179,9 @@ public final class AddMedia extends JDialog {
                 }
             }
         });
+
+        // Add mouse listener to table with added mediaitems
+        addMouseListenerToAddedMediaItemsTable();
 
         // Add changelistener to combobox with previous links
         this.lLinks.addListSelectionListener(new ListSelectionListener() {
@@ -234,7 +213,7 @@ public final class AddMedia extends JDialog {
     /**
      * Overload Constructor
      *
-     * Creates NEW(!) form addMedia
+     * Creates form addMedia
      *
      * @param parent JFrame The Main window of this application is the parent of this window
      * @param prevLinks ArrayList<Link> List with all the previous Link we can connect this Link to
@@ -255,6 +234,10 @@ public final class AddMedia extends JDialog {
         this.callFrom = callFrom;
         this.tfRouteName.setEditable(false);
         this.changeLink = false;
+        this.addedItems = new ArrayList<MediaItem>();
+        this.spAddedMedia = new JScrollPane();
+        this.tAddedMedia = new JTable();
+        this.tableModel = new MediaItemTableModel();
 
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
@@ -284,47 +267,12 @@ public final class AddMedia extends JDialog {
             pRouteName.remove(layout.getLayoutComponent(BorderLayout.CENTER));
             pRouteName.revalidate();
 
-            // Set perious links in list
+            // Set previous links in list
             this.lLinks.setListData(this.prevLinks.toArray());
         }
 
-        // List model
-        this.listModel = new DefaultListModel();
-
-        // Lists
-        this.addedItems = new ArrayList<MediaItem>();
-        this.list = new JList(this.listModel);
-        this.list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
-        // ScrollPane
-        this.scrollPane = new JScrollPane(this.list);
-        this.scrollPane.setPreferredSize(new Dimension(400, 100));
-        this.pAddedMedia.add(this.scrollPane, BorderLayout.CENTER);
-
-        // Enable drag and drop
-        this.list.setDragEnabled(true);
-        this.list.setTransferHandler(new ListTransferHandler());
-        this.list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                JList list = (JList) evt.getSource();
-                if (evt.getClickCount() == 2) {
-                    int index = list.locationToIndex(evt.getPoint());
-                    Object obj = listModel.get(index);
-                    for (MediaItem item : addedItems) {
-                        if (item instanceof Model.Image || item instanceof Text) {
-                            if ((item.getFileName() + "   " + item.getShowDurationInSeconds() + " seconds").equals(obj.toString())) {
-                                if (item instanceof Model.Image || item instanceof Text) {
-                                    enterDuration(item);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
+        // Generate JTable so we can add MediaItems to it
+        generateTable();
 
         // Add window listener to this window
         this.addWindowListener(new WindowAdapter() {
@@ -362,6 +310,9 @@ public final class AddMedia extends JDialog {
                 }
             }
         });
+
+        // Add mouse listener to table with added mediaitems
+        addMouseListenerToAddedMediaItemsTable();
 
         // Add changelistener to combobox with previous links
         this.lLinks.addListSelectionListener(new ListSelectionListener() {
@@ -394,32 +345,26 @@ public final class AddMedia extends JDialog {
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
-     *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
+     * Get the MediaItem object of the row we clicked
      */
-    public void addItem(MediaItem mediaItem) {
-        this.addedItems.add(mediaItem);
-        if (mediaItem instanceof Model.Image || mediaItem instanceof Text) {
-            this.listModel.addElement(mediaItem.getFileName() + "   " + mediaItem.getShowDurationInSeconds() + " seconds");
-        } else {
-            this.listModel.addElement(mediaItem.getFileName());
-        }
+    private void addMouseListenerToAddedMediaItemsTable() {
+        this.tAddedMedia.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            }
+        });
     }
 
     /**
      * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
      * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
-     * @param index int The index we want to add the mediaItem at
      */
-    public void addItemAtIndex(MediaItem mediaItem, int index) {
+    public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
-        if (mediaItem instanceof Model.Image || mediaItem instanceof Text) {
-            this.listModel.add(index, mediaItem.getFileName() + "   " + mediaItem.getShowDurationInSeconds() + " seconds");
-        } else {
-            this.listModel.add(index, mediaItem.getFileName());
-        }
+
+        // Add to table
+        addMediaItemToTable(mediaItem);
     }
 
     /**
@@ -429,11 +374,9 @@ public final class AddMedia extends JDialog {
      */
     public void removeItem(MediaItem mediaItem) {
         this.addedItems.remove(mediaItem);
-        if (mediaItem instanceof Model.Image || mediaItem instanceof Text) {
-            this.listModel.removeElement(mediaItem.getFileName() + "   " + mediaItem.getShowDurationInSeconds() + " seconds");
-        } else {
-            this.listModel.removeElement(mediaItem.getFileName());
-        }
+
+        // Remove from table
+        removeMediaItemFromTable(mediaItem);
     }
 
     /**
@@ -489,6 +432,46 @@ public final class AddMedia extends JDialog {
         }
     }
 
+    /**
+     * Generate the custom JTable that will hold the added MediaItems
+     */
+    private void generateTable() {
+
+        // Create and set model for JTable
+        this.tAddedMedia.setModel(this.tableModel);
+        this.tAddedMedia.getTableHeader().setReorderingAllowed(false);
+        this.tAddedMedia.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        this.tAddedMedia.setColumnSelectionAllowed(false);
+        this.tAddedMedia.setCellSelectionEnabled(false);
+        this.tAddedMedia.setRowSelectionAllowed(true);
+        this.tAddedMedia.revalidate();
+
+        // Enable Drag and Drop
+        this.tAddedMedia.setDragEnabled(true);
+        this.tAddedMedia.setTransferHandler(new TableTransferHandler());
+
+        // Add JTable to JScrollpane
+        this.spAddedMedia.add(this.tAddedMedia);
+        this.spAddedMedia.setPreferredSize(new Dimension(400, 100));
+
+        // Add scrollpane to AddedMedia JPanel
+        this.pAddedMedia.add(this.spAddedMedia, BorderLayout.CENTER);
+    }
+
+    /**
+     * Add new MediaItem to table
+     */
+    private void addMediaItemToTable(MediaItem item) {
+        this.tableModel.addRow(item);
+    }
+
+    /**
+     * Remove MediaItem from table
+     */
+    private void removeMediaItemFromTable(MediaItem item) {
+        this.tableModel.removeRow(item);
+    }
+
     /* DO NOT TOUCH */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -508,8 +491,6 @@ public final class AddMedia extends JDialog {
         lSpaceBottom = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         lLinks = new javax.swing.JList();
-        bUp = new javax.swing.JButton();
-        bDown = new javax.swing.JButton();
         lSpaceMediaUp = new javax.swing.JLabel();
         lSpaceMediaDown = new javax.swing.JLabel();
         pRouteName = new javax.swing.JPanel();
@@ -531,7 +512,6 @@ public final class AddMedia extends JDialog {
         });
 
         pAddedMedia.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "  Added media  ", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 15))); // NOI18N
-        pAddedMedia.setOpaque(false);
         pAddedMedia.setLayout(new java.awt.BorderLayout());
 
         lLinkName.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
@@ -551,20 +531,6 @@ public final class AddMedia extends JDialog {
 
         jScrollPane1.setViewportView(lLinks);
 
-        bUp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/arrow-up.png"))); // NOI18N
-        bUp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bUpActionPerformed(evt);
-            }
-        });
-
-        bDown.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/arrow-down.png"))); // NOI18N
-        bDown.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bDownActionPerformed(evt);
-            }
-        });
-
         pRouteName.setMaximumSize(new java.awt.Dimension(0, 40));
         pRouteName.setMinimumSize(new java.awt.Dimension(0, 40));
         pRouteName.setPreferredSize(new java.awt.Dimension(0, 40));
@@ -579,11 +545,6 @@ public final class AddMedia extends JDialog {
         tfRouteName.setMaximumSize(new java.awt.Dimension(0, 40));
         tfRouteName.setMinimumSize(new java.awt.Dimension(0, 40));
         tfRouteName.setPreferredSize(new java.awt.Dimension(0, 40));
-        tfRouteName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfRouteNameActionPerformed(evt);
-            }
-        });
         pRouteName.add(tfRouteName, java.awt.BorderLayout.CENTER);
 
         org.jdesktop.layout.GroupLayout pMainLayout = new org.jdesktop.layout.GroupLayout(pMain);
@@ -609,9 +570,6 @@ public final class AddMedia extends JDialog {
                                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                                             .add(lRoute)
                                             .add(lLinkName)
-                                            .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, bDown, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .add(org.jdesktop.layout.GroupLayout.TRAILING, bUp, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                             .add(lSpaceMediaUp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                             .add(lSpaceMediaDown, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 32, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -625,7 +583,7 @@ public final class AddMedia extends JDialog {
                                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                                 .add(bSave))
                                             .add(tfLinkName)
-                                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
+                                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 899, Short.MAX_VALUE)
                                             .add(pAddedMedia, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(lSpaceRight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -653,20 +611,16 @@ public final class AddMedia extends JDialog {
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(pMainLayout.createSequentialGroup()
                                 .add(lRoute)
-                                .add(0, 102, Short.MAX_VALUE))
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                .add(0, 129, Short.MAX_VALUE))
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE))
                         .add(18, 18, 18)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(pMainLayout.createSequentialGroup()
                                 .add(lSpaceMediaUp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 13, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .add(26, 26, 26)
-                                .add(bUp)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(bDown)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 197, Short.MAX_VALUE)
                                 .add(lSpaceMediaDown, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(pAddedMedia, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 192, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED, 14, Short.MAX_VALUE)
+                            .add(pAddedMedia, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED, 42, Short.MAX_VALUE)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(pMainLayout.createSequentialGroup()
                                 .add(bBrowse, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -694,6 +648,7 @@ public final class AddMedia extends JDialog {
             j.setCurrentDirectory(file);
         }
         int dialog = j.showOpenDialog(this);
+
         // Catch actions of the File Chooser Dialog Window
         if (dialog == JFileChooser.APPROVE_OPTION) {
 
@@ -837,59 +792,9 @@ public final class AddMedia extends JDialog {
             }
         }
     }//GEN-LAST:event_bSaveActionPerformed
-
-    private void tfRouteNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfRouteNameActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfRouteNameActionPerformed
-
-    private void bUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bUpActionPerformed
-        ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
-        for (Object fileName : list.getSelectedValues()) {
-            mediaItems.add(getAddedItemByFilename((String) fileName));
-        }
-        if (mediaItems.size() > 0) {
-            int[] indices = list.getSelectedIndices();
-            if (indices[0] > 0) {
-                for (int i = 0; i < indices.length; i++) {
-                    indices[i] = (indices[i] - 1);
-                }
-                int i = 0;
-                for (MediaItem mediaItem : mediaItems) {
-                    this.removeItem(mediaItem);
-                    this.addItemAtIndex(mediaItem, (indices[i]));
-                    i++;
-                }
-                list.setSelectedIndices(indices);
-            }
-        }
-
-    }//GEN-LAST:event_bUpActionPerformed
-
-    private void bDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDownActionPerformed
-        ArrayList<MediaItem> mediaItems = new ArrayList<MediaItem>();
-        for (Object fileName : list.getSelectedValues()) {
-            mediaItems.add(getAddedItemByFilename((String) fileName));
-        }
-        if (mediaItems.size() > 0) {
-            int[] indices = list.getSelectedIndices();
-            if (indices[indices.length - 1] < (getAddedItems().size() - 1)) {
-                for (int i = 0; i < indices.length; i++) {
-                    indices[i] = (indices[i] + 1);
-                }
-                for (int i = indices.length - 1; i >= 0; i--) {
-                    MediaItem mediaItem = mediaItems.get(i);
-                    this.removeItem(mediaItem);
-                    this.addItemAtIndex(mediaItem, (indices[i]));
-                }
-                list.setSelectedIndices(indices);
-            }
-        }
-    }//GEN-LAST:event_bDownActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bBrowse;
-    private javax.swing.JButton bDown;
     private javax.swing.JButton bSave;
-    private javax.swing.JButton bUp;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lLinkName;
     private javax.swing.JList lLinks;
@@ -910,121 +815,8 @@ public final class AddMedia extends JDialog {
     // End of variables declaration//GEN-END:variables
 }
 
-/**
- * Custom StringTransferHandler for dragging and dropping items in a list
- */
-class ListTransferHandler extends StringTransferHandler {
-
-    // Variables
-    private int[] indices = null;
-    private int addIndex = -1; // Location where items were added
-    private int addCount = 0; // Number of items added
-
-    /**
-     * Bunde up the selected items in the list as a single string for export
-     *
-     * @param c JComponent The parent of the list items
-     * @return String with selected items
-     */
-    @Override
-    protected String exportString(JComponent c) {
-        JList list = (JList) c;
-        indices = list.getSelectedIndices();
-        Object[] values = list.getSelectedValues();
-
-        StringBuilder buff = new StringBuilder();
-
-        for (int i = 0; i < values.length; i++) {
-            Object val = values[i];
-            buff.append(val == null ? "" : val.toString());
-            if (i != values.length - 1) {
-                buff.append("\n");
-            }
-        }
-
-        return buff.toString();
-    }
-
-    /**
-     * Take the incoming string and wherever there is a newline, break it into a separate item in the list.
-     *
-     * @param c JComponent
-     * @param str String
-     */
-    @Override
-    protected void importString(JComponent c, String str) {
-        JList target = (JList) c;
-        DefaultListModel listModel = (DefaultListModel) target.getModel();
-        int index = target.getSelectedIndex();
-
-        /**
-         * Prevent the user from dropping data back on itself. For example, if the user is moving items #4, #5, #6 and #7 and attempts
-         * to insert the items after item #5, this would be problematic when removing the original items. So this is not allowed.
-         */
-        if (indices != null && index >= indices[0] - 1
-                && index <= indices[indices.length - 1]) {
-            indices = null;
-            return;
-        }
-
-        int max = listModel.getSize();
-        if (index < 0) {
-            index = max;
-        } else {
-            index++;
-            if (index > max) {
-                index = max;
-            }
-        }
-
-        addIndex = index;
-        String[] values = str.split("\n");
-        addCount = values.length;
-
-        for (int i = 0; i < values.length; i++) {
-            listModel.add(index++, values[i]);
-        }
-    }
-
-    /**
-     * If the remove argument is true, the drop has been successful and it's time to remove the selected items from the list. If the
-     * remove argument is false, it was a Copy operation and the original list is left intact.
-     *
-     * @param c JComponent
-     * @param remove boolean
-     */
-    @Override
-    protected void cleanup(JComponent c, boolean remove) {
-        if (remove && indices != null) {
-            JList source = (JList) c;
-            DefaultListModel model = (DefaultListModel) source.getModel();
-
-            /**
-             * If we are moving items around in the same list, we need to adjust the indices accordingly, since those after the
-             * insertion point have moved.
-             */
-            if (addCount > 0) {
-                for (int i = 0; i < indices.length; i++) {
-                    if (indices[i] > addIndex) {
-                        indices[i] += addCount;
-                    }
-                }
-            }
-
-            for (int i = indices.length - 1; i >= 0; i--) {
-                model.remove(indices[i]);
-            }
-
-        }
-
-        indices = null;
-        addCount = 0;
-        addIndex = -1;
-    }
-}
-
 /*
- * Custom TransferHandler for handling strings while dragging and dropping
+ * StringTransferHandler.java is used by the 1.4 ExtendedDnDDemo.java example.
  */
 abstract class StringTransferHandler extends TransferHandler {
 
@@ -1048,7 +840,8 @@ abstract class StringTransferHandler extends TransferHandler {
     public boolean importData(JComponent c, Transferable t) {
         if (canImport(c, t.getTransferDataFlavors())) {
             try {
-                String str = (String) t.getTransferData(DataFlavor.stringFlavor);
+                String str = (String) t
+                        .getTransferData(DataFlavor.stringFlavor);
                 importString(c, str);
                 return true;
             } catch (UnsupportedFlavorException ufe) {
@@ -1071,5 +864,99 @@ abstract class StringTransferHandler extends TransferHandler {
             }
         }
         return false;
+    }
+}
+
+/*
+ * TableTransferHandler.java is used by the 1.4 ExtendedDnDDemo.java example.
+ */
+class TableTransferHandler extends StringTransferHandler {
+
+    private int[] rows = null;
+    private int addIndex = -1; //Location where items were added
+    private int addCount = 0; //Number of items added.
+
+    @Override
+    protected String exportString(JComponent c) {
+        JTable table = (JTable) c;
+        rows = table.getSelectedRows();
+        int colCount = table.getColumnCount();
+
+        StringBuilder buff = new StringBuilder();
+
+        for (int i = 0; i < rows.length; i++) {
+            for (int j = 0; j < colCount; j++) {
+                Object val = table.getValueAt(rows[i], j);
+                buff.append(val == null ? "" : val.toString());
+                if (j != colCount - 1) {
+                    buff.append(",");
+                }
+            }
+            if (i != rows.length - 1) {
+                buff.append("\n");
+            }
+        }
+
+        return buff.toString();
+    }
+
+    @Override
+    protected void importString(JComponent c, String str) {
+        JTable target = (JTable) c;
+        DefaultTableModel model = (DefaultTableModel) target.getModel();
+        int index = target.getSelectedRow();
+
+        //Prevent the user from dropping data back on itself.
+        //For example, if the user is moving rows #4,#5,#6 and #7 and
+        //attempts to insert the rows after row #5, this would
+        //be problematic when removing the original rows.
+        //So this is not allowed.
+        if (rows != null && index >= rows[0] - 1
+                && index <= rows[rows.length - 1]) {
+            rows = null;
+            return;
+        }
+
+        int max = model.getRowCount();
+        if (index < 0) {
+            index = max;
+        } else {
+            index++;
+            if (index > max) {
+                index = max;
+            }
+        }
+        addIndex = index;
+        String[] values = str.split("\n");
+        addCount = values.length;
+        int colCount = target.getColumnCount();
+        for (int i = 0; i < values.length && i < colCount; i++) {
+            model.insertRow(index++, values[i].split(","));
+        }
+    }
+
+    @Override
+    protected void cleanup(JComponent c, boolean remove) {
+        JTable source = (JTable) c;
+        if (remove && rows != null) {
+            DefaultTableModel model = (DefaultTableModel) source.getModel();
+
+            //If we are moving items around in the same table, we
+            //need to adjust the rows accordingly, since those
+            //after the insertion point have moved.
+            if (addCount > 0) {
+                for (int i = 0; i < rows.length; i++) {
+                    if (rows[i] > addIndex) {
+                        rows[i] += addCount;
+                    }
+                }
+            }
+            for (int i = rows.length - 1; i >= 0; i--) {
+                model.removeRow(rows[i]);
+            }
+        }
+        rows = null;
+        addCount = 0;
+        addIndex = -1;
     }
 }
