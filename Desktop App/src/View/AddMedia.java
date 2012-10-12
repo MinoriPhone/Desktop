@@ -1,10 +1,9 @@
 package View;
 
+import Model.CustomDefaultTableModel;
 import Model.FileChooser;
-import Model.Image;
 import Model.Link;
 import Model.MediaItem;
-import Model.MediaItemTableModel;
 import Model.Route;
 import Model.Text;
 import Model.Video;
@@ -24,15 +23,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -50,9 +45,8 @@ public final class AddMedia extends JDialog {
     private static final Logger LOGGER = Logger.getLogger(AddMedia.class.getName());
     private JScrollPane spAddedMedia;
     private JTable tAddedMedia;
-    private DefaultTableModel tableModel;
+    private CustomDefaultTableModel tableModel;
     private ArrayList<MediaItem> addedItems;
-    private DefaultListModel listModel;
     private ArrayList<Link> prevLinks;
     private boolean closedBySave;
     private Link link;
@@ -63,8 +57,7 @@ public final class AddMedia extends JDialog {
     /**
      * Creates form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of
-     * this window
+     * @param parent JFrame The Main window of this application is the parent of this window
      * @param map Instance of Class View.Map
      * @param link Link The Link we are creating
      */
@@ -83,23 +76,10 @@ public final class AddMedia extends JDialog {
         this.tfLinkName.setText(link.getName());
         this.changeLink = true;
         this.addedItems = new ArrayList<MediaItem>();
-        this.tableModel = new DefaultTableModel();
-        this.tableModel.addColumn("Absolute path to file");
-        this.tableModel.addColumn("Filename and type");
-        this.tableModel.addColumn("Duration in seconds");
+        this.tableModel = new CustomDefaultTableModel();
 
-        this.tAddedMedia = new JTable(this.tableModel);
-        this.tAddedMedia.getTableHeader().setReorderingAllowed(false);
-        this.tAddedMedia.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
-        this.spAddedMedia = new JScrollPane(this.tAddedMedia);
-        spAddedMedia.setPreferredSize(new Dimension(400, 100));
-
-        this.tAddedMedia.setDragEnabled(true);
-        this.tAddedMedia.setTransferHandler(new TableTransferHandler());
-
-        this.pAddedMedia.add(spAddedMedia, BorderLayout.CENTER);
-        this.pAddedMedia.setBorder(BorderFactory.createTitledBorder("Table"));
+        // Generate table for added MediaItems
+        generateTable();
 
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
@@ -143,9 +123,6 @@ public final class AddMedia extends JDialog {
             this.lLinks.setListData(this.prevLinks.toArray());
             this.lLinks.setEnabled(false);
         }
-
-        // Generate JTable so we can add MediaItems to it
-        //generateTable();
 
         // MediaItems
         for (MediaItem mItem : link.getMediaItems()) {
@@ -198,9 +175,6 @@ public final class AddMedia extends JDialog {
             }
         });
 
-        // Add mouse listener to table with added mediaitems
-        addMouseListenerToAddedMediaItemsTable();
-
         // Add changelistener to combobox with previous links
         this.lLinks.addListSelectionListener(new ListSelectionListener() {
             /**
@@ -233,10 +207,8 @@ public final class AddMedia extends JDialog {
      *
      * Creates form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of
-     * this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can
-     * connect this Link to
+     * @param parent JFrame The Main window of this application is the parent of this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can connect this Link to
      * @param link Link The Link we are creating
      * @param callFrom int if int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
@@ -255,23 +227,10 @@ public final class AddMedia extends JDialog {
         this.tfRouteName.setEditable(false);
         this.changeLink = false;
         this.addedItems = new ArrayList<MediaItem>();
-        this.tableModel = new DefaultTableModel();
-        this.tableModel.addColumn("Absolute path to file");
-        this.tableModel.addColumn("Filename and type");
-        this.tableModel.addColumn("Duration in seconds");
+        this.tableModel = new CustomDefaultTableModel();
 
-        this.tAddedMedia = new JTable(this.tableModel);
-        this.tAddedMedia.getTableHeader().setReorderingAllowed(false);
-        this.tAddedMedia.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
-        this.spAddedMedia = new JScrollPane(this.tAddedMedia);
-        spAddedMedia.setPreferredSize(new Dimension(400, 100));
-
-        this.tAddedMedia.setDragEnabled(true);
-        this.tAddedMedia.setTransferHandler(new TableTransferHandler());
-
-        this.pAddedMedia.add(spAddedMedia, BorderLayout.CENTER);
-        this.pAddedMedia.setBorder(BorderFactory.createTitledBorder("Table"));
+        // Generate table for added MediaItems
+        generateTable();
 
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
@@ -345,9 +304,6 @@ public final class AddMedia extends JDialog {
             }
         });
 
-        // Add mouse listener to table with added mediaitems
-        addMouseListenerToAddedMediaItemsTable();
-
         // Add changelistener to combobox with previous links
         this.lLinks.addListSelectionListener(new ListSelectionListener() {
             /**
@@ -379,28 +335,9 @@ public final class AddMedia extends JDialog {
     }
 
     /**
-     * Get the MediaItem object of the row we clicked
-     */
-    private void addMouseListenerToAddedMediaItemsTable() {
-        this.tAddedMedia.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                JTable thisTable = (JTable) e.getSource();
-                MediaItem item = getAddedItemByFilenameAndAbsPath(String.valueOf(thisTable.getModel().getValueAt(thisTable.getSelectedRow(), 1)), String.valueOf(thisTable.getModel().getValueAt(thisTable.getSelectedRow(), 0)));
-                if(item instanceof Text || item instanceof Image)
-                {
-                    enterDuration(item, thisTable.getSelectedRow());
-                }
-            }
-        });
-    }
-
-    /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
-     * the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
@@ -410,11 +347,9 @@ public final class AddMedia extends JDialog {
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from
-     * the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
      */
     public void removeItem(MediaItem mediaItem, int row) {
         this.addedItems.remove(mediaItem);
@@ -424,8 +359,7 @@ public final class AddMedia extends JDialog {
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will
-     * be in the right order!
+     * Get all added media items. If we closed the window, then the items will be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -483,33 +417,66 @@ public final class AddMedia extends JDialog {
      */
     private void generateTable() {
 
-        // Create and set model for JTable
-        //this.tAddedMedia.setModel(this.tableModel);
+        // Create column headers for JTable
+        this.tableModel.addColumn("Absolute path to file");
+        this.tableModel.addColumn("Filename and type");
+        this.tableModel.addColumn("Duration in seconds");
+
+        // Create JTable with the given column headers and properties
+        this.tAddedMedia = new JTable(this.tableModel);
         this.tAddedMedia.getTableHeader().setReorderingAllowed(false);
         this.tAddedMedia.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        //  this.tAddedMedia.setColumnSelectionAllowed(false);
-        //this.tAddedMedia.setCellSelectionEnabled(false);
-        //this.tAddedMedia.setRowSelectionAllowed(true);
-        //this.tAddedMedia.revalidate();
+        this.tAddedMedia.setColumnSelectionAllowed(false);
+        this.tAddedMedia.setCellSelectionEnabled(false);
+        this.tAddedMedia.setRowSelectionAllowed(true);
 
-        // Add JTable to JScrollpane
-        this.spAddedMedia.add(this.tAddedMedia);
-        this.spAddedMedia.setPreferredSize(new Dimension(400, 100));
 
-        // Enable Drag and Drop
+        // Add created JTable to a new JScrollPane
+        this.spAddedMedia = new JScrollPane(this.tAddedMedia);
+        spAddedMedia.setPreferredSize(new Dimension(400, 100));
+
+        // Enable Drag-and-Drop rows
         this.tAddedMedia.setDragEnabled(true);
         this.tAddedMedia.setTransferHandler(new TableTransferHandler());
 
-        // Add scrollpane to AddedMedia JPanel
-        this.pAddedMedia.add(this.spAddedMedia, BorderLayout.CENTER);
-        this.pAddedMedia.setBorder(BorderFactory.createTitledBorder("Table"));
+        // Add JScrollPane to AddedMedia JPanel
+        this.pAddedMedia.add(spAddedMedia, BorderLayout.CENTER);
+
+        // Add mouse listener to table so we can adjust the number of showduration seconds
+        this.tAddedMedia.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                // If user double clicked
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    e.consume();
+
+                    // Get JTable
+                    JTable thisTable = (JTable) e.getSource();
+
+                    // Get clicked MediaItem (row)
+                    MediaItem item = getAddedItemByFilenameAndAbsPath(
+                            String.valueOf(thisTable.getModel().getValueAt(thisTable.getSelectedRow(), 1)),
+                            String.valueOf(thisTable.getModel().getValueAt(thisTable.getSelectedRow(), 0)));
+
+                    // Show popup for changing seconds of MediaItem if it is a Model.Text- or Model.Image-object
+                    if (item instanceof Model.Text || item instanceof Model.Image) {
+                        enterDuration(item, thisTable.getSelectedRow());
+                    }
+                }
+            }
+        });
     }
 
     /**
      * Add new MediaItem to table
      */
     private void addMediaItemToTable(MediaItem item) {
-        this.tableModel.addRow(new String[]{item.getAbsolutePath(), item.getFileName(), String.valueOf(item.getShowDurationInSeconds())});
+        this.tableModel.addRow(new String[]{
+                    item.getAbsolutePath(),
+                    item.getFileName(),
+                    String.valueOf(item.getShowDurationInSeconds())
+                });
     }
 
     /**
@@ -708,10 +675,10 @@ public final class AddMedia extends JDialog {
                     this.addItem((Video) mItem);
                 } else if (mItem instanceof Model.Image) {
                     this.addItem((Model.Image) mItem);
-                    enterDuration(mItem, this.tableModel.getRowCount()-1);
+                    enterDuration(mItem, this.tableModel.getRowCount() - 1);
                 } else if (mItem instanceof Text) {
                     this.addItem((Text) mItem);
-                    enterDuration(mItem, this.tableModel.getRowCount()-1);
+                    enterDuration(mItem, this.tableModel.getRowCount() - 1);
                 }
             }
         } else if (dialog == JFileChooser.CANCEL_OPTION) {
