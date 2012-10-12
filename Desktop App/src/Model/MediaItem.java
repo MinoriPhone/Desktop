@@ -23,15 +23,15 @@ public interface MediaItem {
      * Get absolute path to the file
      */
     public String getAbsolutePath();
-    
+
     /**
      * Set the absolute path of the file
-     * 
+     *
      * @param absPath String absolute path to file
      * @return String
      */
     public void setAbsolutePath(String absPath);
-    
+
     /**
      * Get the number of seconds for how long we want to show the file
      *
@@ -45,7 +45,21 @@ public interface MediaItem {
      * @param showDurationInSeconds int Number of seconds for showing the file
      */
     public void setShowDurationInSeconds(int showDurationInSeconds);
-    
+
+    /**
+     * Set the shortcut Link
+     *
+     * @param isShortcut
+     */
+    public void setShortcut(Link isShortcut);
+
+    /**
+     * Get the shortcut Link
+     * 
+     * @return true if it is a shortcut
+     */
+    public Link getShortcut();
+
     /**
      * Print to XML
      *

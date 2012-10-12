@@ -136,20 +136,22 @@ public class LinkPainter implements Painter<JXMapViewer> {
      * @param mapViewer
      * @return 
      */
-    public Link intersects(JXMapViewer mapViewer) {
+    public ArrayList<Link> intersects(JXMapViewer mapViewer) {
+        ArrayList<Link> clickedLinkArray = new ArrayList<Link>();
         for (Link link : links) {
             if (mousePos != null) {
                 for (Line2D line : link.GetLines(mapViewer, mousePos)) {
                     if (line.ptSegDist(mapViewer.getTileFactory().geoToPixel(mapViewer.convertPointToGeoPosition(mousePos), mapViewer.getZoom())) < 3) {
                         link.setColor(this.hoverColor);
                         mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                        return link;
+                        clickedLinkArray.add(link);
+                        break;
                     } else {
                         link.setColor(this.color);
                     }
                 }
             }
         }
-        return null;
+        return clickedLinkArray;
     }
 }

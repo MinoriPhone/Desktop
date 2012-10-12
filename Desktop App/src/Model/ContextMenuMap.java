@@ -1,6 +1,8 @@
 package Model;
 
+import View.Map;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -12,6 +14,7 @@ public class ContextMenuMap extends JPopupMenu {
     JMenuItem createLinkItem;
     JMenuItem changeLinkItem;
     JMenuItem changeRadiusItem;
+    ArrayList<JMenuItem> menuItems;
 
     /**
      * Constructor
@@ -27,6 +30,18 @@ public class ContextMenuMap extends JPopupMenu {
         add(createLinkItem);
         add(changeLinkItem);
         add(changeRadiusItem);
+    }
+
+    /**
+     * Constructor
+     */
+    public ContextMenuMap(ArrayList<Link> links) {
+        menuItems = new ArrayList<JMenuItem>();
+        for (Link link : links) {
+            JMenuItem menuItem = new JMenuItem(link.getName());
+            menuItems.add(menuItem);
+            add(menuItem);
+        }
     }
 
     /**
@@ -107,5 +122,15 @@ public class ContextMenuMap extends JPopupMenu {
     public void setChangeRadiusItem(JMenuItem changeRadiusItem) {
         this.changeRadiusItem = changeRadiusItem;
     }
+
+    public ArrayList<JMenuItem> getMenuItems() {
+        return menuItems;
+    }
+
+    public void setMenuItems(ArrayList<JMenuItem> menuItems) {
+        this.menuItems = menuItems;
+    }
+    
+    
     
 }

@@ -11,6 +11,7 @@ public class Image implements MediaItem {
     private String fileName;
     private String absPath;
     private int showDurationInSeconds;
+    private Link shortcut;
 
     /**
      * Constructor
@@ -79,6 +80,11 @@ public class Image implements MediaItem {
     public String printXML(boolean XMLProject) {
         String XMLString = "";
         XMLString += "<image>\r\n";
+        
+        if (shortcut != null) {
+            XMLString += "<shortcut>" + this.shortcut.getId() + "</shortcut>\r\n";
+        }
+        
         if (XMLProject) {
             XMLString += "<filename>" + this.absPath + this.fileName + "</filename>\r\n";
         } else {
@@ -108,5 +114,15 @@ public class Image implements MediaItem {
     @Override
     public void setAbsolutePath(String absPath) {
         this.absPath = absPath;
+    }
+
+    @Override
+    public void setShortcut(Link isShortcut) {
+        this.shortcut = isShortcut;
+    }
+
+    @Override
+    public Link getShortcut() {
+        return this.shortcut;
     }
 }
