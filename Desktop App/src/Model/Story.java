@@ -107,7 +107,6 @@ public class Story {
     public void newEmptyRoute() {
         Route route = new Route();
         routes.add(route);
-        routesPanel.refreshList(routes);
     }
 
     /**
