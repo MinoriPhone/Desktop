@@ -52,7 +52,7 @@ public class Map extends JPanel {
     private CompoundPainter<JXMapViewer> painter;
     private Set<Node> nodes;
     private Story story;
-    private Main parent;
+    private Main main;
     private boolean buttonNodeClicked;
     private boolean buttonLinkClicked;
     private boolean buttonStartClicked;
@@ -67,8 +67,8 @@ public class Map extends JPanel {
         // Create a story
         this.story = story;
 
-        // Remember the parent
-        this.parent = parent;
+        // Remember the main
+        this.main = parent;
 
         // Create a map
         mapViewer = new JXMapViewer();
@@ -96,7 +96,7 @@ public class Map extends JPanel {
         linkPainter = new LinkPainter();
 
         // Add listeners to the map
-        MouseInputListener mia = new MapListeners(mapViewer, this, linkPainter, this.parent);
+        MouseInputListener mia = new MapListeners(mapViewer, this, linkPainter, this.main);
         mapViewer.addMouseListener(mia);
         mapViewer.addMouseMotionListener(mia);
         mapViewer.addMouseListener(new CenterMapListener(mapViewer));
@@ -316,18 +316,18 @@ class MapListeners extends MouseInputAdapter {
     private Map map;
     private LinkPainter linkPainter;
     private Node draggingNode;
-    private Main parent;
+    private Main main;
 
     /**
      * Constructor
      *
      * @param mapViewer JXMapViewer The map
      */
-    public MapListeners(JXMapViewer mapViewer, Map map, LinkPainter linkPainter, Main parent) {
+    public MapListeners(JXMapViewer mapViewer, Map map, LinkPainter linkPainter, Main main) {
         this.mapViewer = mapViewer;
         this.map = map;
         this.linkPainter = linkPainter;
-        this.parent = parent;
+        this.main = main;
     }
 
     /**
@@ -472,7 +472,7 @@ class MapListeners extends MouseInputAdapter {
             // Create node menu
             ContextMenuMap contextMenuMap = new ContextMenuMap();
             final Node currentNode = map.getNodeAtCoord(evt.getPoint());
-
+            
             // Check if the node got any links attached. If so, the
             // item is disabled and the delete function will be added.
             if (map.getStory().getLinkForEndNode(currentNode) != null) {
@@ -543,12 +543,14 @@ class MapListeners extends MouseInputAdapter {
                         @Override
                         public void actionPerformed(ActionEvent ae) {
                             openMediaDialogByLinkClick(clickedLinks.get(a));
+                            main.getPanelRoutes().expandToNode(main.getPanelRoutes().getStoryNode(), clickedLinks.get(a));
                         }
                     });
                 }
                 contextMenuMap.showContextMenuMap(evt);
             } else {
                 openMediaDialogByLinkClick(clickedLinks.get(0));
+                main.getPanelRoutes().expandToNode(main.getPanelRoutes().getStoryNode(), clickedLinks.get(0));
             }
         }
     }
@@ -697,7 +699,7 @@ class MapListeners extends MouseInputAdapter {
     private void openMediaDialogByLinkClick(Link link) {
 
         // Open AddMedia
-        final AddMedia popup = new AddMedia(parent, map, link);
+        final AddMedia popup = new AddMedia(main, map, link);
         popup.setVisible(true);
 
         // Add window listener to the popup dialog window, so we
@@ -744,7 +746,7 @@ class MapListeners extends MouseInputAdapter {
                 currentLink = new Link(null, null, node, map.getStory().getLinkCounter());
             }
             // Show popup window for adding media to the startnode (Link)
-            final AddMedia popup = new AddMedia(parent, map, prevLinks, currentLink, startOrLink);
+            final AddMedia popup = new AddMedia(main, map, prevLinks, currentLink, startOrLink);
             popup.setVisible(true);
 
             // Add window listener to the popup dialog window, so we

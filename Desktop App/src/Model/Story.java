@@ -301,4 +301,9 @@ public class Story {
     public void repaint(){
         routesPanel.refreshList(routes);
     }
+
+    @Override
+    public String toString() {
+        return this.getName();
+    }
 }

@@ -81,4 +81,10 @@ public class Route {
         return XMLString;
 
     }
+
+    @Override
+    public String toString() {
+        return this.getName();
+    }
+       
 }

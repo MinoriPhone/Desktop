@@ -174,6 +174,10 @@ public class Main extends JFrame implements PropertyChangeListener {
         return defaultStoryName;
     }
 
+    public Routes getPanelRoutes() {
+        return panelRoutes;
+    }
+    
     /* DO NOT TOUCH */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

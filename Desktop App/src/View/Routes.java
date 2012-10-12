@@ -1,14 +1,18 @@
 package View;
 
 import Model.Link;
+import Model.Node;
 import Model.Route;
 import Model.Story;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -33,10 +37,10 @@ public class Routes extends JPanel {
         storyNode.removeAllChildren();
         // Loop trough routes        
         for (Route route : routes) {
-            DefaultMutableTreeNode tempRoute = new DefaultMutableTreeNode(route.getName());
+            DefaultMutableTreeNode tempRoute = new DefaultMutableTreeNode(route);
             storyNode.add(tempRoute);
 
-            DefaultMutableTreeNode tempLink = new DefaultMutableTreeNode(route.getStartLink().getName());
+            DefaultMutableTreeNode tempLink = new DefaultMutableTreeNode(route.getStartLink());
             tempRoute.add(tempLink);
             appendChilds(route.getStartLink(), tempLink);
 
@@ -57,7 +61,7 @@ public class Routes extends JPanel {
 
     void addStory(Story story) {
         this.story = story;
-        storyNode = new DefaultMutableTreeNode(story.getName());
+        storyNode = new DefaultMutableTreeNode(story);
         treeModel = new DefaultTreeModel(storyNode);
         refreshList(story.getRoutes());
 
@@ -66,15 +70,40 @@ public class Routes extends JPanel {
         tree = new JTree(treeModel);
         add(tree);
     }
-        
+
+    public void expandToNode(DefaultMutableTreeNode dmt, Object obj) {
+        Enumeration a = dmt.children();
+
+        while (a.hasMoreElements()) {
+            DefaultMutableTreeNode tempTreeNode = (DefaultMutableTreeNode) a.nextElement();
+            if (tempTreeNode.getUserObject() == obj) {
+                tree.expandPath(new TreePath(tempTreeNode.getPath()).getParentPath());
+                
+                break;
+            }else{
+                expandToNode(tempTreeNode, obj);
+            }
+        }
+    }
 
     void appendChilds(Link parentLink, DefaultMutableTreeNode parentTreeNode) {
 
         for (Link link : parentLink.getLinks()) {
-            DefaultMutableTreeNode tempLink = new DefaultMutableTreeNode(link.getName());
+            DefaultMutableTreeNode tempLink = new DefaultMutableTreeNode(link);
             parentTreeNode.add(tempLink);
             appendChilds(link, tempLink);
         }
+    }
 
+    public DefaultTreeModel getTreeModel() {
+        return treeModel;
+    }
+
+    public DefaultMutableTreeNode getStoryNode() {
+        return storyNode;
+    }
+
+    public JTree getTree() {
+        return tree;
     }
 }
