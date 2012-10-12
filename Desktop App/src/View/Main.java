@@ -420,6 +420,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         }
         //browse
         JFileChooser j = new JFileChooser();
+        j.setDialogTitle("Select an iStory project file file to open");
         j.addChoosableFileFilter(new ExtensionFileFilter(
                 new String[]{".proj"}, // Extensions we accept
                 "Project files (*.proj)"));
@@ -602,6 +603,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         JFileChooser j = new JFileChooser();
         //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         j.setSelectedFile(new File(map.getStory().getName()));
+        j.setDialogTitle("Select a location to save the project");
         int dialog = j.showSaveDialog(this);
 
         // Catch actions of the File Chooser Dialog Window
@@ -676,6 +678,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         JFileChooser j = new JFileChooser();
         j.setAcceptAllFileFilterUsed(false);
+        j.setDialogTitle("Select the export location");
         j.addChoosableFileFilter(new ExtensionFileFilter(
                 new String[]{".iStory"}, // Extensions we accept
                 "Project files (*.iStory)"));
@@ -933,6 +936,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         JFileChooser j = new JFileChooser();
         j.setAcceptAllFileFilterUsed(false);
+        j.setDialogTitle("Select an iStory file to import");
         j.addChoosableFileFilter(new ExtensionFileFilter(
                 new String[]{".iStory"}, // Extensions we accept
                 "Project files (*.iStory)"));
@@ -946,6 +950,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
                 JFileChooser importLocationChooser = new JFileChooser();
                 importLocationChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                importLocationChooser.setDialogTitle("Select a location to store the files");
                 int importDialog = importLocationChooser.showOpenDialog(this);
                 String pad;
                 String selectedZipFileName = j.getSelectedFile().getName().replace(".iStory", "");
