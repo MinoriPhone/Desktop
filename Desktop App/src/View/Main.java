@@ -369,6 +369,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     }//GEN-LAST:event_miAboutActionPerformed
     private void bNodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bNodeActionPerformed
         // Add Node to the map
+        this.map.setNodeOnMouse();
         this.map.setButtonNodeClicked(true);
         this.map.setButtonLinkClicked(false);
         this.map.setButtonStartClicked(false);

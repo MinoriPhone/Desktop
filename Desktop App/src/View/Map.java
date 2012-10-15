@@ -38,6 +38,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 
+
 /**
  * Panel containing the Map
  */
@@ -57,6 +58,7 @@ public class Map extends JPanel {
     private boolean buttonLinkClicked;
     private boolean buttonStartClicked;
     private boolean linkOnMouse;
+    private Node nodeOnMouse;
 
     /**
      * Creates new form Map
@@ -302,8 +304,16 @@ public class Map extends JPanel {
         xmlString += "</extranodes>\r\n";
         return xmlString;
     }
-}
 
+    void setNodeOnMouse() {
+        nodeOnMouse = new Node(85.02070774312594, -140.625); //Position outside map (invisible)
+        addNode(nodeOnMouse);
+    }
+
+    Node getNodeOnMouse() {
+        return nodeOnMouse;
+    }
+}
 /**
  * Class containing all listeners for the Map.
  */
@@ -348,13 +358,13 @@ class MapListeners extends MouseInputAdapter {
         if (map.isButtonNodeClicked()) {
 
             // Get GEO Position where we want to place the node
-            GeoPosition geopos = mapViewer.convertPointToGeoPosition(coord);
+            //GeoPosition geopos = mapViewer.convertPointToGeoPosition(coord);
 
             // Add Node to Map
-            map.addNode(new Node(geopos));
+            //map.addNode(new Node(geopos));
 
             // Repaint Map
-            mapViewer.repaint();
+            //mapViewer.repaint();
             map.setButtonNodeClicked(false);
             mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
@@ -472,7 +482,7 @@ class MapListeners extends MouseInputAdapter {
             // Create node menu
             ContextMenuMap contextMenuMap = new ContextMenuMap();
             final Node currentNode = map.getNodeAtCoord(evt.getPoint());
-            
+
             // Check if the node got any links attached. If so, the
             // item is disabled and the delete function will be added.
             if (map.getStory().getLinkForEndNode(currentNode) != null) {
@@ -519,7 +529,7 @@ class MapListeners extends MouseInputAdapter {
             contextMenuMap.getChangeRadiusItem().addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent ae) {
-                    String n = JOptionPane.showInputDialog("Enter the duration of the file in seconds", currentNode.getRadius());
+                    String n = JOptionPane.showInputDialog("Change the radius of the node (in meters)", currentNode.getRadius());
                     if (n != null) {
                         if (!n.equals("")) {
                             try {
@@ -675,18 +685,23 @@ class MapListeners extends MouseInputAdapter {
     @Override
     public void mouseMoved(MouseEvent e) {
         Point2D coord = new Point2D.Double(e.getX(), e.getY());
-        linkPainter.setMousePos(coord);
-        Node currentNode = map.getNodeAtCoord(e.getPoint());
-        if (currentNode != null) {
-            //currentNode.setColor(Color.getHSBColor(0.5f, 0.2f, 1f));
-            mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        if (!map.isButtonNodeClicked()) {
+            linkPainter.setMousePos(coord);
+            Node currentNode = map.getNodeAtCoord(e.getPoint());
+            if (currentNode != null) {
+                //currentNode.setColor(Color.getHSBColor(0.5f, 0.2f, 1f));
+                mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            } else {
+                mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+            if (map.isLinkOnMouse()) {
+                mapViewer.repaint();
+            } else {
+                linkPainter.intersects(mapViewer);
+                mapViewer.repaint();
+            }
         } else {
-            mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        }
-        if (map.isLinkOnMouse()) {
-            mapViewer.repaint();
-        } else {
-            linkPainter.intersects(mapViewer);
+            map.getNodeOnMouse().setGeoposition(mapViewer.convertPointToGeoPosition(coord));
             mapViewer.repaint();
         }
     }

@@ -70,7 +70,7 @@ public final class AddMedia extends JDialog {
         this.map = map;
         this.link = link;
         this.closedBySave = false;
-        this.callFrom = (link.getP2() == null) ? 1 : 0;
+        this.callFrom = (link.getP1() == null) ? 1 : 0;
         this.tfRouteName.setEditable(false);
         this.tfRouteName.setText(map.getStory().getRouteForLink(link).getName());
         this.tfLinkName.setText(link.getName());
