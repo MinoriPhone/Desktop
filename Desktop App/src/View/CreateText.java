@@ -400,20 +400,22 @@ public class CreateText extends javax.swing.JDialog {
      */
     private void exportToHTML() {
 
-        // Initialize output stream
-        BufferedOutputStream out = null;
+        // Prompt save dialog
+        JFileChooser chooser = new JFileChooser();
+        chooser.setMultiSelectionEnabled(false);
 
-        try {
-            // Prompt save dialog
-            JFileChooser chooser = new JFileChooser();
-            chooser.setMultiSelectionEnabled(false);
+        // Catch action of the File Chooser Dialog Window
+        int option = chooser.showSaveDialog(this);
 
-            // Catch action of the File Chooser Dialog Window
-            int option = chooser.showSaveDialog(this);
-
-            // User pressed save
-            if (option == JFileChooser.APPROVE_OPTION) {
-
+        // User pressed save
+        if (option == JFileChooser.APPROVE_OPTION) {
+            
+            // Initialize output stream
+            BufferedOutputStream out = null;
+            
+            // Create .html
+            String filePath = chooser.getSelectedFile().getAbsolutePath() + ".html";
+            try {
                 // Get style document
                 StyledDocument doc = (StyledDocument) this.textPane.getDocument();
 
@@ -446,5 +448,6 @@ public class CreateText extends javax.swing.JDialog {
         } catch (BadLocationException ex) {
             Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 }

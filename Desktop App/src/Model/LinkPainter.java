@@ -123,7 +123,7 @@ public class LinkPainter implements Painter<JXMapViewer> {
         for (Link link : links) {
             g.setColor(link.getColor());
             if (mousePos != null) {
-                for (Line2D line : link.GetLines(map, mousePos)) {
+                for (Line2D line : link.getLines(map, mousePos)) {
                     g.draw(line);
                 }
             }
@@ -140,7 +140,7 @@ public class LinkPainter implements Painter<JXMapViewer> {
         ArrayList<Link> clickedLinkArray = new ArrayList<Link>();
         for (Link link : links) {
             if (mousePos != null) {
-                for (Line2D line : link.GetLines(mapViewer, mousePos)) {
+                for (Line2D line : link.getLines(mapViewer, mousePos)) {
                     if (line.ptSegDist(mapViewer.getTileFactory().geoToPixel(mapViewer.convertPointToGeoPosition(mousePos), mapViewer.getZoom())) < 3) {
                         link.setColor(this.hoverColor);
                         mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
