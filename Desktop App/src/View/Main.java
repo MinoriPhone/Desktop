@@ -979,6 +979,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                             return false;
                         }
                     }
+                }else if (dialog == JFileChooser.CANCEL_OPTION) {
+                    return true;
                 }
                 folder.mkdir();
                 pad = importLocationChooser.getSelectedFile().getAbsolutePath() + System.getProperty("file.separator") + selectedZipFileName + System.getProperty("file.separator");
