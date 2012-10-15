@@ -177,7 +177,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     public Routes getPanelRoutes() {
         return panelRoutes;
     }
-    
+
     /* DO NOT TOUCH */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -461,7 +461,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                         story.newEmptyRoute();
                     } else if (strLine.contains("<route.name>") && strLine.contains("</route.name>")) {
                         story.getRoutes().get(story.getRoutes().size() - 1).setName(strLine.substring("<route.name>".length(), strLine.length() - "</route.name>".length()));
-                        panelRoutes.refreshList(story.getRoutes());
                     } else if (strLine.contains("<route.link>")) {
                         tempLink.add(new Link());
                         story.getRoutes().get(story.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
@@ -513,7 +512,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         map.addNode(nod);
                     }
                 }
-
+                panelRoutes.refreshList(story.getRoutes());
                 story.setSomethingChanged(false);
                 //Close the input stream
                 in.close();
@@ -1043,7 +1042,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                             story.newEmptyRoute();
                         } else if (strLine.contains("<route.name>") && strLine.contains("</route.name>")) {
                             story.getRoutes().get(story.getRoutes().size() - 1).setName(strLine.substring("<route.name>".length(), strLine.length() - "</route.name>".length()));
-                            panelRoutes.refreshList(story.getRoutes());
+                            //panelRoutes.refreshList(story.getRoutes());
                         } else if (strLine.contains("<route.link>")) {
                             tempLink.add(new Link());
                             story.getRoutes().get(story.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
@@ -1095,7 +1094,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                             map.addNode(nod);
                         }
                     }
-
+                    panelRoutes.refreshList(story.getRoutes());
                     story.setSomethingChanged(false);
                     //Close the input stream
                     in.close();
