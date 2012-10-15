@@ -25,11 +25,13 @@ public class Image implements MediaItem {
      * @param fileName String Name of the Image-file
      * @param absPath String absolute path to Image-file
      * @param showDurationInSeconds String The number of seconds for how long we want to show the Image
+     * @param shortcut Link the link to the main MediaItem
      */
     public Image(String fileName, String absPath, int showDurationInSeconds) {
         this.fileName = fileName;
         this.absPath = absPath;
         this.setShowDurationInSeconds(showDurationInSeconds);
+        this.shortcut = null;
     }
 
     /**
