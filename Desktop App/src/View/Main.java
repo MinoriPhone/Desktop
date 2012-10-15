@@ -211,7 +211,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         pMenu.setPreferredSize(new java.awt.Dimension(200, 500));
         pMenu.setLayout(new java.awt.BorderLayout());
 
-        bNode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/waypoint_white.png"))); // NOI18N
+        bNode.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/blue_waypoint.png"))); // NOI18N
         bNode.setText("Node");
         bNode.setToolTipText("");
         bNode.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -221,7 +221,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             }
         });
 
-        bLink.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/link.png"))); // NOI18N
+        bLink.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/red_link.png"))); // NOI18N
         bLink.setText("Link");
         bLink.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         bLink.addActionListener(new java.awt.event.ActionListener() {
@@ -230,7 +230,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             }
         });
 
-        bStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/start.png"))); // NOI18N
+        bStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/green_start.png"))); // NOI18N
         bStart.setText("Start");
         bStart.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         bStart.addActionListener(new java.awt.event.ActionListener() {
@@ -257,10 +257,10 @@ public class Main extends JFrame implements PropertyChangeListener {
                 .addContainerGap()
                 .add(bNode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(bLink, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(bStart)
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(bLink, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pMenu.add(pMenuButtons, java.awt.BorderLayout.PAGE_START);
@@ -459,7 +459,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                         story.newEmptyRoute();
                     } else if (strLine.contains("<route.name>") && strLine.contains("</route.name>")) {
                         story.getRoutes().get(story.getRoutes().size() - 1).setName(strLine.substring("<route.name>".length(), strLine.length() - "</route.name>".length()));
-                        panelRoutes.refreshList(story.getRoutes());
                     } else if (strLine.contains("<route.link>")) {
                         tempLink.add(new Link());
                         story.getRoutes().get(story.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
@@ -511,7 +510,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         map.addNode(nod);
                     }
                 }
-
+                panelRoutes.refreshList(story.getRoutes());
                 story.setSomethingChanged(false);
                 //Close the input stream
                 in.close();
@@ -1041,7 +1040,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                             story.newEmptyRoute();
                         } else if (strLine.contains("<route.name>") && strLine.contains("</route.name>")) {
                             story.getRoutes().get(story.getRoutes().size() - 1).setName(strLine.substring("<route.name>".length(), strLine.length() - "</route.name>".length()));
-                            panelRoutes.refreshList(story.getRoutes());
+                            //panelRoutes.refreshList(story.getRoutes());
                         } else if (strLine.contains("<route.link>")) {
                             tempLink.add(new Link());
                             story.getRoutes().get(story.getRoutes().size() - 1).setStartLink(tempLink.get(tempLink.size() - 1));
@@ -1093,7 +1092,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                             map.addNode(nod);
                         }
                     }
-
+                    panelRoutes.refreshList(story.getRoutes());
                     story.setSomethingChanged(false);
                     //Close the input stream
                     in.close();

@@ -178,10 +178,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="bNode" min="-2" pref="43" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="bLink" min="-2" pref="43" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="bStart" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="35" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="bLink" min="-2" pref="43" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -190,7 +190,7 @@
                 <Component class="javax.swing.JButton" name="bNode">
                   <Properties>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                      <Image iconType="3" name="/View/Images/waypoint_white.png"/>
+                      <Image iconType="3" name="/View/Images/blue_waypoint.png"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Node"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -203,7 +203,7 @@
                 <Component class="javax.swing.JButton" name="bLink">
                   <Properties>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                      <Image iconType="3" name="/View/Images/link.png"/>
+                      <Image iconType="3" name="/View/Images/red_link.png"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Link"/>
                     <Property name="horizontalAlignment" type="int" value="2"/>
@@ -215,7 +215,7 @@
                 <Component class="javax.swing.JButton" name="bStart">
                   <Properties>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                      <Image iconType="3" name="/View/Images/start.png"/>
+                      <Image iconType="3" name="/View/Images/green_start.png"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Start"/>
                     <Property name="horizontalAlignment" type="int" value="2"/>
