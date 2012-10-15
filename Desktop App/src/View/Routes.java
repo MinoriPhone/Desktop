@@ -1,13 +1,10 @@
 package View;
 
 import Model.Link;
-import Model.Node;
 import Model.Route;
 import Model.Story;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
