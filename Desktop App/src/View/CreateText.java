@@ -213,14 +213,15 @@ public class CreateText extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(lTitle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 28, Short.MAX_VALUE)
-                .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel2)
-                    .add(jLabel3)
-                    .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel2)
                     .add(bColorChooser)
-                    .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jLabel1)
+                        .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jLabel3)
+                        .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -399,48 +400,44 @@ public class CreateText extends javax.swing.JDialog {
      */
     private void exportToRtf() {
 
-        // Initialize output stream
-        BufferedOutputStream out = null;
+        // Prompt save dialog
+        JFileChooser chooser = new JFileChooser();
+        chooser.setMultiSelectionEnabled(false);
 
-        try {
-            // Prompt save dialog
-            JFileChooser chooser = new JFileChooser();
-            chooser.setMultiSelectionEnabled(false);
+        // Catch action of the File Chooser Dialog Window
+        int option = chooser.showSaveDialog(this);
 
-            // Catch action of the File Chooser Dialog Window
-            int option = chooser.showSaveDialog(this);
-
-            // User pressed save
-            if (option == JFileChooser.APPROVE_OPTION) {
-
+        // User pressed save
+        if (option == JFileChooser.APPROVE_OPTION) {
+            
+            // Initialize output stream
+            BufferedOutputStream out = null;
+            
+            // Create .html
+            String filePath = chooser.getSelectedFile().getAbsolutePath() + ".html";
+            try {
                 // Get style document
                 StyledDocument doc = (StyledDocument) this.textPane.getDocument();
 
                 // Create kit to export
                 HTMLEditorKit kit = new HTMLEditorKit();
 
-                // Create .rtf
-                String filePath = chooser.getSelectedFile().getAbsoluteFile().toString() + ".html";
                 out = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
                 kit.write(out, doc, doc.getStartPosition().getOffset(), doc.getLength());
-
-                // Add mediaItem to List
-                this.parent.addTextMediaItemToList(chooser.getSelectedFile().getName() + ".html", filePath);
                 
-                // Close this screen
-                parent.setVisible(true);
-                this.dispose();
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BadLocationException ex) {
-            Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
                 out.close();
             } catch (IOException ex) {
-                Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, "Can not close output stream!", ex);
+                Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadLocationException ex) {
+                Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
             }
+            // Add mediaItem to List
+            this.parent.addTextMediaItemToList(chooser.getSelectedFile().getName() + ".html", filePath);
+
+            // Close this screen
+            parent.setVisible(true);
+            this.dispose();
         }
+
     }
 }
