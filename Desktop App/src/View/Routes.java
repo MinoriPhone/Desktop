@@ -2,12 +2,15 @@ package View;
 
 import Model.Link;
 import Model.Route;
+import Model.RoutesTreeRenderer;
 import Model.Story;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -30,6 +33,15 @@ public class Routes extends JPanel {
 
     }
 
+    private void appendChilds(Link parentLink, DefaultMutableTreeNode parentTreeNode) {
+
+        for (Link link : parentLink.getLinks()) {
+            DefaultMutableTreeNode tempLink = new DefaultMutableTreeNode(link);
+            parentTreeNode.add(tempLink);
+            appendChilds(link, tempLink);
+        }
+    }
+
     public void refreshList(ArrayList<Route> routes) {
         storyNode.removeAllChildren();
         // Loop trough routes        
@@ -40,7 +52,6 @@ public class Routes extends JPanel {
             DefaultMutableTreeNode tempLink = new DefaultMutableTreeNode(route.getStartLink());
             tempRoute.add(tempLink);
             appendChilds(route.getStartLink(), tempLink);
-
         }
 
         treeModel.reload();
@@ -65,6 +76,7 @@ public class Routes extends JPanel {
         treeModel = new DefaultTreeModel(storyNode);
 
         tree = new JTree(treeModel);
+        tree.setCellRenderer(new RoutesTreeRenderer());
         add(tree);
     }
 
@@ -75,20 +87,11 @@ public class Routes extends JPanel {
             DefaultMutableTreeNode tempTreeNode = (DefaultMutableTreeNode) a.nextElement();
             if (tempTreeNode.getUserObject() == obj) {
                 tree.expandPath(new TreePath(tempTreeNode.getPath()).getParentPath());
-                
+
                 break;
-            }else{
+            } else {
                 expandToNode(tempTreeNode, obj);
             }
-        }
-    }
-
-    void appendChilds(Link parentLink, DefaultMutableTreeNode parentTreeNode) {
-
-        for (Link link : parentLink.getLinks()) {
-            DefaultMutableTreeNode tempLink = new DefaultMutableTreeNode(link);
-            parentTreeNode.add(tempLink);
-            appendChilds(link, tempLink);
         }
     }
 

@@ -300,7 +300,7 @@ public class Link {
     /**
      * Get all media items
      */
-    public ArrayList<Line2D.Double> GetLines(JXMapViewer map, Point2D mousePos) {
+    public ArrayList<Line2D.Double> getLines(JXMapViewer map, Point2D mousePos) {
         ArrayList<Line2D.Double> lines = new ArrayList<Line2D.Double>();
         Point2D pt1;
         Point2D pt2;
