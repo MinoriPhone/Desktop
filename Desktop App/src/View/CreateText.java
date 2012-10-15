@@ -1,5 +1,6 @@
 package View;
 
+import Model.Filename;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -39,7 +40,6 @@ public class CreateText extends javax.swing.JDialog {
     private int currentFontStyle;
     private int currentFontSize;
     private Color currentFontColor;
-    private String pathToCreatedFile = "";
 
     /**
      * Creates new form CreateText
@@ -204,7 +204,7 @@ public class CreateText extends javax.swing.JDialog {
                         .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(28, 28, 28)
                         .add(bColorChooser)
-                        .add(0, 44, Short.MAX_VALUE)))
+                        .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pNorthLayout.setVerticalGroup(
@@ -213,14 +213,15 @@ public class CreateText extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(lTitle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 28, Short.MAX_VALUE)
-                .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel2)
-                    .add(jLabel3)
-                    .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel2)
                     .add(bColorChooser)
-                    .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(jLabel1)
+                        .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jLabel3)
+                        .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -265,7 +266,7 @@ public class CreateText extends javax.swing.JDialog {
                         .add(pDocument, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 357, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(bSave)
-                        .add(0, 7, Short.MAX_VALUE))
+                        .add(0, 66, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -327,7 +328,7 @@ public class CreateText extends javax.swing.JDialog {
 
     private void bSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveActionPerformed
         // Create document
-        exportToRtf();
+        exportToHTML();
     }//GEN-LAST:event_bSaveActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bColorChooser;
@@ -395,9 +396,9 @@ public class CreateText extends javax.swing.JDialog {
     }
 
     /**
-     * Export style document to rtf
+     * Export style document to html
      */
-    private void exportToRtf() {
+    private void exportToHTML() {
 
         // Initialize output stream
         BufferedOutputStream out = null;
@@ -419,14 +420,23 @@ public class CreateText extends javax.swing.JDialog {
                 // Create kit to export
                 HTMLEditorKit kit = new HTMLEditorKit();
 
-                // Create .rtf
-                String filePath = chooser.getSelectedFile().getAbsoluteFile().toString() + ".html";
+                // Create .html
+                String filePath = chooser.getSelectedFile().getAbsolutePath() + ".html";
                 out = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
                 kit.write(out, doc, doc.getStartPosition().getOffset(), doc.getLength());
+                out.close();
 
-                // Add mediaItem to List
-                this.parent.addTextMediaItemToList(chooser.getSelectedFile().getName() + ".html", filePath);
-                
+                // Get filename and extension
+                Filename fn = new Filename(filePath);
+                String fileName = fn.filename();
+                String extension = fn.extension().toLowerCase();
+
+                // Get absolute path to the file (so path without filename and extension)
+                String abspath = filePath.substring(0, filePath.length() - fileName.length() - extension.length() - 1);
+
+                // Return parameters for creating Text Item
+                this.parent.addTextMediaItemToList(fileName + "." + extension, abspath);
+
                 // Close this screen
                 parent.setVisible(true);
                 this.dispose();
@@ -435,12 +445,6 @@ public class CreateText extends javax.swing.JDialog {
             Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
         } catch (BadLocationException ex) {
             Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, "Can not close output stream!", ex);
-            }
         }
     }
 }
