@@ -33,8 +33,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -177,7 +175,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     public Routes getPanelRoutes() {
         return panelRoutes;
     }
-    
+
     /* DO NOT TOUCH */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
