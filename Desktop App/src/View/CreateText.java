@@ -409,12 +409,10 @@ public class CreateText extends javax.swing.JDialog {
 
         // User pressed save
         if (option == JFileChooser.APPROVE_OPTION) {
-            
+
             // Initialize output stream
             BufferedOutputStream out = null;
-            
-            // Create .html
-            String filePath = chooser.getSelectedFile().getAbsolutePath() + ".html";
+
             try {
                 // Get style document
                 StyledDocument doc = (StyledDocument) this.textPane.getDocument();
@@ -442,12 +440,12 @@ public class CreateText extends javax.swing.JDialog {
                 // Close this screen
                 parent.setVisible(true);
                 this.dispose();
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BadLocationException ex) {
-            Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
+            } catch (IOException ex) {
+                Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadLocationException ex) {
+                Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
