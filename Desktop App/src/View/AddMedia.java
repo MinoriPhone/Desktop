@@ -430,7 +430,6 @@ public final class AddMedia extends JDialog {
         this.tAddedMedia.setCellSelectionEnabled(false);
         this.tAddedMedia.setRowSelectionAllowed(true);
 
-
         // Add created JTable to a new JScrollPane
         this.spAddedMedia = new JScrollPane(this.tAddedMedia);
         spAddedMedia.setPreferredSize(new Dimension(400, 100));
@@ -510,6 +509,7 @@ public final class AddMedia extends JDialog {
         pRouteName = new javax.swing.JPanel();
         lRouteName = new javax.swing.JLabel();
         tfRouteName = new javax.swing.JTextField();
+        bAddText = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -561,6 +561,13 @@ public final class AddMedia extends JDialog {
         tfRouteName.setPreferredSize(new java.awt.Dimension(0, 40));
         pRouteName.add(tfRouteName, java.awt.BorderLayout.CENTER);
 
+        bAddText.setText("Create text");
+        bAddText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bAddTextActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout pMainLayout = new org.jdesktop.layout.GroupLayout(pMain);
         pMain.setLayout(pMainLayout);
         pMainLayout.setHorizontalGroup(
@@ -593,6 +600,8 @@ public final class AddMedia extends JDialog {
                                                     .add(lSpaceBottom, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                     .add(pMainLayout.createSequentialGroup()
                                                         .add(bBrowse)
+                                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                        .add(bAddText)
                                                         .add(0, 0, Short.MAX_VALUE)))
                                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                                 .add(bSave))
@@ -631,13 +640,15 @@ public final class AddMedia extends JDialog {
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(pMainLayout.createSequentialGroup()
                                 .add(lSpaceMediaUp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 13, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 197, Short.MAX_VALUE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 196, Short.MAX_VALUE)
                                 .add(lSpaceMediaDown, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(pAddedMedia, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED, 42, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED, 43, Short.MAX_VALUE)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(pMainLayout.createSequentialGroup()
-                                .add(bBrowse, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                    .add(bBrowse, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                                    .add(bAddText, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .add(22, 22, 22)
                                 .add(lSpaceBottom, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, pMainLayout.createSequentialGroup()
@@ -797,7 +808,16 @@ public final class AddMedia extends JDialog {
             }
         }
     }//GEN-LAST:event_bSaveActionPerformed
+
+    private void bAddTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAddTextActionPerformed
+        /* Add your own styled text as a file to the added media */
+
+        // Call JDialog to create styled text file
+        CreateText textDialog = new CreateText(this);
+        textDialog.setVisible(true);
+    }//GEN-LAST:event_bAddTextActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bAddText;
     private javax.swing.JButton bBrowse;
     private javax.swing.JButton bSave;
     private javax.swing.JScrollPane jScrollPane1;
@@ -818,6 +838,30 @@ public final class AddMedia extends JDialog {
     private javax.swing.JTextField tfLinkName;
     private javax.swing.JTextField tfRouteName;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Path to created Text File
+     *
+     * @param path String
+     */
+    protected void addTextMediaItemToList(String fileName, String path) {
+
+        // Create MediaItem by path of the File that the user created
+        MediaItem mItem = new Text(fileName, path, 2);
+
+        // Add selected file to list
+        if (mItem != null) {
+            if (mItem instanceof Video) {
+                this.addItem((Video) mItem);
+            } else if (mItem instanceof Model.Image) {
+                this.addItem((Model.Image) mItem);
+                enterDuration(mItem, this.tableModel.getRowCount() - 1);
+            } else if (mItem instanceof Text) {
+                this.addItem((Text) mItem);
+                enterDuration(mItem, this.tableModel.getRowCount() - 1);
+            }
+        }
+    }
 }
 
 /*
