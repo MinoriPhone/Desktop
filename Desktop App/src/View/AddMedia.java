@@ -353,7 +353,7 @@ public final class AddMedia extends JDialog {
      */
     public void removeItem(MediaItem mediaItem, int row) {
         this.addedItems.remove(mediaItem);
-
+        
         // Remove from table
         removeMediaItemFromTable(row);
     }
@@ -508,6 +508,7 @@ public final class AddMedia extends JDialog {
         lRouteName = new javax.swing.JLabel();
         tfRouteName = new javax.swing.JTextField();
         bAddText = new javax.swing.JButton();
+        bDeleteItem = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -532,6 +533,7 @@ public final class AddMedia extends JDialog {
 
         tfLinkName.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
 
+        bSave.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         bSave.setText("Save");
         bSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -561,10 +563,19 @@ public final class AddMedia extends JDialog {
         tfRouteName.setPreferredSize(new java.awt.Dimension(0, 40));
         pRouteName.add(tfRouteName, java.awt.BorderLayout.CENTER);
 
+        bAddText.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         bAddText.setText("Create text");
         bAddText.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bAddTextActionPerformed(evt);
+            }
+        });
+
+        bDeleteItem.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        bDeleteItem.setText("Delete media");
+        bDeleteItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bDeleteItemActionPerformed(evt);
             }
         });
 
@@ -583,6 +594,7 @@ public final class AddMedia extends JDialog {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(lSpaceTop, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(pRouteName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(pMainLayout.createSequentialGroup()
                                 .add(6, 6, 6)
                                 .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
@@ -591,17 +603,21 @@ public final class AddMedia extends JDialog {
                                     .add(lLinkName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .add(lRoute, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
+                                .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(pAddedMedia, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .add(tfLinkName)
+                                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
+                                    .add(org.jdesktop.layout.GroupLayout.TRAILING, pMainLayout.createSequentialGroup()
+                                        .add(0, 0, Short.MAX_VALUE)
+                                        .add(bAddText, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 102, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                                     .add(pMainLayout.createSequentialGroup()
                                         .add(bBrowse)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(bAddText))
-                                    .add(org.jdesktop.layout.GroupLayout.TRAILING, bSave)
-                                    .add(tfLinkName))
-                                .add(0, 0, Short.MAX_VALUE))
-                            .add(pRouteName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .add(18, 18, 18)
+                                        .add(bDeleteItem)
+                                        .add(0, 0, Short.MAX_VALUE))))
+                            .add(pMainLayout.createSequentialGroup()
+                                .add(0, 0, Short.MAX_VALUE)
+                                .add(bSave)))
                         .add(47, 47, 47))))
         );
         pMainLayout.setVerticalGroup(
@@ -611,9 +627,6 @@ public final class AddMedia extends JDialog {
                 .add(lTitle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 50, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(pMainLayout.createSequentialGroup()
-                        .add(lSpaceLeft, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(26, 26, 26))
                     .add(pMainLayout.createSequentialGroup()
                         .add(lSpaceTop, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -625,24 +638,31 @@ public final class AddMedia extends JDialog {
                         .add(18, 18, 18)
                         .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(lRoute)
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 101, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(18, 18, Short.MAX_VALUE)
-                        .add(pAddedMedia, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 161, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 93, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                             .add(pMainLayout.createSequentialGroup()
-                                .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(lSpaceMediaUp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 13, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                        .add(bBrowse, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                        .add(bAddText, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(lSpaceMediaUp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 13, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .add(lSpaceMediaDown, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, pMainLayout.createSequentialGroup()
-                                .add(0, 53, Short.MAX_VALUE)
-                                .add(bSave, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .add(18, 18, 18)))
-                        .addContainerGap())))
+                            .add(pMainLayout.createSequentialGroup()
+                                .add(30, 30, 30)
+                                .add(bAddText)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pAddedMedia, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 169, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                                    .add(bBrowse)
+                                    .add(bDeleteItem))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 56, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .add(pMainLayout.createSequentialGroup()
+                        .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(pMainLayout.createSequentialGroup()
+                                .add(0, 0, Short.MAX_VALUE)
+                                .add(bSave, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 37, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(lSpaceLeft, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .add(26, 26, 26))))
         );
 
         getContentPane().add(pMain, java.awt.BorderLayout.CENTER);
@@ -785,6 +805,7 @@ public final class AddMedia extends JDialog {
                 // Close this window and bring main window to the front
                 super.toFront();
                 this.dispose();
+
             } // User did NOT give this Link a name
             else {
                 JOptionPane.showMessageDialog(null,
@@ -802,9 +823,35 @@ public final class AddMedia extends JDialog {
         CreateText textDialog = new CreateText(this);
         textDialog.setVisible(true);
     }//GEN-LAST:event_bAddTextActionPerformed
+
+    private void bDeleteItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDeleteItemActionPerformed
+        /* Delete selected media item that is previously added */
+        
+        // Get selected row
+        int row = tAddedMedia.getSelectedRow();
+        
+        // If a row is selected
+        if (row > -1) {
+            
+            // Get clicked MediaItem (row)
+            MediaItem item = getAddedItemByFilenameAndAbsPath(
+                    String.valueOf(this.tAddedMedia.getModel().getValueAt(this.tAddedMedia.getSelectedRow(), 1)),
+                    String.valueOf(this.tAddedMedia.getModel().getValueAt(this.tAddedMedia.getSelectedRow(), 0)));
+            
+            // and remove from table and added media item list
+            this.removeItem(item, row);
+
+        } else {
+            JOptionPane.showMessageDialog(null,
+                    "You must select a media item (row)!", // message
+                    "Info", // title
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_bDeleteItemActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bAddText;
     private javax.swing.JButton bBrowse;
+    private javax.swing.JButton bDeleteItem;
     private javax.swing.JButton bSave;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lLinkName;
