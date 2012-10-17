@@ -76,11 +76,13 @@ public class CreateText extends javax.swing.JDialog {
         this.currentFontSize = 11;
         this.currentFontColor = Color.BLACK;
 
-        // Apply standard font variables to document
-        applyNewStyle();
-
         // Setup choosable font properties
         setupChoosableFontProperties();
+        
+        // Set standard font, style and size
+        this.cbFonts.setSelectedItem(this.currentFont);
+        this.cbFontStyle.setSelectedItem(this.currentFontStyle);
+        this.cbFontSize.setSelectedItem(this.currentFontSize);
     }
 
     /**
@@ -104,12 +106,13 @@ public class CreateText extends javax.swing.JDialog {
         this.cbFontStyle.addItem("Plain");
         this.cbFontStyle.addItem("Bold");
         this.cbFontStyle.addItem("Italic");
-        this.cbFontStyle.addItem("Bold Italic");
+        this.cbFontStyle.setEditable(false);
 
         // Add Font sizes
         for (int size = 8; size <= 72; size++) {
             this.cbFontSize.addItem(size);
         }
+        this.cbFontSize.setEditable(false);
     }
 
     /* DO NOT TOUCH */
@@ -300,8 +303,6 @@ public class CreateText extends javax.swing.JDialog {
             this.currentFontStyle = Font.BOLD;
         } else if ("Italic".equals(style)) {
             this.currentFontStyle = Font.ITALIC;
-        } else if ("Bold Italic".equals(style)) {
-            this.currentFontStyle = Font.BOLD | Font.ITALIC;
         }
 
         // Apply new font variables to document
@@ -377,7 +378,6 @@ public class CreateText extends javax.swing.JDialog {
      * Apply style to document
      */
     private void applyNewStyle() {
-//        try {
         // Remove old style
         this.context.removeStyle(this.docStyle);
 

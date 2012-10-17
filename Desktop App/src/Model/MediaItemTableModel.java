@@ -7,7 +7,7 @@ public class MediaItemTableModel extends AbstractTableModel {
 
     // Variables
     private ArrayList<MediaItem> mediaItemList;
-    private String[] headerList = {"Absolute path to file", "Filename and type", "Duration in seconds"};
+    private String[] headerList = {"Absolute path", "Filename", "Duration"};
     private Class[] classes = {String.class, String.class, Integer.class};
 
     /**
