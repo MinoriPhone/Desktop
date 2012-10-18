@@ -55,7 +55,7 @@ public interface MediaItem {
 
     /**
      * Get the shortcut Link
-     * 
+     *
      * @return true if it is a shortcut
      */
     public Link getShortcut();
@@ -65,4 +65,8 @@ public interface MediaItem {
      *
      */
     public String printXML(boolean XMLProject);
+
+    public Boolean isCorrupt();
+    
+    public void setCorrupt(Boolean corrupt);
 }

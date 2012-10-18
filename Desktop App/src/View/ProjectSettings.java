@@ -67,7 +67,6 @@ public class ProjectSettings extends javax.swing.JFrame {
         bSave = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
         setResizable(false);
 
         lTitle.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -158,6 +157,8 @@ public class ProjectSettings extends javax.swing.JFrame {
         } else {
             main.setTitle(tfStoryName.getText() + " - iStory designer " + Application.getVersion());
         }
+        // Refresh the routes panel
+        main.getPanelRoutes().refreshList(map.getStory().getRoutes());
         dispose();
 
     }//GEN-LAST:event_bSaveActionPerformed

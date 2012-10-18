@@ -12,6 +12,7 @@ public class Image implements MediaItem {
     private String absPath;
     private int showDurationInSeconds;
     private Link shortcut;
+    private Boolean isCorrupt;
 
     /**
      * Constructor
@@ -32,6 +33,7 @@ public class Image implements MediaItem {
         this.absPath = absPath;
         this.setShowDurationInSeconds(showDurationInSeconds);
         this.shortcut = null;
+        this.isCorrupt = false;
     }
 
     /**
@@ -126,5 +128,15 @@ public class Image implements MediaItem {
     @Override
     public Link getShortcut() {
         return this.shortcut;
+    }
+
+    @Override
+    public Boolean isCorrupt() {
+        return this.isCorrupt;
+    }
+
+    @Override
+    public void setCorrupt(Boolean corrupt) {
+        this.isCorrupt = corrupt;
     }
 }
