@@ -224,15 +224,6 @@ public class Map extends JPanel {
      */
     public void setButtonNodeClicked(boolean buttonNodeClicked) {
         this.buttonNodeClicked = buttonNodeClicked;
-        if (buttonNodeClicked) {
-            /*Toolkit tk = Toolkit.getDefaultToolkit();
-             try {
-             mapViewer.setCursor(tk.createCustomCursor(ImageIO.read(this.getClass().getResourceAsStream("../View/Images/waypoint_white.png")), new Point(0, 0), "MyCursor"));
-                
-             } catch (IOException ex) {
-             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-             }*/
-        }
     }
 
     /**

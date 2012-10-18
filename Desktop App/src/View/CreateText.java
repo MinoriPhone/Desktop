@@ -1,5 +1,6 @@
 package View;
 
+import Model.ExtensionFileFilter;
 import Model.Filename;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -13,9 +14,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipOutputStream;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
@@ -71,14 +74,12 @@ public class CreateText extends javax.swing.JDialog {
         this.setLocation(x, y);
 
         // Initialize standard font variables
-        this.currentFont = "Arial";
         this.currentFontStyle = Font.PLAIN;
-        this.currentFontSize = 11;
         this.currentFontColor = Color.BLACK;
 
         // Setup choosable font properties
         setupChoosableFontProperties();
-        
+
         // Set standard font, style and size
         this.cbFonts.setSelectedItem(this.currentFont);
         this.cbFontStyle.setSelectedItem(this.currentFontStyle);
@@ -99,6 +100,9 @@ public class CreateText extends javax.swing.JDialog {
         // Add Fonts
         for (String font : fontNames) {
             this.cbFonts.addItem(font);
+            if (font.equals("Arial")) {
+                this.currentFont = font;
+            }
         }
         this.cbFonts.setEditable(false);
 
@@ -111,6 +115,9 @@ public class CreateText extends javax.swing.JDialog {
         // Add Font sizes
         for (int size = 8; size <= 72; size++) {
             this.cbFontSize.addItem(size);
+            if (size == 14) {
+                this.currentFontSize = size;
+            }
         }
         this.cbFontSize.setEditable(false);
     }
@@ -399,11 +406,13 @@ public class CreateText extends javax.swing.JDialog {
      * Export style document to html
      */
     private void exportToHTML() {
-
         // Prompt save dialog
         JFileChooser chooser = new JFileChooser();
         chooser.setMultiSelectionEnabled(false);
 
+        chooser.addChoosableFileFilter(new ExtensionFileFilter(
+                new String[]{".html"}, // Extensions we accept
+                "HTML files (*.html)"));
         // Catch action of the File Chooser Dialog Window
         int option = chooser.showSaveDialog(this);
 
@@ -414,15 +423,45 @@ public class CreateText extends javax.swing.JDialog {
             BufferedOutputStream out = null;
 
             try {
-                // Get style document
-                StyledDocument doc = (StyledDocument) this.textPane.getDocument();
-
+                
                 // Create kit to export
                 HTMLEditorKit kit = new HTMLEditorKit();
-
+                
+                String filePath = chooser.getSelectedFile().getAbsolutePath();
                 // Create .html
-                String filePath = chooser.getSelectedFile().getAbsolutePath() + ".html";
-                out = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
+                // Add ".html  at the end of the string (only if it doesn't exist)
+                if (!filePath.endsWith(".html")) {
+                    filePath += ".html";
+                }
+                // Check if the iStory file already exists
+                File HTMLFile = new File(filePath);
+                if (!HTMLFile.isFile()) {
+                    out = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
+                } else {
+                    // Confirm the save
+                    int confirmoption = JOptionPane.showConfirmDialog(null,
+                            "There is already a file with the same name in the selected folder. \n "
+                            + "Do you want to overwrite this file?",
+                            "File already exists",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (confirmoption == JOptionPane.YES_OPTION) {
+                        File deletedFile = new File(filePath);
+                        deletedFile.delete();
+                        out = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
+                    } else if (confirmoption == JOptionPane.NO_OPTION) {
+                        exportToHTML();
+                        return;
+                    } else if (confirmoption == JOptionPane.CANCEL_OPTION || option == JOptionPane.CLOSED_OPTION) {
+                        exportToHTML();
+                        return;
+                    }
+                }
+                // Get style document
+                StyledDocument doc = (StyledDocument) this.textPane.getDocument();
+                String UnescapedText = doc.getText(0, doc.getLength());
+                doc.remove(0, doc.getLength());
+                doc.insertString(0, escapeHTML(UnescapedText), currentDocumentStyle);
+                
                 kit.write(out, doc, doc.getStartPosition().getOffset(), doc.getLength());
                 out.close();
 
@@ -434,12 +473,12 @@ public class CreateText extends javax.swing.JDialog {
                 // Get absolute path to the file (so path without filename and extension)
                 String abspath = filePath.substring(0, filePath.length() - fileName.length() - extension.length() - 1);
 
+                // Close this screen
+                this.parent.setVisible(true);
+                this.dispose();
+                
                 // Return parameters for creating Text Item
                 this.parent.addTextMediaItemToList(fileName + "." + extension, abspath);
-
-                // Close this screen
-                parent.setVisible(true);
-                this.dispose();
 
             } catch (IOException ex) {
                 Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
@@ -448,4 +487,33 @@ public class CreateText extends javax.swing.JDialog {
             }
         }
     }
+    
+    public static String escapeHTML(String s) {
+    StringBuilder sb = new StringBuilder();
+    int n = s.length();
+    for (int i = 0; i < n; i++) {
+      char c = s.charAt(i);
+      switch (c) {
+      case '<':
+        sb.append("&lt;");
+        break;
+      case '>':
+        sb.append("&gt;");
+        break;
+      case '&':
+        sb.append("&amp;");
+        break;
+      case '\"':
+        sb.append("&quot;");
+        break;
+      case ' ':
+        sb.append("&nbsp;");
+        break;
+      default:
+        sb.append(c);
+        break;
+      }
+    }
+    return sb.toString();
+  }
 }
