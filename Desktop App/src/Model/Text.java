@@ -31,7 +31,7 @@ public class Text implements MediaItem {
     public Text(String fileName, String absPath, int showDurationInSeconds) {
         this.fileName = fileName;
         this.absPath = absPath;
-        this.showDurationInSeconds = showDurationInSeconds;
+        this.setShowDurationInSeconds(showDurationInSeconds);
         this.shortcut = null;
         this.isCorrupt = false;
     }

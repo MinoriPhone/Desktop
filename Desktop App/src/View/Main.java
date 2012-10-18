@@ -812,7 +812,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
                 String fileName = j.getSelectedFile().toString();
 
-                // Add ".iStory  at the end of the string (only if it not exists)
+                // Add ".iStory  at the end of the string (only if it doesn't exist)
                 if (!fileName.endsWith(".iStory")) {
                     fileName += ".iStory";
                 }

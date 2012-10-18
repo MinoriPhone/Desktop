@@ -155,9 +155,9 @@ public final class AddMedia extends JDialog {
                     // that the created link (drawing) will be deleted.
                     Object[] options = {"Close", "Cancel"};
                     int n = JOptionPane.showOptionDialog(null,
-                            "By pressing 'Close' the Link will be deleted and" + "\n"
-                            + "nothing will be saved. Otherwise press 'Cancel'.", // message
-                            "Deleted created Link", // title
+                            "By pressing 'Close' the changes will be discarded." + "\n"
+                            + "Otherwise press 'Cancel'.", // message
+                            "Discard changes", // title
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE,
                             null, // do not use a custom Icon
