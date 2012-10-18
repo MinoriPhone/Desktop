@@ -12,7 +12,8 @@ public class Text implements MediaItem {
     private String absPath;
     private int showDurationInSeconds;
     private Link shortcut;
- 
+    private Boolean isCorrupt;
+
     /**
      * Constructor
      */
@@ -32,6 +33,7 @@ public class Text implements MediaItem {
         this.absPath = absPath;
         this.showDurationInSeconds = showDurationInSeconds;
         this.shortcut = null;
+        this.isCorrupt = false;
     }
 
     /**
@@ -81,7 +83,7 @@ public class Text implements MediaItem {
     @Override
     public String printXML(boolean XMLProject) {
         String XMLString = "";
-        XMLString += "<message>\r\n";
+        XMLString += "<text>\r\n";
 
         if (shortcut != null) {
             XMLString += "<shortcut>" + this.shortcut.getId() + "</shortcut>\r\n";
@@ -95,7 +97,7 @@ public class Text implements MediaItem {
         }
 
         XMLString += "<duration>" + this.showDurationInSeconds + "</duration>\r\n";
-        XMLString += "</message>\r\n";
+        XMLString += "</text>\r\n";
         return XMLString;
     }
 
@@ -127,5 +129,15 @@ public class Text implements MediaItem {
     @Override
     public Link getShortcut() {
         return this.shortcut;
+    }
+
+    @Override
+    public Boolean isCorrupt() {
+        return this.isCorrupt;
+    }
+
+    @Override
+    public void setCorrupt(Boolean corrupt) {
+        this.isCorrupt = corrupt;
     }
 }

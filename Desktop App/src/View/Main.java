@@ -45,6 +45,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * The Main screen of the application
@@ -416,7 +417,10 @@ public class Main extends JFrame implements PropertyChangeListener {
                     JOptionPane.YES_NO_CANCEL_OPTION);
 
             if (n == JOptionPane.YES_OPTION) {
-                saveStory();
+                // saveStory returns false if the user cancels
+                if (!saveStory()) {
+                    return;
+                }
             } else if (n == JOptionPane.CANCEL_OPTION) {
                 return;
             }
@@ -487,13 +491,46 @@ public class Main extends JFrame implements PropertyChangeListener {
                     } else if (strLine.contains("<text>")) {
                         tempMediaItem = new Text();
                     } else if (strLine.contains("<filename>") && strLine.contains("</filename>")) {
-                        File file = new File(strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
+                        final File file = new File(strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
                         //Check if file exists
                         if (file.exists()) {
                             tempMediaItem.setAbsolutePath(file.getPath().substring(0, file.getPath().length() - file.getName().length()));
                             tempMediaItem.setFileName(file.getName());
                         } else {
-                            System.err.println("file does not exist");
+
+                            // Browse for any corrupt file
+                            JFileChooser corruptFileChooser = new JFileChooser();
+                            corruptFileChooser.setDialogTitle("Find the corrupt file");
+                            corruptFileChooser.setFileFilter(new FileFilter() {
+                                @Override
+                                public boolean accept(File corruptFile) {
+                                    if (corruptFile.isDirectory()) {
+                                        return true;
+                                    } else if (file.getName().equals(corruptFile.getName())) {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+
+                                @Override
+                                public String getDescription() {
+                                    return file.getName();
+                                }
+                            });
+
+                            int corruptDialog = corruptFileChooser.showOpenDialog(this);
+
+                            // Catch actions of the File Chooser Dialog Window
+                            if (corruptDialog == JFileChooser.APPROVE_OPTION) {
+                                File newFile = corruptFileChooser.getSelectedFile();
+
+                                tempMediaItem.setAbsolutePath(newFile.getPath().substring(0, newFile.getPath().length() - newFile.getName().length()));
+                                tempMediaItem.setFileName(newFile.getName());
+                            } else if (corruptDialog == JFileChooser.CANCEL_OPTION) {
+                                tempMediaItem.setAbsolutePath(file.getPath().substring(0, file.getPath().length() - file.getName().length()));
+                                tempMediaItem.setFileName(file.getName());
+                                tempMediaItem.setCorrupt(true);
+                            }
                         }
                     } else if (strLine.contains("<duration>") && strLine.contains("</duration>")) {
                         tempMediaItem.setShowDurationInSeconds(Integer.parseInt(strLine.substring("<duration>".length(), strLine.length() - "</duration>".length())));
@@ -537,7 +574,10 @@ public class Main extends JFrame implements PropertyChangeListener {
                     JOptionPane.YES_NO_CANCEL_OPTION);
 
             if (n == JOptionPane.YES_OPTION) {
-                saveStory();
+                // saveStory returns false if the user cancels
+                if (!saveStory()) {
+                    return;
+                }
             } else if (n == JOptionPane.CANCEL_OPTION) {
                 return;
             }
@@ -545,10 +585,12 @@ public class Main extends JFrame implements PropertyChangeListener {
         String storyName = JOptionPane.showInputDialog("Name of the new story", defaultStoryName);
         if (storyName != null) {
             if (!storyName.equals("")) {
-                story = new Story(storyName, panelRoutes, this);
-                this.setTitle(storyName + " - iStory designer " + Application.getVersion());
+                story = new Story(storyName, panelRoutes, this);                
                 map.Clear(story);
+                panelRoutes.addStory(story);
                 panelRoutes.refreshList(story.getRoutes());
+                
+                this.setTitle(storyName + " - iStory designer " + Application.getVersion());
                 return;
             }
         }
@@ -556,6 +598,24 @@ public class Main extends JFrame implements PropertyChangeListener {
     }//GEN-LAST:event_miNewActionPerformed
 
     private void miImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miImportActionPerformed
+        // Check for changes, if so ask for confirm
+        if (story.isSomethingChanged()) {
+            // Show save confirm window
+            int n = JOptionPane.showConfirmDialog(null,
+                    "You made one or several changes to the current story.\n"
+                    + "Do you want to save this before importing a new one?\n",
+                    "Save?",
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+
+            if (n == JOptionPane.YES_OPTION) {
+                // saveStory returns false if the user cancels
+                if (!saveStory()) {
+                    return;
+                }
+            } else if (n == JOptionPane.CANCEL_OPTION) {
+                return;
+            }
+        }
         triggerProgressTask(TaskOptions.IMPORT);
     }//GEN-LAST:event_miImportActionPerformed
 
@@ -599,6 +659,10 @@ public class Main extends JFrame implements PropertyChangeListener {
      * @return boolean
      */
     private boolean saveStory() {
+
+        if (!checkForCorruptFiles()) {
+            return false;
+        }
 
         boolean XMLProject = true; // make a proj file
 
@@ -670,11 +734,62 @@ public class Main extends JFrame implements PropertyChangeListener {
     }
 
     /**
+     * Check if there are any corrupt mediaitems
+     *
+     * @return true if all the corrupt files were fixed / false if not
+     */
+    private Boolean checkForCorruptFiles() {
+
+        for (Link link : story.getAllLinks()) {
+            for (final MediaItem mediaItem : link.getMediaItems()) {
+
+                if (mediaItem.isCorrupt()) {
+                    // Browse for any corrupt file
+                    JFileChooser corruptFileChooser = new JFileChooser();
+                    corruptFileChooser.setDialogTitle("Find the corrupt file");
+                    corruptFileChooser.setFileFilter(new FileFilter() {
+                        @Override
+                        public boolean accept(File corruptFile) {
+                            if (corruptFile.isDirectory()) {
+                                return true;
+                            } else if (mediaItem.getFileName().equals(corruptFile.getName())) {
+                                return true;
+                            }
+                            return false;
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return mediaItem.getFileName();
+                        }
+                    });
+
+                    int corruptDialog = corruptFileChooser.showOpenDialog(this);
+
+                    // Catch actions of the File Chooser Dialog Window
+                    if (corruptDialog == JFileChooser.APPROVE_OPTION) {
+                        File corruptFile = corruptFileChooser.getSelectedFile();
+                        mediaItem.setAbsolutePath(corruptFile.getPath().substring(0, corruptFile.getPath().length() - corruptFile.getName().length()));
+                        mediaItem.setCorrupt(false);
+                    } else if (corruptDialog == JFileChooser.CANCEL_OPTION) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * TODO
      *
      * @return boolean
      */
     private boolean exportStory() {
+
+        if (!checkForCorruptFiles()) {
+            return false;
+        }
         float progress = 0f;
         boolean XMLProject = false; // make a proj file
 
@@ -779,7 +894,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                 // Get total of filesize
                 for (Link link : story.getAllLinks()) {
 
-                    for (MediaItem mediaItem : link.getMediaItems()) {
+                    for (final MediaItem mediaItem : link.getMediaItems()) {
                         File tempFile = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
 
                         // Check an add shortcuts for performance
@@ -806,12 +921,10 @@ public class Main extends JFrame implements PropertyChangeListener {
                         }
                     }
                 }
-
-                ///////////
-                // XML
-                ///////////
-
-                // Create an XML-file
+///////////
+// XML
+///////////
+// Create an XML-file
                 String filenameWithPath = fileName.replace(".iStory", "") + ".xml";
                 File XMLfile = new File(filenameWithPath);
                 String filename = j.getName(XMLfile);
@@ -907,8 +1020,12 @@ public class Main extends JFrame implements PropertyChangeListener {
                 // Set the changed to false to be able to close the program
                 story.setSomethingChanged(false);
                 return true;
+
+
             } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Main.class
+                        .getName()).log(Level.SEVERE, null, ex);
+
                 return false;
             }
         } else if (dialog == JFileChooser.CANCEL_OPTION) {
@@ -978,7 +1095,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                             return false;
                         }
                     }
-                }else if (dialog == JFileChooser.CANCEL_OPTION) {
+                } else if (dialog == JFileChooser.CANCEL_OPTION) {
                     return true;
                 }
                 folder.mkdir();
@@ -1076,8 +1193,6 @@ public class Main extends JFrame implements PropertyChangeListener {
                             if (file.exists()) {
                                 tempMediaItem.setAbsolutePath(file.getPath().substring(0, file.getPath().length() - file.getName().length()));
                                 tempMediaItem.setFileName(file.getName());
-                            } else {
-                                System.err.println("file does not exist");
                             }
                         } else if (strLine.contains("<duration>") && strLine.contains("</duration>")) {
                             tempMediaItem.setShowDurationInSeconds(Integer.parseInt(strLine.substring("<duration>".length(), strLine.length() - "</duration>".length())));
@@ -1106,8 +1221,12 @@ public class Main extends JFrame implements PropertyChangeListener {
 
 
                 return true;
+
+
             } catch (IOException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Main.class
+                        .getName()).log(Level.SEVERE, null, ex);
+
                 return false;
             }
         } else if (dialog == JFileChooser.CANCEL_OPTION) {
