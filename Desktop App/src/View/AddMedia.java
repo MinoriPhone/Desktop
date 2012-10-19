@@ -8,6 +8,8 @@ import Model.Route;
 import Model.Text;
 import Model.Video;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -34,7 +36,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 /**
  * Popup Window for adding media to a link
@@ -353,7 +357,7 @@ public final class AddMedia extends JDialog {
      */
     public void removeItem(MediaItem mediaItem, int row) {
         this.addedItems.remove(mediaItem);
-        
+
         // Remove from table
         removeMediaItemFromTable(row);
     }
@@ -438,6 +442,8 @@ public final class AddMedia extends JDialog {
         this.tAddedMedia.setDragEnabled(true);
         this.tAddedMedia.setTransferHandler(new TableTransferHandler());
 
+        this.tAddedMedia.setDefaultRenderer(Object.class, new MyTableCellRender());
+
         // Add JScrollPane to AddedMedia JPanel
         this.pAddedMedia.add(spAddedMedia, BorderLayout.CENTER);
 
@@ -483,6 +489,40 @@ public final class AddMedia extends JDialog {
      */
     private void removeMediaItemFromTable(int row) {
         this.tableModel.removeRow(row);
+    }
+
+    class MyTableCellRender extends DefaultTableCellRenderer {
+
+        public MyTableCellRender() {
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            MediaItem item = getAddedItemByFilenameAndAbsPath(String.valueOf(tAddedMedia.getModel().getValueAt(row, 1)), String.valueOf(tAddedMedia.getModel().getValueAt(row, 0)));
+            if (item.isCorrupt()) {
+                setForeground(Color.red);
+                if (isSelected) {
+                    setBackground(Color.lightGray);
+                } else {
+                    setBackground(Color.white);
+                }
+                setForeground(Color.red);
+            } else {
+                setForeground(Color.black);
+                if (isSelected) {
+                    setBackground(Color.LIGHT_GRAY);
+                } else {
+                    setBackground(Color.white);
+                }
+
+            }
+
+            setFocusable(true);
+
+            setText(value.toString());
+            return this;
+        }
     }
 
     /* DO NOT TOUCH */
@@ -826,18 +866,18 @@ public final class AddMedia extends JDialog {
 
     private void bDeleteItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDeleteItemActionPerformed
         /* Delete selected media item that is previously added */
-        
+
         // Get selected row
         int row = tAddedMedia.getSelectedRow();
-        
+
         // If a row is selected
         if (row > -1) {
-            
+
             // Get clicked MediaItem (row)
             MediaItem item = getAddedItemByFilenameAndAbsPath(
                     String.valueOf(this.tAddedMedia.getModel().getValueAt(this.tAddedMedia.getSelectedRow(), 1)),
                     String.valueOf(this.tAddedMedia.getModel().getValueAt(this.tAddedMedia.getSelectedRow(), 0)));
-            
+
             // and remove from table and added media item list
             this.removeItem(item, row);
 
