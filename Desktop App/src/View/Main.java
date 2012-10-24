@@ -585,11 +585,11 @@ public class Main extends JFrame implements PropertyChangeListener {
         String storyName = JOptionPane.showInputDialog("Name of the new story", defaultStoryName);
         if (storyName != null) {
             if (!storyName.equals("")) {
-                story = new Story(storyName, panelRoutes, this);                
+                story = new Story(storyName, panelRoutes, this);
                 map.Clear(story);
                 panelRoutes.addStory(story);
                 panelRoutes.refreshList(story.getRoutes());
-                
+
                 this.setTitle(storyName + " - iStory designer " + Application.getVersion());
                 return;
             }
@@ -660,7 +660,7 @@ public class Main extends JFrame implements PropertyChangeListener {
      */
     private boolean saveStory() {
 
-        if (!checkForCorruptFiles()) {
+        if (!verifyValidExport()) {
             return false;
         }
 
@@ -738,11 +738,23 @@ public class Main extends JFrame implements PropertyChangeListener {
      *
      * @return true if all the corrupt files were fixed / false if not
      */
-    private Boolean checkForCorruptFiles() {
+    private Boolean verifyValidExport() {
+
 
         for (Link link : story.getAllLinks()) {
+
+            // Check if there are any links with no media item
+            if (link.getMediaItems().isEmpty()) {
+                JOptionPane.showMessageDialog(null,
+                            "There are Links with no Media items. Add some media items or delete these links.",
+                            "No media items",
+                            JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
             for (final MediaItem mediaItem : link.getMediaItems()) {
 
+                // Check for corrupt items
                 if (mediaItem.isCorrupt()) {
                     // Browse for any corrupt file
                     JFileChooser corruptFileChooser = new JFileChooser();
@@ -787,9 +799,10 @@ public class Main extends JFrame implements PropertyChangeListener {
      */
     private boolean exportStory() {
 
-        if (!checkForCorruptFiles()) {
+        if (!verifyValidExport()) {
             return false;
         }
+
         float progress = 0f;
         boolean XMLProject = false; // make a proj file
 

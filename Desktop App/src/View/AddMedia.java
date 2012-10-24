@@ -726,6 +726,15 @@ public final class AddMedia extends JDialog {
             // Get selected MediaItem by path of the File that the user selected
             MediaItem mItem = f.getMediaItemFromFile(j.getSelectedFile().getAbsolutePath().toString());
 
+            // Show message dialog for .mov files
+            if (j.getSelectedFile().getName().endsWith(".mov")) {
+                
+                JOptionPane.showMessageDialog(null,
+                        "Note that files with in the .mov format are slower to load than other video formats.",
+                        ".mov files",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+            
             // Add selected file to list
             if (mItem != null) {
                 if (mItem instanceof Video) {
