@@ -13,6 +13,7 @@ import Model.Video;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -65,6 +66,8 @@ public class Main extends JFrame implements PropertyChangeListener {
     private final String defaultStoryName;
     private HashMap<MediaItem, Link> exportMediaItems;
     private DocumentStyleSettings dss;
+    private GraphicsEnvironment ge;
+    private String[] availableFonts;
 
     private enum TaskOptions {
 
@@ -129,8 +132,20 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         // Revalidate JPanels
         this.pack();
+
+
+        // Obtain Font info from the current graphics environment and get all font names
+        this.ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        this.availableFonts = ge.getAvailableFontFamilyNames();
     }
 
+    /**
+     * Get all available fonts
+     */
+    public String[] getAvailableFonts() {
+        return this.availableFonts;
+    }
+    
     private void checkChangeBeforeClose() {
         if (story.isSomethingChanged()) {
 
@@ -756,9 +771,9 @@ public class Main extends JFrame implements PropertyChangeListener {
             // Check if there are any links with no media item
             if (link.getMediaItems().isEmpty()) {
                 JOptionPane.showMessageDialog(null,
-                            "There are Links with no Media items. Add some media items or delete these links.",
-                            "No media items",
-                            JOptionPane.ERROR_MESSAGE);
+                        "There are Links with no Media items. Add some media items or delete these links.",
+                        "No media items",
+                        JOptionPane.ERROR_MESSAGE);
                 return false;
             }
 

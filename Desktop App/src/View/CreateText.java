@@ -605,11 +605,8 @@ public class CreateText extends JDialog implements PropertyChangeListener {
      */
     private boolean loadFonts() {
         try {
-            // Obtain Font info from the current graphics environment
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-
             // Get an array of all font names
-            String[] fontNames = ge.getAvailableFontFamilyNames();
+            String[] fontNames = parent.getParentView().getAvailableFonts();
 
             // Calculate 1% of font loading
             float onePercent = 99f / (fontNames.length);
@@ -619,17 +616,13 @@ public class CreateText extends JDialog implements PropertyChangeListener {
             for (String font : fontNames) {
 
                 this.cbFonts.addItem(font);
-
-                // Set standard font from project settings
-                if (font.equals(this.dss.getCurrentFont())) {
-                    this.cbFonts.setSelectedItem(font);
-                }
+                this.cbFonts.setSelectedItem(font);
 
                 // Set font loading progression and name of font we are loading
                 loadingFont = font;
                 progress += onePercent;
                 task.setProgression((int) Math.floor(Math.min(progress, 99)));
-                
+
                 // Show progess
                 Thread.sleep(10);
             }
@@ -639,6 +632,7 @@ public class CreateText extends JDialog implements PropertyChangeListener {
 
         // Done loading fonts
         task.setProgression(Math.min(100, 100));
+        this.cbFonts.setSelectedItem(this.dss.getCurrentFont());
         this.cbFonts.setEditable(false);
 
         return true;
