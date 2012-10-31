@@ -144,7 +144,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     public String[] getAvailableFonts() {
         return this.availableFonts;
     }
-    
+
     private void checkChangeBeforeClose() {
         if (story.isSomethingChanged()) {
 
@@ -475,6 +475,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                 //Read File Line By Line
                 ArrayList<Link> tempLink = new ArrayList<Link>();
                 ArrayList<Link> addedLinks = new ArrayList<Link>();
+                ArrayList<Node> addedNodes = new ArrayList<Node>();
                 double tempLong = 0.0;
                 double tempLat = 0.0;
                 double tempRad = 0.0;
@@ -509,10 +510,19 @@ public class Main extends JFrame implements PropertyChangeListener {
                     } else if (strLine.contains("</from>")) {
                         tempLink.get(tempLink.size() - 1).setP1(tempLink.get(tempLink.size() - 2).getP2());
                     } else if (strLine.contains("</to>")) {
-                        Node nod = new Node(tempLat, tempLong);
-                        nod.setRadius(tempRad);
+                        Node nod = null;
+                        for (Node node : addedNodes) {
+                            if (node.getPosition().getLatitude() == tempLat && node.getPosition().getLongitude() == tempLong) {
+                                nod = node;
+                            }
+                        }
+                        if (nod == null) {
+                            nod = new Node(tempLat, tempLong);
+                            nod.setRadius(tempRad);
+                            map.addNode(nod);
+                            addedNodes.add(nod);
+                        }
                         tempLink.get(tempLink.size() - 1).setP2(nod);
-                        map.addNode(nod);
                     } else if (strLine.contains("<video>")) {
                         tempMediaItem = new Video();
                     } else if (strLine.contains("<image>")) {
@@ -583,6 +593,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                         tempLink.remove(tempLink.size() - 1);
                     } else if (strLine.contains("</node>")) {
                         Node nod = new Node(tempLat, tempLong);
+                        nod.setRadius(tempRad);
                         map.addNode(nod);
                     }
                 }
@@ -1207,6 +1218,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                     //Read File Line By Line
                     ArrayList<Link> tempLink = new ArrayList<Link>();
                     ArrayList<Link> addedLinks = new ArrayList<Link>();
+                    ArrayList<Node> addedNodes = new ArrayList<Node>();
                     double tempLong = 0.0;
                     double tempLat = 0.0;
                     double tempRad = 0.0;
@@ -1243,10 +1255,19 @@ public class Main extends JFrame implements PropertyChangeListener {
                         } else if (strLine.contains("</from>")) {
                             tempLink.get(tempLink.size() - 1).setP1(tempLink.get(tempLink.size() - 2).getP2());
                         } else if (strLine.contains("</to>")) {
-                            Node nod = new Node(tempLat, tempLong);
-                            nod.setRadius(tempRad);
+                            Node nod = null;
+                            for (Node node : addedNodes) {
+                                if (node.getPosition().getLatitude() == tempLat && node.getPosition().getLongitude() == tempLong) {
+                                    nod = node;
+                                }
+                            }
+                            if (nod == null) {
+                                nod = new Node(tempLat, tempLong);
+                                nod.setRadius(tempRad);
+                                map.addNode(nod);
+                                addedNodes.add(nod);
+                            }
                             tempLink.get(tempLink.size() - 1).setP2(nod);
-                            map.addNode(nod);
                         } else if (strLine.contains("<video>")) {
                             tempMediaItem = new Video();
                         } else if (strLine.contains("<image>")) {
@@ -1289,6 +1310,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                             tempLink.remove(tempLink.size() - 1);
                         } else if (strLine.contains("</node>")) {
                             Node nod = new Node(tempLat, tempLong);
+                            nod.setRadius(tempRad);
                             map.addNode(nod);
                         }
                     }

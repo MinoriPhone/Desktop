@@ -66,7 +66,7 @@ public interface MediaItem {
      */
     public String printXML(boolean XMLProject);
 
-    public Boolean isCorrupt();
+    public boolean isCorrupt();
     
-    public void setCorrupt(Boolean corrupt);
+    public void setCorrupt(boolean corrupt);
 }

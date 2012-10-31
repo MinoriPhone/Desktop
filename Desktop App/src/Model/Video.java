@@ -12,7 +12,7 @@ public class Video implements MediaItem {
     private String absPath;
     private int showDurationInSeconds = -1;
     private Link shortcut;
-    private Boolean isCorrupt;
+    private boolean isCorrupt;
 
     /**
      * Constructor
@@ -121,12 +121,12 @@ public class Video implements MediaItem {
     }
     
     @Override
-    public Boolean isCorrupt() {
+    public boolean isCorrupt() {
         return this.isCorrupt;
     }    
 
     @Override
-    public void setCorrupt(Boolean corrupt) {
+    public void setCorrupt(boolean corrupt) {
         this.isCorrupt = corrupt;
     }
 }
