@@ -1,5 +1,6 @@
 package View;
 
+import Model.DocumentStyleSettings;
 import Model.ExtensionFileFilter;
 import Model.Filename;
 import java.awt.BorderLayout;
@@ -8,19 +9,23 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipOutputStream;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
@@ -29,7 +34,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-public class CreateText extends javax.swing.JDialog {
+public class CreateText extends JDialog implements PropertyChangeListener {
 
     // Variables
     private AddMedia parent;
@@ -43,6 +48,11 @@ public class CreateText extends javax.swing.JDialog {
     private int currentFontStyle;
     private int currentFontSize;
     private Color currentFontColor;
+    private Color currentBackgroundColor;
+    private DocumentStyleSettings dss;
+    private ProgressMonitor progressMonitor;
+    private CreateText.Task task;
+    private String loadingFont;
 
     /**
      * Creates new form CreateText
@@ -50,6 +60,7 @@ public class CreateText extends javax.swing.JDialog {
     public CreateText(AddMedia parent) {
         super(parent, true);
         this.parent = parent;
+        this.dss = parent.getParentView().getDocumentStyleSettings();
 
         initComponents();
 
@@ -74,16 +85,14 @@ public class CreateText extends javax.swing.JDialog {
         this.setLocation(x, y);
 
         // Initialize standard font variables
-        this.currentFontStyle = Font.PLAIN;
-        this.currentFontColor = Color.BLACK;
+        this.currentFont = this.dss.getCurrentFont();
+        this.currentFontStyle = this.dss.getCurrentFontStyle();
+        this.currentFontSize = this.dss.getCurrentFontSize();
+        this.currentFontColor = this.dss.getCurrentFontColor();
+        this.currentBackgroundColor = this.dss.getCurrentBackgroundColor();
 
         // Setup choosable font properties
         setupChoosableFontProperties();
-
-        // Set standard font, style and size
-        this.cbFonts.setSelectedItem(this.currentFont);
-        this.cbFontStyle.setSelectedItem(this.currentFontStyle);
-        this.cbFontSize.setSelectedItem(this.currentFontSize);
     }
 
     /**
@@ -91,32 +100,23 @@ public class CreateText extends javax.swing.JDialog {
      */
     private void setupChoosableFontProperties() {
 
-        // Obtain Font info from the current graphics environment
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-
-        // Get an array of all font names
-        String[] fontNames = ge.getAvailableFontFamilyNames();
-
-        // Add Fonts
-        for (String font : fontNames) {
-            this.cbFonts.addItem(font);
-            if (font.equals("Arial")) {
-                this.currentFont = font;
-            }
-        }
-        this.cbFonts.setEditable(false);
+        // Load fonts and add them to the combobox 'cbFonts'
+        triggerLoadFonts();
 
         // Add Font styles
         this.cbFontStyle.addItem("Plain");
         this.cbFontStyle.addItem("Bold");
         this.cbFontStyle.addItem("Italic");
+        this.cbFontStyle.setSelectedItem(this.dss.getCurrentFontStyle());
         this.cbFontStyle.setEditable(false);
 
         // Add Font sizes
         for (int size = 8; size <= 72; size++) {
             this.cbFontSize.addItem(size);
-            if (size == 14) {
-                this.currentFontSize = size;
+
+            // Set standard font size from project settings
+            if (size == this.dss.getCurrentFontSize()) {
+                this.cbFontSize.setSelectedItem(size);
             }
         }
         this.cbFontSize.setEditable(false);
@@ -130,6 +130,7 @@ public class CreateText extends javax.swing.JDialog {
         pMain = new javax.swing.JPanel();
         pNorth = new javax.swing.JPanel();
         lTitle = new javax.swing.JLabel();
+        pWest = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         cbFonts = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
@@ -137,9 +138,11 @@ public class CreateText extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         cbFontSize = new javax.swing.JComboBox();
         bColorChooser = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        bBackgroundColorChooser = new javax.swing.JButton();
         pCenter = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         pDocument = new javax.swing.JPanel();
         bSave = new javax.swing.JButton();
@@ -151,6 +154,22 @@ public class CreateText extends javax.swing.JDialog {
         lTitle.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lTitle.setText("Create text file");
+
+        org.jdesktop.layout.GroupLayout pNorthLayout = new org.jdesktop.layout.GroupLayout(pNorth);
+        pNorth.setLayout(pNorthLayout);
+        pNorthLayout.setHorizontalGroup(
+            pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(lTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 872, Short.MAX_VALUE)
+        );
+        pNorthLayout.setVerticalGroup(
+            pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(pNorthLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(lTitle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE))
+        );
+
+        pMain.add(pNorth, java.awt.BorderLayout.PAGE_START);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -165,7 +184,7 @@ public class CreateText extends javax.swing.JDialog {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("Font style:");
+        jLabel2.setText("Style:");
 
         cbFontStyle.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         cbFontStyle.addActionListener(new java.awt.event.ActionListener() {
@@ -192,52 +211,83 @@ public class CreateText extends javax.swing.JDialog {
             }
         });
 
-        org.jdesktop.layout.GroupLayout pNorthLayout = new org.jdesktop.layout.GroupLayout(pNorth);
-        pNorth.setLayout(pNorthLayout);
-        pNorthLayout.setHorizontalGroup(
-            pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pNorthLayout.createSequentialGroup()
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel7.setText("Color:");
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel8.setText("Background color:");
+
+        bBackgroundColorChooser.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/colorwheel.png"))); // NOI18N
+        bBackgroundColorChooser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bBackgroundColorChooserActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout pWestLayout = new org.jdesktop.layout.GroupLayout(pWest);
+        pWest.setLayout(pWestLayout);
+        pWestLayout.setHorizontalGroup(
+            pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(pWestLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(lTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(pNorthLayout.createSequentialGroup()
-                        .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 82, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(pWestLayout.createSequentialGroup()
+                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 140, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 140, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(pWestLayout.createSequentialGroup()
+                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(jLabel7, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jLabel8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 119, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 140, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 81, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 140, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 55, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(28, 28, 28)
-                        .add(bColorChooser)
-                        .add(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        pNorthLayout.setVerticalGroup(
-            pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(pNorthLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(lTitle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 28, Short.MAX_VALUE)
-                .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel2)
-                    .add(bColorChooser)
-                    .add(pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(jLabel1)
-                        .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(jLabel3)
-                        .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(bColorChooser)
+                            .add(bBackgroundColorChooser))))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
-        pNorthLayout.linkSize(new java.awt.Component[] {bColorChooser, cbFontSize, cbFontStyle, cbFonts, jLabel1, jLabel2, jLabel3}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        pWestLayout.linkSize(new java.awt.Component[] {cbFontStyle, cbFonts}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
-        pMain.add(pNorth, java.awt.BorderLayout.PAGE_START);
+        pWestLayout.linkSize(new java.awt.Component[] {jLabel1, jLabel2, jLabel3}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        pWestLayout.setVerticalGroup(
+            pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(pWestLayout.createSequentialGroup()
+                .add(61, 61, 61)
+                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel2))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel3)
+                    .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(39, 39, 39)
+                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(pWestLayout.createSequentialGroup()
+                        .add(jLabel8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(jLabel7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(bColorChooser)))
+                    .add(bBackgroundColorChooser))
+                .addContainerGap(217, Short.MAX_VALUE))
+        );
+
+        pWestLayout.linkSize(new java.awt.Component[] {bColorChooser, cbFontSize, cbFontStyle, cbFonts, jLabel1, jLabel2, jLabel3}, org.jdesktop.layout.GroupLayout.VERTICAL);
+
+        pMain.add(pWest, java.awt.BorderLayout.LINE_START);
 
         pDocument.setLayout(new java.awt.BorderLayout());
 
@@ -254,16 +304,18 @@ public class CreateText extends javax.swing.JDialog {
         pCenterLayout.setHorizontalGroup(
             pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, pCenterLayout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(pDocument, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 626, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 630, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(bSave))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(pCenterLayout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 630, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, pCenterLayout.createSequentialGroup()
+                        .add(8, 8, 8)
+                        .add(pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(pDocument, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 585, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(bSave))
+                        .add(43, 43, 43))))
         );
         pCenterLayout.setVerticalGroup(
             pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -273,12 +325,11 @@ public class CreateText extends javax.swing.JDialog {
                     .add(pCenterLayout.createSequentialGroup()
                         .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 15, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pDocument, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 357, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(pDocument, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(bSave)
-                        .add(0, 66, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .add(6, 6, 6))
+                    .add(jLabel4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -327,18 +378,32 @@ public class CreateText extends javax.swing.JDialog {
 
     private void bColorChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bColorChooserActionPerformed
         // Get selected font color
-        Color color = JColorChooser.showDialog(this, "Choose color", this.currentFontColor);
+        Color color = JColorChooser.showDialog(this, "Choose font color", this.currentFontColor);
 
         // Apply new font variables to document
-        this.currentFontColor = color;
-        applyNewStyle();
+        if (color != null) {
+            this.currentFontColor = color;
+            applyNewStyle();
+        }
     }//GEN-LAST:event_bColorChooserActionPerformed
 
     private void bSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveActionPerformed
         // Create document
         exportToHTML();
     }//GEN-LAST:event_bSaveActionPerformed
+
+    private void bBackgroundColorChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bBackgroundColorChooserActionPerformed
+        // Get selected background color
+        Color color = JColorChooser.showDialog(this, "Choose background color", this.currentBackgroundColor);
+
+        // Apply new font variables to document
+        if (color != null) {
+            this.currentBackgroundColor = color;
+            applyNewStyle();
+        }
+    }//GEN-LAST:event_bBackgroundColorChooserActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bBackgroundColorChooser;
     private javax.swing.JButton bColorChooser;
     private javax.swing.JButton bSave;
     private javax.swing.JComboBox cbFontSize;
@@ -348,13 +413,15 @@ public class CreateText extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel lTitle;
     private javax.swing.JPanel pCenter;
     private javax.swing.JPanel pDocument;
     private javax.swing.JPanel pMain;
     private javax.swing.JPanel pNorth;
+    private javax.swing.JPanel pWest;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -390,13 +457,12 @@ public class CreateText extends javax.swing.JDialog {
 
         // Create new style
         this.currentDocumentStyle = this.context.addStyle(this.docStyle, null);
-
-        // Setup attributes
         this.currentDocumentStyle.addAttribute(StyleConstants.FontFamily, this.currentFont);
         this.currentDocumentStyle.addAttribute(StyleConstants.Bold, isCurrentFontStyleBold());
         this.currentDocumentStyle.addAttribute(StyleConstants.Italic, isCurrentFontStyleItalic());
         this.currentDocumentStyle.addAttribute(StyleConstants.FontSize, this.currentFontSize);
         this.currentDocumentStyle.addAttribute(StyleConstants.Foreground, this.currentFontColor);
+        this.currentDocumentStyle.addAttribute(StyleConstants.Background, this.currentBackgroundColor); //TODO
 
         // Finally, apply the new style to the heading
         this.document.setParagraphAttributes(0, 1, this.currentDocumentStyle, false);
@@ -423,17 +489,19 @@ public class CreateText extends javax.swing.JDialog {
             BufferedOutputStream out = null;
 
             try {
-                
+
                 // Create kit to export
                 HTMLEditorKit kit = new HTMLEditorKit();
-                
+
+                // Get path
                 String filePath = chooser.getSelectedFile().getAbsolutePath();
-                // Create .html
+
                 // Add ".html  at the end of the string (only if it doesn't exist)
                 if (!filePath.endsWith(".html")) {
                     filePath += ".html";
                 }
-                // Check if the iStory file already exists
+
+                // Check if the html file already exists
                 File HTMLFile = new File(filePath);
                 if (!HTMLFile.isFile()) {
                     out = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
@@ -448,10 +516,7 @@ public class CreateText extends javax.swing.JDialog {
                         File deletedFile = new File(filePath);
                         deletedFile.delete();
                         out = new BufferedOutputStream(new FileOutputStream(new File(filePath)));
-                    } else if (confirmoption == JOptionPane.NO_OPTION) {
-                        exportToHTML();
-                        return;
-                    } else if (confirmoption == JOptionPane.CANCEL_OPTION || option == JOptionPane.CLOSED_OPTION) {
+                    } else {
                         exportToHTML();
                         return;
                     }
@@ -461,7 +526,7 @@ public class CreateText extends javax.swing.JDialog {
                 String UnescapedText = doc.getText(0, doc.getLength());
                 doc.remove(0, doc.getLength());
                 doc.insertString(0, escapeHTML(UnescapedText), currentDocumentStyle);
-                
+
                 kit.write(out, doc, doc.getStartPosition().getOffset(), doc.getLength());
                 out.close();
 
@@ -476,7 +541,7 @@ public class CreateText extends javax.swing.JDialog {
                 // Close this screen
                 this.parent.setVisible(true);
                 this.dispose();
-                
+
                 // Return parameters for creating Text Item
                 this.parent.addTextMediaItemToList(fileName + "." + extension, abspath);
 
@@ -487,33 +552,158 @@ public class CreateText extends javax.swing.JDialog {
             }
         }
     }
-    
+
+    /**
+     * Escape HTML string
+     *
+     * @param s String we want to escape
+     *
+     * @return String
+     */
     public static String escapeHTML(String s) {
-    StringBuilder sb = new StringBuilder();
-    int n = s.length();
-    for (int i = 0; i < n; i++) {
-      char c = s.charAt(i);
-      switch (c) {
-      case '<':
-        sb.append("&lt;");
-        break;
-      case '>':
-        sb.append("&gt;");
-        break;
-      case '&':
-        sb.append("&amp;");
-        break;
-      case '\"':
-        sb.append("&quot;");
-        break;
-      case ' ':
-        sb.append("&nbsp;");
-        break;
-      default:
-        sb.append(c);
-        break;
-      }
+        StringBuilder sb = new StringBuilder();
+        int n = s.length();
+        for (int i = 0; i < n; i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '\"':
+                    sb.append("&quot;");
+                    break;
+                case ' ':
+                    sb.append("&nbsp;");
+                    break;
+                default:
+                    sb.append(c);
+                    break;
+            }
+        }
+        return sb.toString();
     }
-    return sb.toString();
-  }
+
+    /**
+     * Trigger progress monitor and task to load fonts
+     */
+    private void triggerLoadFonts() {
+        progressMonitor = new ProgressMonitor(CreateText.this, "Loading fonts", "", 0, 100);
+        progressMonitor.setProgress(0);
+        task = new CreateText.Task();
+        task.addPropertyChangeListener(this);
+        task.execute();
+    }
+
+    /**
+     * Loading fonts
+     */
+    private boolean loadFonts() {
+
+        // Obtain Font info from the current graphics environment
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        // Get an array of all font names
+        String[] fontNames = ge.getAvailableFontFamilyNames();
+
+        // Calculate 1% of font loading
+        float onePercent = (fontNames.length) / 100;
+        float progress = 0f;
+        
+        // Add Fonts
+        for (String font : fontNames) {
+            this.cbFonts.addItem(font);
+
+            // Set standard font from project settings
+            if (font.equals(this.dss.getCurrentFont())) {
+                this.cbFonts.setSelectedItem(font);
+            }
+            
+            // Set font loading progression and name of font we are loading
+            loadingFont = font;
+            progress += onePercent;
+            task.setProgression((int) Math.floor(Math.min(progress, 99)));
+        }
+        
+        // Done loading fonts
+        task.setProgression(Math.min(100, 100));
+        this.cbFonts.setEditable(false);
+        
+        return true;
+    }
+
+    /**
+     * Progressbar for exporting a story
+     */
+    class Task extends SwingWorker<Void, Void> {
+
+        /**
+         * Set progress
+         *
+         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
+         * final protected.
+         *
+         * @param progress int current progress
+         */
+        public void setProgression(int progress) {
+            this.setProgress(progress);
+        }
+
+        /**
+         * Load fonts
+         *
+         * @return null
+         */
+        @Override
+        public Void doInBackground() {
+            loadFonts();
+            return null;
+        }
+
+        /**
+         * This function is called when loading fonts progress is done
+         */
+        @Override
+        public void done() {
+
+            // Loading fonts is canceled by user
+            if (progressMonitor.isCanceled()) {
+                JOptionPane.showMessageDialog(
+                        CreateText.this,
+                        "Loading fonts canceled by user!",
+                        "Canceled",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+    /**
+     * Invoked when task's progress property changes.
+     *
+     * @param pce PropertyChangeEvent
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent pce) {
+        if ("progress".equals(pce.getPropertyName())) {
+
+            // Get new progress value
+            int progress = (Integer) pce.getNewValue();
+
+            // Show progress to user
+            progressMonitor.setProgress(progress);
+            progressMonitor.setNote(String.format("<html><b>Completed %d%%.</b> <br /><br /> %s<br /></html>", progress, loadingFont));
+
+            // If user cancels the font loading
+            if (progressMonitor.isCanceled()) {
+                task.cancel(true);
+                progressMonitor.setProgress(0);
+                // Task.done() is called
+            }
+        }
+    }
 }

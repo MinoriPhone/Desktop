@@ -1,6 +1,7 @@
 package View;
 
 import Model.Application;
+import Model.DocumentStyleSettings;
 import Model.ExtensionFileFilter;
 import Model.Image;
 import Model.Link;
@@ -63,6 +64,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     private String currentMediaItemName;
     private final String defaultStoryName;
     private HashMap<MediaItem, Link> exportMediaItems;
+    private DocumentStyleSettings dss;
 
     private enum TaskOptions {
 
@@ -74,6 +76,7 @@ public class Main extends JFrame implements PropertyChangeListener {
      */
     public Main() {
         initComponents();
+
         // Get the size of the screen
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension dim = tk.getScreenSize();
@@ -120,6 +123,9 @@ public class Main extends JFrame implements PropertyChangeListener {
                 checkChangeBeforeClose();
             }
         });
+
+        // Get document style settings
+        this.dss = new DocumentStyleSettings();
 
         // Revalidate JPanels
         this.pack();
@@ -175,6 +181,10 @@ public class Main extends JFrame implements PropertyChangeListener {
 
     public Routes getPanelRoutes() {
         return panelRoutes;
+    }
+
+    public DocumentStyleSettings getDocumentStyleSettings() {
+        return this.dss;
     }
 
     /* DO NOT TOUCH */

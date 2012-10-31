@@ -19,7 +19,6 @@ public class Link {
     private ArrayList<MediaItem> mediaItems;
     private Color color;
     private long id;
-    private Link twin;
 
     /**
      * Constructor
@@ -121,24 +120,6 @@ public class Link {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    /**
-     * Get the twin of the Link
-     *
-     * @return Link
-     */
-    public Link getTwin() {
-        return twin;
-    }
-
-    /**
-     * Set the twin of the Link
-     *
-     * @param twin Link
-     */
-    public void setTwin(Link twin) {
-        this.twin = twin;
     }
 
     /**
@@ -260,8 +241,16 @@ public class Link {
      * @return
      */
     public ArrayList<Link> getPrevLinksForNode(Node node, ArrayList<Link> prevLinks) {
-        if (this.getP2().equals(node)) {
-            prevLinks.add(this);
+        boolean found = false;
+        if (this.getP2() == node) {
+            for (Link link : prevLinks) {
+                if (link == this) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                prevLinks.add(this);
+            }
         }
         for (Link currentLink : links) {
             prevLinks = currentLink.getPrevLinksForNode(node, prevLinks);
@@ -393,31 +382,22 @@ public class Link {
      *
      * @return the id
      */
-    public Link getParentFromLink(Link link, Link parent) {
-        if (this.equals(link)) {
-            return parent;
-        } else {
-            for (Link currentLink : links) {
-                return currentLink.getParentFromLink(link, this);
+    public ArrayList<Link> getParentsFromLink(ArrayList<Link> parents, Link link, Link parent) {
+        if (this == link) {
+            boolean found = false;
+            for (Link link1 : parents) {
+                if (parent == link1) {
+                    found = true;
+                }
             }
-            return null;
-        }
-    }
-
-    /**
-     * Get the identifier from this link
-     *
-     * @return the id
-     */
-    public Link getTwins(Link link) {
-        if (this.twin != null && this.twin.equals(link)) {
-            return twin;
-        } else {
-            for (Link currentLink : links) {
-                return currentLink.getTwins(link);
+            if (!found) {
+                parents.add(parent);
             }
-            return null;
         }
+        for (Link currentLink : links) {
+            currentLink.getParentsFromLink(parents, link, this);
+        }
+        return parents;
     }
 
     /**
