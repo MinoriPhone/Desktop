@@ -773,25 +773,32 @@ public final class AddMedia extends JDialog {
             // Get selected MediaItem by path of the File that the user selected
             MediaItem mItem = f.getMediaItemFromFile(j.getSelectedFile().getAbsolutePath().toString());
 
-            // Show message dialog for .mov files
-            if (j.getSelectedFile().getName().endsWith(".mov")) {
+            if (getAddedItemByFilenameAndAbsPath(mItem.getFileName(), mItem.getAbsolutePath()) != null) {
 
-                JOptionPane.showMessageDialog(null,
-                        "Note that files with in the .mov format are slower to load than other video formats.",
-                        ".mov files",
-                        JOptionPane.WARNING_MESSAGE);
-            }
+                JOptionPane.showMessageDialog(this, "The media is already added.");
 
-            // Add selected file to list
-            if (mItem != null) {
-                if (mItem instanceof Video) {
-                    this.addItem((Video) mItem);
-                } else if (mItem instanceof Model.Image) {
-                    this.addItem((Model.Image) mItem);
-                    enterDuration(mItem, this.tableModel.getRowCount() - 1);
-                } else if (mItem instanceof Text) {
-                    this.addItem((Text) mItem);
-                    enterDuration(mItem, this.tableModel.getRowCount() - 1);
+            } else {
+
+                // Show message dialog for .mov files
+                if (j.getSelectedFile().getName().endsWith(".mov")) {
+
+                    JOptionPane.showMessageDialog(null,
+                            "Note that files with in the .mov format are slower to load than other video formats.",
+                            ".mov files",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
+                // Add selected file to list
+                if (mItem != null) {
+                    if (mItem instanceof Video) {
+                        this.addItem((Video) mItem);
+                    } else if (mItem instanceof Model.Image) {
+                        this.addItem((Model.Image) mItem);
+                        enterDuration(mItem, this.tableModel.getRowCount() - 1);
+                    } else if (mItem instanceof Text) {
+                        this.addItem((Text) mItem);
+                        enterDuration(mItem, this.tableModel.getRowCount() - 1);
+                    }
                 }
             }
         } else if (dialog == JFileChooser.CANCEL_OPTION) {
