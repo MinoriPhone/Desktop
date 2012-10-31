@@ -178,6 +178,15 @@ public class Story {
     }
 
     /**
+     * Print XML
+     */
+    public void setPrinted(boolean printed) {
+        for (Route route : this.routes) {
+            route.getStartLink().setAllPrinted(printed);
+        }
+    }
+
+    /**
      * Get all routes that are part of a Node
      *
      * @param node Node

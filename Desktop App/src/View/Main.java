@@ -460,8 +460,10 @@ public class Main extends JFrame implements PropertyChangeListener {
                 String strLine;
                 //Read File Line By Line
                 ArrayList<Link> tempLink = new ArrayList<Link>();
+                ArrayList<Link> addedLinks = new ArrayList<Link>();
                 double tempLong = 0.0;
                 double tempLat = 0.0;
+                double tempRad = 0.0;
                 MediaItem tempMediaItem = null;
                 while ((strLine = br.readLine()) != null) {
                     // Print the content on the console
@@ -488,10 +490,13 @@ public class Main extends JFrame implements PropertyChangeListener {
                         tempLong = Double.parseDouble(strLine.substring("<longitude>".length(), strLine.length() - "</longitude>".length()));
                     } else if (strLine.contains("<latitude>") && strLine.contains("</latitude>")) {
                         tempLat = Double.parseDouble(strLine.substring("<latitude>".length(), strLine.length() - "</latitude>".length()));
+                    } else if (strLine.contains("<radius>") && strLine.contains("</radius>")) {
+                        tempRad = Double.parseDouble(strLine.substring("<radius>".length(), strLine.length() - "</radius>".length()));
                     } else if (strLine.contains("</from>")) {
                         tempLink.get(tempLink.size() - 1).setP1(tempLink.get(tempLink.size() - 2).getP2());
                     } else if (strLine.contains("</to>")) {
                         Node nod = new Node(tempLat, tempLong);
+                        nod.setRadius(tempRad);
                         tempLink.get(tempLink.size() - 1).setP2(nod);
                         map.addNode(nod);
                     } else if (strLine.contains("<video>")) {
@@ -546,12 +551,21 @@ public class Main extends JFrame implements PropertyChangeListener {
                         tempMediaItem.setShowDurationInSeconds(Integer.parseInt(strLine.substring("<duration>".length(), strLine.length() - "</duration>".length())));
                     } else if (strLine.contains("</video>") || strLine.contains("</image>") || strLine.contains("</text>")) {
                         tempLink.get(tempLink.size() - 1).getMediaItems().add(tempMediaItem);
+                    } else if (strLine.contains("<link.shortcut>") && strLine.contains("</link.shortcut>")) {
+                        int shortcut = Integer.parseInt(strLine.substring("<link.shortcut>".length(), strLine.length() - "</link.shortcut>".length()));
+                        for (Link link : addedLinks) {
+                            if (link.getId() == shortcut) {
+                                map.removeLastLink();
+                                tempLink.set(tempLink.size() - 1, link);
+                            }
+                        }
                     } else if (strLine.contains("<link>")) {
                         Link link = new Link();
                         tempLink.add(link);
                         map.addLink(link);
                     } else if (strLine.contains("</link>")) {
                         tempLink.get(tempLink.size() - 2).addLink(tempLink.get(tempLink.size() - 1));
+                        addedLinks.add(tempLink.get(tempLink.size() - 1));
                         tempLink.remove(tempLink.size() - 1);
                     } else if (strLine.contains("</node>")) {
                         Node nod = new Node(tempLat, tempLong);
@@ -688,6 +702,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             try {
 
                 String XMLcontent = this.story.printXML(XMLProject);
+                this.story.setPrinted(false);
                 // Add no linked nodes at the end
                 XMLcontent += this.map.printNodeXML();
 
@@ -756,9 +771,9 @@ public class Main extends JFrame implements PropertyChangeListener {
             // Check if there are any links with no media item
             if (link.getMediaItems().isEmpty()) {
                 JOptionPane.showMessageDialog(null,
-                            "There are Links with no Media items. Add some media items or delete these links.",
-                            "No media items",
-                            JOptionPane.ERROR_MESSAGE);
+                        "There are Links with no Media items. Add some media items or delete these links.",
+                        "No media items",
+                        JOptionPane.ERROR_MESSAGE);
                 return false;
             }
 
@@ -914,36 +929,40 @@ public class Main extends JFrame implements PropertyChangeListener {
                 float storyFilesSize = 0f;
 
                 boolean exportShortCut = false;
+                story.setPrinted(false);
                 // Get total of filesize
                 for (Link link : story.getAllLinks()) {
+                    if (!link.getPrinted()) {
+                        for (final MediaItem mediaItem : link.getMediaItems()) {
+                            File tempFile = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
 
-                    for (final MediaItem mediaItem : link.getMediaItems()) {
-                        File tempFile = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
-
-                        // Check an add shortcuts for performance
-                        if (exportMediaItems.isEmpty()) {
-                            exportMediaItems.put(mediaItem, link);
-                        } else {
-                            for (MediaItem currentMediaItem : exportMediaItems.keySet()) {
-
-                                String mediaPathFile = mediaItem.getAbsolutePath() + mediaItem.getFileName();
-                                String currentMediaPathFile = currentMediaItem.getAbsolutePath() + currentMediaItem.getFileName();
-
-                                if (mediaPathFile.equals(currentMediaPathFile)) {
-                                    mediaItem.setShortcut(exportMediaItems.get(currentMediaItem));
-                                    exportShortCut = true;
-                                    break;
-                                }
-                            }
-                            if (!exportShortCut) {
-                                // Filesize (only if it's not a shortcut)
-                                storyFilesSize += tempFile.length() / maxBufferSize;
+                            // Check an add shortcuts for performance
+                            if (exportMediaItems.isEmpty()) {
                                 exportMediaItems.put(mediaItem, link);
+                            } else {
+                                for (MediaItem currentMediaItem : exportMediaItems.keySet()) {
+
+                                    String mediaPathFile = mediaItem.getAbsolutePath() + mediaItem.getFileName();
+                                    String currentMediaPathFile = currentMediaItem.getAbsolutePath() + currentMediaItem.getFileName();
+
+                                    if (mediaPathFile.equals(currentMediaPathFile)) {
+                                        mediaItem.setShortcut(exportMediaItems.get(currentMediaItem));
+                                        exportShortCut = true;
+                                        break;
+                                    }
+                                }
+                                if (!exportShortCut) {
+                                    // Filesize (only if it's not a shortcut)
+                                    storyFilesSize += tempFile.length() / maxBufferSize;
+                                    exportMediaItems.put(mediaItem, link);
+                                }
+                                exportShortCut = false;
                             }
-                            exportShortCut = false;
                         }
+                        link.setPrinted(true);
                     }
                 }
+                this.story.setPrinted(false);
 ///////////
 // XML
 ///////////
@@ -952,6 +971,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                 File XMLfile = new File(filenameWithPath);
                 String filename = j.getName(XMLfile);
                 String XMLcontent = this.story.printXML(XMLProject);
+                this.story.setPrinted(false);
 
                 boolean exists = XMLfile.createNewFile();
                 if (exists) {
@@ -980,56 +1000,58 @@ public class Main extends JFrame implements PropertyChangeListener {
 
                 // Loop over all links to get the  mediafiles
                 for (Link link : story.getAllLinks()) {
+                    if (!link.getPrinted()) {
+                        zipOut.putNextEntry(new ZipEntry(link.getId() + "/"));
 
-                    zipOut.putNextEntry(new ZipEntry(link.getId() + "/"));
+                        for (MediaItem mediaItem : link.getMediaItems()) {
+                            // Get the file from the location
+                            File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
+                            exists = file.isFile();
 
-                    for (MediaItem mediaItem : link.getMediaItems()) {
-                        // Get the file from the location
-                        File file = new File(mediaItem.getAbsolutePath() + mediaItem.getFileName());
-                        exists = file.isFile();
+                            if (exists) {
+                                // check if it's not a shortcut
+                                if (mediaItem.getShortcut() == null) {
 
-                        if (exists) {
-                            // check if it's not a shortcut
-                            if (mediaItem.getShortcut() == null) {
+                                    currentMediaItemName = file.getName();
 
-                                currentMediaItemName = file.getName();
+                                    // Get the data from the file
+                                    byte[] data = new byte[maxBufferSize];
+                                    // Create inputBuffer for the data
+                                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+                                    // Internal count for the databuffer
+                                    int count = 0;
+                                    // Add new file to the zip file                            
+                                    zipOut.putNextEntry(new ZipEntry(link.getId() + "/" + mediaItem.getFileName()));
 
-                                // Get the data from the file
-                                byte[] data = new byte[maxBufferSize];
-                                // Create inputBuffer for the data
-                                BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-                                // Internal count for the databuffer
-                                int count = 0;
-                                // Add new file to the zip file                            
-                                zipOut.putNextEntry(new ZipEntry(link.getId() + "/" + mediaItem.getFileName()));
-
-                                // Fill the new file with data
-                                while ((count = in.read(data, 0, maxBufferSize)) != -1) {
-                                    zipOut.write(data, 0, count);
-                                    progress += percent;
-                                    if (!task.isCancelled() || !progressMonitor.isCanceled()) {
-                                        task.setProgression((int) Math.floor(Math.min(progress, 99)));
-                                    } else {
-                                        // Close the buffers
-                                        in.close();
-                                        zipOut.flush();
-                                        zipOut.close();
-                                        // Delete the corupt file
-                                        File deletedFile = new File(fileName);
-                                        if (!deletedFile.delete()) {
-                                            JOptionPane.showMessageDialog(
-                                                    Main.this,
-                                                    "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
-                                                    "Could not delete iStory file",
-                                                    JOptionPane.WARNING_MESSAGE);
+                                    // Fill the new file with data
+                                    while ((count = in.read(data, 0, maxBufferSize)) != -1) {
+                                        zipOut.write(data, 0, count);
+                                        progress += percent;
+                                        if (!task.isCancelled() || !progressMonitor.isCanceled()) {
+                                            task.setProgression((int) Math.floor(Math.min(progress, 99)));
+                                        } else {
+                                            // Close the buffers
+                                            in.close();
+                                            zipOut.flush();
+                                            zipOut.close();
+                                            // Delete the corupt file
+                                            File deletedFile = new File(fileName);
+                                            if (!deletedFile.delete()) {
+                                                JOptionPane.showMessageDialog(
+                                                        Main.this,
+                                                        "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
+                                                        "Could not delete iStory file",
+                                                        JOptionPane.WARNING_MESSAGE);
+                                            }
+                                            exportMediaItems.clear();
+                                            return false;
                                         }
-                                        exportMediaItems.clear();
-                                        return false;
                                     }
+                                    in.close();
                                 }
-                                in.close();
                             }
                         }
+                        link.setPrinted(true);
                     }
                 }
                 // Save and close the buffers
@@ -1041,6 +1063,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                 task.setProgression(100);
 
                 // Set the changed to false to be able to close the program
+                this.story.setPrinted(false);
                 story.setSomethingChanged(false);
                 return true;
 
@@ -1169,9 +1192,12 @@ public class Main extends JFrame implements PropertyChangeListener {
                     String strLine;
                     //Read File Line By Line
                     ArrayList<Link> tempLink = new ArrayList<Link>();
+                    ArrayList<Link> addedLinks = new ArrayList<Link>();
                     double tempLong = 0.0;
                     double tempLat = 0.0;
+                    double tempRad = 0.0;
                     MediaItem tempMediaItem = null;
+                    int tempShortcut = 0;
                     while ((strLine = br.readLine()) != null) {
                         // Print the content on the console
                         if (strLine.equals("<story>")) {
@@ -1198,10 +1224,13 @@ public class Main extends JFrame implements PropertyChangeListener {
                             tempLong = Double.parseDouble(strLine.substring("<longitude>".length(), strLine.length() - "</longitude>".length()));
                         } else if (strLine.contains("<latitude>") && strLine.contains("</latitude>")) {
                             tempLat = Double.parseDouble(strLine.substring("<latitude>".length(), strLine.length() - "</latitude>".length()));
+                        } else if (strLine.contains("<radius>") && strLine.contains("</radius>")) {
+                            tempRad = Double.parseDouble(strLine.substring("<radius>".length(), strLine.length() - "</radius>".length()));
                         } else if (strLine.contains("</from>")) {
                             tempLink.get(tempLink.size() - 1).setP1(tempLink.get(tempLink.size() - 2).getP2());
                         } else if (strLine.contains("</to>")) {
                             Node nod = new Node(tempLat, tempLong);
+                            nod.setRadius(tempRad);
                             tempLink.get(tempLink.size() - 1).setP2(nod);
                             map.addNode(nod);
                         } else if (strLine.contains("<video>")) {
@@ -1210,8 +1239,15 @@ public class Main extends JFrame implements PropertyChangeListener {
                             tempMediaItem = new Image();
                         } else if (strLine.contains("<text>")) {
                             tempMediaItem = new Text();
+                        } else if (strLine.contains("<shortcut>") && strLine.contains("</shortcut>")) {
+                            tempShortcut = Integer.parseInt(strLine.substring("<shortcut>".length(), strLine.length() - "</shortcut>".length()));
                         } else if (strLine.contains("<filename>") && strLine.contains("</filename>")) {
-                            File file = new File(pad + tempLink.get(tempLink.size() - 1).getId() + System.getProperty("file.separator") + strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
+                            File file;
+                            if (tempShortcut > 0) {
+                                file = new File(pad + tempShortcut + System.getProperty("file.separator") + strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
+                            } else {
+                                file = new File(pad + tempLink.get(tempLink.size() - 1).getId() + System.getProperty("file.separator") + strLine.substring("<filename>".length(), strLine.length() - "</filename>".length()));
+                            }
                             //Check if file exists
                             if (file.exists()) {
                                 tempMediaItem.setAbsolutePath(file.getPath().substring(0, file.getPath().length() - file.getName().length()));
@@ -1221,12 +1257,21 @@ public class Main extends JFrame implements PropertyChangeListener {
                             tempMediaItem.setShowDurationInSeconds(Integer.parseInt(strLine.substring("<duration>".length(), strLine.length() - "</duration>".length())));
                         } else if (strLine.contains("</video>") || strLine.contains("</image>") || strLine.contains("</text>")) {
                             tempLink.get(tempLink.size() - 1).getMediaItems().add(tempMediaItem);
+                        } else if (strLine.contains("<link.shortcut>") && strLine.contains("</link.shortcut>")) {
+                            int shortcut = Integer.parseInt(strLine.substring("<link.shortcut>".length(), strLine.length() - "</link.shortcut>".length()));
+                            for (Link link : addedLinks) {
+                                if (link.getId() == shortcut) {
+                                    map.removeLastLink();
+                                    tempLink.set(tempLink.size() - 1, link);
+                                }
+                            }
                         } else if (strLine.contains("<link>")) {
                             Link link = new Link();
                             tempLink.add(link);
                             map.addLink(link);
                         } else if (strLine.contains("</link>")) {
                             tempLink.get(tempLink.size() - 2).addLink(tempLink.get(tempLink.size() - 1));
+                            addedLinks.add(tempLink.get(tempLink.size() - 1));
                             tempLink.remove(tempLink.size() - 1);
                         } else if (strLine.contains("</node>")) {
                             Node nod = new Node(tempLat, tempLong);
@@ -1290,8 +1335,9 @@ public class Main extends JFrame implements PropertyChangeListener {
         /**
          * Set progress
          *
-         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
-         * final protected.
+         * Own implementation of setProgress() because we need to set the
+         * progress outside SwingWorker. The function setProgress() is final
+         * protected.
          *
          * @param progress int current progress
          */

@@ -19,6 +19,7 @@ public class Link {
     private ArrayList<MediaItem> mediaItems;
     private Color color;
     private long id;
+    private boolean printed = false;
 
     /**
      * Constructor
@@ -190,33 +191,62 @@ public class Link {
      */
     public String printXML(boolean XMLProject) {
         String XMLString = "";
-        XMLString += "<link.name>" + this.name + "</link.name>\r\n";
-        XMLString += "<link.id>" + this.id + "</link.id>\r\n";
-        if (p1 != null) {
-            XMLString += "<from>\r\n";
-            XMLString += this.p1.printXML(XMLProject);
-            XMLString += "</from>\r\n";
-        }
-        if (p2 != null) {
-            XMLString += "<to>\r\n";
-            XMLString += this.p2.printXML(XMLProject);
-            XMLString += "</to>\r\n";
-        }
-        XMLString += "<queue>\r\n";
-        for (MediaItem item : this.mediaItems) {
-            XMLString += item.printXML(XMLProject);
-        }
-        XMLString += "</queue>\r\n";
-        if (this.links.size() > 0) {
-            XMLString += "<links>\r\n";
-            for (Link link : this.links) {
-                XMLString += "<link>\r\n";
-                XMLString += link.printXML(XMLProject);
-                XMLString += "</link>\r\n";
+        if (!printed) {
+            XMLString += "<link.name>" + this.name + "</link.name>\r\n";
+            XMLString += "<link.id>" + this.id + "</link.id>\r\n";
+            if (p1 != null) {
+                XMLString += "<from>\r\n";
+                XMLString += this.p1.printXML(XMLProject);
+                XMLString += "</from>\r\n";
             }
-            XMLString += "</links>\r\n";
+            if (p2 != null) {
+                XMLString += "<to>\r\n";
+                XMLString += this.p2.printXML(XMLProject);
+                XMLString += "</to>\r\n";
+            }
+            XMLString += "<queue>\r\n";
+            for (MediaItem item : this.mediaItems) {
+                XMLString += item.printXML(XMLProject);
+            }
+            XMLString += "</queue>\r\n";
+            if (this.links.size() > 0) {
+                XMLString += "<links>\r\n";
+                for (Link link : this.links) {
+                    XMLString += "<link>\r\n";
+                    XMLString += link.printXML(XMLProject);
+                    XMLString += "</link>\r\n";
+                }
+                XMLString += "</links>\r\n";
+            }
+        } else {
+            XMLString += "<link.shortcut>" + this.id + "</link.shortcut>\r\n";
         }
+        this.printed = true;
         return XMLString;
+    }
+
+    /**
+     * set Printed boolean
+     */
+    public void setAllPrinted(boolean printed) {
+        this.printed = printed;
+        for (Link link : this.links) {
+            link.setAllPrinted(printed);
+        }
+    }
+
+    /**
+     * set Printed boolean
+     */
+    public void setPrinted(boolean printed) {
+        this.printed = printed;
+    }
+
+    /**
+     * get Printed boolean
+     */
+    public boolean getPrinted() {
+        return this.printed;
     }
 
     public Link getLinkForEndNode(Node endNode) {
@@ -287,66 +317,68 @@ public class Link {
     }
 
     /**
-     * Get all media items
+     * Get all lines
      */
     public ArrayList<Line2D.Double> getLines(JXMapViewer map, Point2D mousePos) {
         ArrayList<Line2D.Double> lines = new ArrayList<Line2D.Double>();
-        Point2D pt1;
-        Point2D pt2;
-        double length = 10;
-        if (p2 == null && p1 != null) {
-            pt1 = map.getTileFactory().geoToPixel(p1.getGeoposition(), map.getZoom());
-            pt2 = map.getTileFactory().geoToPixel(map.convertPointToGeoPosition(mousePos), map.getZoom());
-        } else {
-            pt1 = map.getTileFactory().geoToPixel(p1.getGeoposition(), map.getZoom());
-            pt2 = map.getTileFactory().geoToPixel(p2.getGeoposition(), map.getZoom());
-        }
-        Line2D.Double line = new Line2D.Double((int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
-        lines.add(line);
-
-        Point2D middle;
-        if (pt1.getX() == pt2.getX()) {
-            middle = new Point2D.Double(pt1.getX(), (pt1.getY() + pt2.getY()) / 2);
-        } else if (pt1.getY() == pt2.getY()) {
-            middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, pt1.getY());
-        } else {
-            middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
-        }
-
-        double difX = (double) pt1.getX() - (double) pt2.getX();
-        double difY = (double) pt1.getY() - (double) pt2.getY();
-
-        Point2D arrowLineY;
-        Point2D arrowLineX;
-
-        if (difY == 0) {
-            double deltaX = Math.sqrt((length * length) / 2);
-            if (difX < 0) {
-                deltaX = deltaX * -1;
+        if (p1 != null) {
+            Point2D pt1;
+            Point2D pt2;
+            double length = 10;
+            if (p2 == null && p1 != null) {
+                pt1 = map.getTileFactory().geoToPixel(p1.getGeoposition(), map.getZoom());
+                pt2 = map.getTileFactory().geoToPixel(map.convertPointToGeoPosition(mousePos), map.getZoom());
+            } else {
+                pt1 = map.getTileFactory().geoToPixel(p1.getGeoposition(), map.getZoom());
+                pt2 = map.getTileFactory().geoToPixel(p2.getGeoposition(), map.getZoom());
             }
-            double deltaY = deltaX;
-            arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
-            arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
-        } else {
-            double angle = Math.atan(difX / difY);
+            Line2D.Double line = new Line2D.Double((int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
+            lines.add(line);
 
-            double arrowAngle = angle - 95;
+            Point2D middle;
+            if (pt1.getX() == pt2.getX()) {
+                middle = new Point2D.Double(pt1.getX(), (pt1.getY() + pt2.getY()) / 2);
+            } else if (pt1.getY() == pt2.getY()) {
+                middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, pt1.getY());
+            } else {
+                middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
+            }
 
-            double deltaX = length * Math.sin(arrowAngle);
-            double deltaY = length * Math.cos(arrowAngle);
+            double difX = (double) pt1.getX() - (double) pt2.getX();
+            double difY = (double) pt1.getY() - (double) pt2.getY();
 
-            if (difY > 0) {
+            Point2D arrowLineY;
+            Point2D arrowLineX;
+
+            if (difY == 0) {
+                double deltaX = Math.sqrt((length * length) / 2);
+                if (difX < 0) {
+                    deltaX = deltaX * -1;
+                }
+                double deltaY = deltaX;
                 arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
                 arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
             } else {
-                arrowLineX = new Point2D.Double(middle.getX() - deltaY, middle.getY() + deltaX);
-                arrowLineY = new Point2D.Double(middle.getX() - deltaX, middle.getY() - deltaY);
+                double angle = Math.atan(difX / difY);
+
+                double arrowAngle = angle - 95;
+
+                double deltaX = length * Math.sin(arrowAngle);
+                double deltaY = length * Math.cos(arrowAngle);
+
+                if (difY > 0) {
+                    arrowLineX = new Point2D.Double(middle.getX() + deltaX, middle.getY() + deltaY);
+                    arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
+                } else {
+                    arrowLineX = new Point2D.Double(middle.getX() - deltaY, middle.getY() + deltaX);
+                    arrowLineY = new Point2D.Double(middle.getX() - deltaX, middle.getY() - deltaY);
+                }
             }
+            Line2D.Double pijltje1 = new Line2D.Double((int) middle.getX(), (int) middle.getY(), (int) arrowLineY.getX(), (int) arrowLineY.getY());
+            lines.add(pijltje1);
+            Line2D.Double pijltje2 = new Line2D.Double((int) middle.getX(), (int) middle.getY(), (int) arrowLineX.getX(), (int) arrowLineX.getY());
+            lines.add(pijltje2);
         }
-        Line2D.Double pijltje1 = new Line2D.Double((int) middle.getX(), (int) middle.getY(), (int) arrowLineY.getX(), (int) arrowLineY.getY());
-        lines.add(pijltje1);
-        Line2D.Double pijltje2 = new Line2D.Double((int) middle.getX(), (int) middle.getY(), (int) arrowLineX.getX(), (int) arrowLineX.getY());
-        lines.add(pijltje2);
         return lines;
     }
 

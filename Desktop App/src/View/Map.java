@@ -167,6 +167,19 @@ public class Map extends JPanel {
     }
 
     /**
+     * Add Link to the mapViewer
+     *
+     * @param link Link The Link we want to add to the mapViewer
+     */
+    public void removeLastLink() {
+        linkPainter.removeLastLink();
+        mapViewer.repaint();
+
+        // Set changeboolean to true
+        story.setSomethingChanged(true);
+    }
+
+    /**
      * Delete Node from the mapViewer
      *
      * @param node Node The Node we want to delete from the mapViewer
