@@ -43,7 +43,6 @@ public class CreateText extends JDialog {
     private int currentFontStyle;
     private int currentFontSize;
     private Color currentFontColor;
-    private Color currentBackgroundColor;
     private DocumentStyleSettings dss;
 
     /**
@@ -81,42 +80,10 @@ public class CreateText extends JDialog {
         this.currentFontStyle = this.dss.getCurrentFontStyle();
         this.currentFontSize = this.dss.getCurrentFontSize();
         this.currentFontColor = this.dss.getCurrentFontColor();
-        this.currentBackgroundColor = this.dss.getCurrentBackgroundColor();
 
         // Setup choosable font properties
         setupChoosableFontProperties();
-    }
-
-    /**
-     * Setting up all possible font properties
-     */
-    private void setupChoosableFontProperties() {
-
-        // Load fonts and add them to the combobox 'cbFonts'
-        String[] fontNames = parent.getParentView().getAvailableFonts();
-        for (String font : fontNames) {
-            this.cbFonts.addItem(font);
-        }
-        this.cbFonts.setSelectedItem(this.dss.getCurrentFont());
-        this.cbFonts.setEditable(false);
-
-        // Add Font styles
-        this.cbFontStyle.addItem("Plain");
-        this.cbFontStyle.addItem("Bold");
-        this.cbFontStyle.addItem("Italic");
-        this.cbFontStyle.setSelectedItem(this.dss.getCurrentFontStyle());
-        this.cbFontStyle.setEditable(false);
-
-        // Add Font sizes
-        for (int size = 8; size <= 72; size++) {
-            this.cbFontSize.addItem(size);
-
-            // Set standard font size from project settings
-            if (size == this.dss.getCurrentFontSize()) {
-                this.cbFontSize.setSelectedItem(size);
-            }
-        }
-        this.cbFontSize.setEditable(false);
+        applyNewStyle();
     }
 
     /* DO NOT TOUCH */
@@ -128,16 +95,16 @@ public class CreateText extends JDialog {
         pNorth = new javax.swing.JPanel();
         lTitle = new javax.swing.JLabel();
         pWest = new javax.swing.JPanel();
+        pFontProps = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         cbFonts = new javax.swing.JComboBox();
-        jLabel2 = new javax.swing.JLabel();
         cbFontStyle = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         cbFontSize = new javax.swing.JComboBox();
         bColorChooser = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        bBackgroundColorChooser = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
         pCenter = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -156,7 +123,7 @@ public class CreateText extends JDialog {
         pNorth.setLayout(pNorthLayout);
         pNorthLayout.setHorizontalGroup(
             pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(lTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 872, Short.MAX_VALUE)
+            .add(lTitle, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 862, Short.MAX_VALUE)
         );
         pNorthLayout.setVerticalGroup(
             pNorthLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -167,6 +134,8 @@ public class CreateText extends JDialog {
         );
 
         pMain.add(pNorth, java.awt.BorderLayout.PAGE_START);
+
+        pFontProps.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "   Font Properties   ", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 13))); // NOI18N
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -179,16 +148,16 @@ public class CreateText extends JDialog {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("Style:");
-
         cbFontStyle.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         cbFontStyle.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbFontStyleActionPerformed(evt);
             }
         });
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel2.setText("Style:");
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -212,16 +181,49 @@ public class CreateText extends JDialog {
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel7.setText("Color:");
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel8.setText("Background color:");
+        org.jdesktop.layout.GroupLayout pFontPropsLayout = new org.jdesktop.layout.GroupLayout(pFontProps);
+        pFontProps.setLayout(pFontPropsLayout);
+        pFontPropsLayout.setHorizontalGroup(
+            pFontPropsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(pFontPropsLayout.createSequentialGroup()
+                .add(pFontPropsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(pFontPropsLayout.createSequentialGroup()
+                        .add(6, 6, 6)
+                        .add(jLabel7, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 49, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(pFontPropsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 146, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 146, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 93, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(bColorChooser))
+                .add(0, 0, Short.MAX_VALUE))
+        );
+        pFontPropsLayout.setVerticalGroup(
+            pFontPropsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(pFontPropsLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(pFontPropsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(pFontPropsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel2))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(pFontPropsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel3)
+                    .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(pFontPropsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(bColorChooser))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
-        bBackgroundColorChooser.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/colorwheel.png"))); // NOI18N
-        bBackgroundColorChooser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bBackgroundColorChooserActionPerformed(evt);
-            }
-        });
+        pFontPropsLayout.linkSize(new java.awt.Component[] {bColorChooser, cbFontSize, cbFontStyle, cbFonts, jLabel1, jLabel2, jLabel3}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
         org.jdesktop.layout.GroupLayout pWestLayout = new org.jdesktop.layout.GroupLayout(pWest);
         pWest.setLayout(pWestLayout);
@@ -230,59 +232,19 @@ public class CreateText extends JDialog {
             .add(pWestLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pWestLayout.createSequentialGroup()
-                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 140, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 140, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(pWestLayout.createSequentialGroup()
-                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(jLabel7, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(jLabel8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 119, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(bColorChooser)
-                            .add(bBackgroundColorChooser))))
-                .addContainerGap(20, Short.MAX_VALUE))
+                    .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 213, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(pFontProps, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        pWestLayout.linkSize(new java.awt.Component[] {cbFontStyle, cbFonts}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
-        pWestLayout.linkSize(new java.awt.Component[] {jLabel1, jLabel2, jLabel3}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         pWestLayout.setVerticalGroup(
             pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(pWestLayout.createSequentialGroup()
-                .add(61, 61, 61)
-                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(cbFonts, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap()
+                .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(cbFontStyle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel2))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
-                    .add(cbFontSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(39, 39, 39)
-                .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(pWestLayout.createSequentialGroup()
-                        .add(jLabel8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pWestLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(jLabel7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(bColorChooser)))
-                    .add(bBackgroundColorChooser))
-                .addContainerGap(217, Short.MAX_VALUE))
+                .add(pFontProps, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(310, Short.MAX_VALUE))
         );
-
-        pWestLayout.linkSize(new java.awt.Component[] {bColorChooser, cbFontSize, cbFontStyle, cbFonts, jLabel1, jLabel2, jLabel3}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
         pMain.add(pWest, java.awt.BorderLayout.LINE_START);
 
@@ -300,19 +262,21 @@ public class CreateText extends JDialog {
         pCenter.setLayout(pCenterLayout);
         pCenterLayout.setHorizontalGroup(
             pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pCenterLayout.createSequentialGroup()
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(pCenterLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(pCenterLayout.createSequentialGroup()
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 630, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, pCenterLayout.createSequentialGroup()
-                        .add(8, 8, 8)
+                        .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 585, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(0, 22, Short.MAX_VALUE))
+                    .add(pCenterLayout.createSequentialGroup()
                         .add(pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(pDocument, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 585, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(bSave))
-                        .add(43, 43, 43))))
+                            .add(pDocument, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(pCenterLayout.createSequentialGroup()
+                                .add(0, 0, Short.MAX_VALUE)
+                                .add(bSave)))
+                        .add(35, 35, 35))))
         );
         pCenterLayout.setVerticalGroup(
             pCenterLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -322,7 +286,7 @@ public class CreateText extends JDialog {
                     .add(pCenterLayout.createSequentialGroup()
                         .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 15, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pDocument, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                        .add(pDocument, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(bSave)
                         .add(6, 6, 6))
@@ -389,18 +353,7 @@ public class CreateText extends JDialog {
         exportToHTML();
     }//GEN-LAST:event_bSaveActionPerformed
 
-    private void bBackgroundColorChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bBackgroundColorChooserActionPerformed
-        // Get selected background color
-        Color color = JColorChooser.showDialog(this, "Choose background color", this.currentBackgroundColor);
-
-        // Apply new font variables to document
-        if (color != null) {
-            this.currentBackgroundColor = color;
-            applyNewStyle();
-        }
-    }//GEN-LAST:event_bBackgroundColorChooserActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bBackgroundColorChooser;
     private javax.swing.JButton bColorChooser;
     private javax.swing.JButton bSave;
     private javax.swing.JComboBox cbFontSize;
@@ -410,16 +363,45 @@ public class CreateText extends JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel lTitle;
     private javax.swing.JPanel pCenter;
     private javax.swing.JPanel pDocument;
+    private javax.swing.JPanel pFontProps;
     private javax.swing.JPanel pMain;
     private javax.swing.JPanel pNorth;
     private javax.swing.JPanel pWest;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Setting up all possible font properties
+     */
+    private void setupChoosableFontProperties() {
+
+        // Load fonts and add them to the combobox 'cbFonts'
+        String[] fontNames = parent.getParentView().getAvailableFonts();
+        for (String font : fontNames) {
+            this.cbFonts.addItem(font);
+        }
+        this.cbFonts.setSelectedItem(this.dss.getCurrentFont());
+        this.cbFonts.setEditable(false);
+
+        // Add Font styles
+        this.cbFontStyle.addItem("Plain");
+        this.cbFontStyle.addItem("Bold");
+        this.cbFontStyle.addItem("Italic");
+        this.cbFontStyle.setSelectedItem(this.dss.getCurrentFontStyle());
+        this.cbFontStyle.setEditable(false);
+
+        // Add Font sizes
+        for (int size = 8; size <= 72; size++) {
+            this.cbFontSize.addItem(size);
+        }
+        this.cbFontSize.setSelectedItem(this.dss.getCurrentFontSize());
+        this.cbFontSize.setEditable(false);
+    }
 
     /**
      * Check if current font style is Bold
@@ -459,10 +441,9 @@ public class CreateText extends JDialog {
         this.currentDocumentStyle.addAttribute(StyleConstants.Italic, isCurrentFontStyleItalic());
         this.currentDocumentStyle.addAttribute(StyleConstants.FontSize, this.currentFontSize);
         this.currentDocumentStyle.addAttribute(StyleConstants.Foreground, this.currentFontColor);
-        this.currentDocumentStyle.addAttribute(StyleConstants.Background, this.currentBackgroundColor); //TODO
 
         // Finally, apply the new style to the heading
-        this.document.setParagraphAttributes(0, 1, this.currentDocumentStyle, false);
+        this.document.setParagraphAttributes(0, this.document.getLength(), this.currentDocumentStyle, true);
     }
 
     /**
@@ -486,7 +467,6 @@ public class CreateText extends JDialog {
             BufferedOutputStream out = null;
 
             try {
-
                 // Create kit to export
                 HTMLEditorKit kit = new HTMLEditorKit();
 
@@ -519,11 +499,12 @@ public class CreateText extends JDialog {
                     }
                 }
                 // Get style document
-                StyledDocument doc = (StyledDocument) this.textPane.getDocument();
-                String UnescapedText = doc.getText(0, doc.getLength());
+                StyledDocument doc = this.textPane.getStyledDocument();
+                String unescapedText = doc.getText(0, doc.getLength());
                 doc.remove(0, doc.getLength());
-                doc.insertString(0, escapeHTML(UnescapedText), currentDocumentStyle);
+                doc.insertString(0, escapeHTML(unescapedText), this.currentDocumentStyle);
 
+                // Export
                 kit.write(out, doc, doc.getStartPosition().getOffset(), doc.getLength());
                 out.close();
 

@@ -25,7 +25,6 @@ public class ProjectSettings extends JFrame {
     private int tempFontStyle;
     private int tempFontSize;
     private Color tempFontColor;
-    private Color tempBackgroundColor;
 
     /**
      * Constructor
@@ -71,7 +70,6 @@ public class ProjectSettings extends JFrame {
         this.tempFontStyle = this.main.getDocumentStyleSettings().getCurrentFontStyle();
         this.tempFontSize = this.main.getDocumentStyleSettings().getCurrentFontSize();
         this.tempFontColor = this.main.getDocumentStyleSettings().getCurrentFontColor();
-        this.tempBackgroundColor = this.main.getDocumentStyleSettings().getCurrentBackgroundColor();
     }
 
     /**
@@ -125,8 +123,6 @@ public class ProjectSettings extends JFrame {
         cbFontStyle = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
         cbFontSize = new javax.swing.JComboBox();
-        jLabel8 = new javax.swing.JLabel();
-        bBackgroundColorChooser = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         bColorChooser = new javax.swing.JButton();
 
@@ -232,17 +228,6 @@ public class ProjectSettings extends JFrame {
             }
         });
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel8.setText("Background color:");
-
-        bBackgroundColorChooser.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Images/colorwheel.png"))); // NOI18N
-        bBackgroundColorChooser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bBackgroundColorChooserActionPerformed(evt);
-            }
-        });
-
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel7.setText("Color:");
@@ -260,25 +245,17 @@ public class ProjectSettings extends JFrame {
             pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pTextSettingsLayout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pTextSettingsLayout.createSequentialGroup()
-                        .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cbFonts, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cbFontStyle, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cbFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(pTextSettingsLayout.createSequentialGroup()
-                        .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(bColorChooser)
-                            .addComponent(bBackgroundColorChooser))))
+                    .addComponent(cbFonts, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbFontStyle, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bColorChooser))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pTextSettingsLayout.setVerticalGroup(
@@ -296,16 +273,11 @@ public class ProjectSettings extends JFrame {
                 .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(cbFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(39, 39, 39)
-                .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pTextSettingsLayout.createSequentialGroup()
-                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(bColorChooser)))
-                    .addComponent(bBackgroundColorChooser))
-                .addContainerGap(7, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bColorChooser))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout pProjectSettingsLayout = new javax.swing.GroupLayout(pProjectSettings);
@@ -333,8 +305,8 @@ public class ProjectSettings extends JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(pStorySettings, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(pTextSettings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(pTextSettings, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
                 .addComponent(bSave)
                 .addContainerGap())
         );
@@ -364,7 +336,6 @@ public class ProjectSettings extends JFrame {
         this.main.getDocumentStyleSettings().setCurrentFontStyle(this.tempFontStyle);
         this.main.getDocumentStyleSettings().setCurrentFontSize(this.tempFontSize);
         this.main.getDocumentStyleSettings().setCurrentFontColor(this.tempFontColor);
-        this.main.getDocumentStyleSettings().setCurrentBackgroundColor(this.tempBackgroundColor);
 
         // Refresh the routes panel
         main.getPanelRoutes().refreshList(map.getStory().getRoutes());
@@ -421,23 +392,14 @@ public class ProjectSettings extends JFrame {
         this.tempFontSize = size;
     }//GEN-LAST:event_cbFontSizeActionPerformed
 
-    private void bBackgroundColorChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bBackgroundColorChooserActionPerformed
-        // Get selected background color
-        Color color = JColorChooser.showDialog(this, "Choose background color", this.main.getDocumentStyleSettings().getCurrentBackgroundColor());
-
-        // Apply new font variables to document
-        this.tempFontColor = color;
-    }//GEN-LAST:event_bBackgroundColorChooserActionPerformed
-
     private void bColorChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bColorChooserActionPerformed
         // Get selected font color
-        Color bgColor = JColorChooser.showDialog(this, "Choose font color", this.main.getDocumentStyleSettings().getCurrentFontColor());
+        Color fontColor = JColorChooser.showDialog(this, "Choose font color", this.main.getDocumentStyleSettings().getCurrentFontColor());
 
         // Apply new font variables to document
-        this.tempBackgroundColor = bgColor;
+        this.tempFontColor = fontColor;
     }//GEN-LAST:event_bColorChooserActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bBackgroundColorChooser;
     private javax.swing.JButton bColorChooser;
     private javax.swing.JButton bImageBrowse;
     private javax.swing.JButton bSave;
@@ -448,7 +410,6 @@ public class ProjectSettings extends JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel lStoryImage;
     private javax.swing.JLabel lStoryName;
     private javax.swing.JLabel lTitle;

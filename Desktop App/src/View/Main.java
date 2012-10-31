@@ -133,7 +133,6 @@ public class Main extends JFrame implements PropertyChangeListener {
         // Revalidate JPanels
         this.pack();
 
-
         // Obtain Font info from the current graphics environment and get all font names
         this.ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         this.availableFonts = ge.getAvailableFontFamilyNames();
