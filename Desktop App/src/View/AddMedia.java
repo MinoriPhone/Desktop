@@ -549,7 +549,7 @@ public final class AddMedia extends JDialog {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            /*MediaItem item = getAddedItemByFilenameAndAbsPath(String.valueOf(tAddedMedia.getModel().getValueAt(row, 1)), String.valueOf(tAddedMedia.getModel().getValueAt(row, 0)));
+            MediaItem item = getAddedItemByFilenameAndAbsPath(String.valueOf(tAddedMedia.getModel().getValueAt(row, 1)), String.valueOf(tAddedMedia.getModel().getValueAt(row, 0)));
             if (item.isCorrupt()) {
                 setForeground(Color.RED);
                 if (isSelected) {
@@ -567,7 +567,7 @@ public final class AddMedia extends JDialog {
                 }
             }
             setFocusable(true);
-            setText(value.toString());*/
+            setText(value.toString());
             return this;
         }
     }
