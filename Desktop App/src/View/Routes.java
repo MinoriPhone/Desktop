@@ -6,11 +6,9 @@ import Model.RoutesTreeRenderer;
 import Model.Story;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
