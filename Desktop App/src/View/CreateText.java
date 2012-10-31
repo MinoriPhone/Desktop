@@ -7,10 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,8 +21,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
@@ -34,7 +29,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-public class CreateText extends JDialog implements PropertyChangeListener {
+public class CreateText extends JDialog {
 
     // Variables
     private AddMedia parent;
@@ -50,9 +45,6 @@ public class CreateText extends JDialog implements PropertyChangeListener {
     private Color currentFontColor;
     private Color currentBackgroundColor;
     private DocumentStyleSettings dss;
-    private ProgressMonitor progressMonitor;
-    private CreateText.Task task;
-    private String loadingFont;
 
     /**
      * Creates new form CreateText
@@ -101,7 +93,12 @@ public class CreateText extends JDialog implements PropertyChangeListener {
     private void setupChoosableFontProperties() {
 
         // Load fonts and add them to the combobox 'cbFonts'
-        triggerLoadFonts();
+        String[] fontNames = parent.getParentView().getAvailableFonts();
+        for (String font : fontNames) {
+            this.cbFonts.addItem(font);
+        }
+        this.cbFonts.setSelectedItem(this.dss.getCurrentFont());
+        this.cbFonts.setEditable(false);
 
         // Add Font styles
         this.cbFontStyle.addItem("Plain");
@@ -587,125 +584,5 @@ public class CreateText extends JDialog implements PropertyChangeListener {
             }
         }
         return sb.toString();
-    }
-
-    /**
-     * Trigger progress monitor and task to load fonts
-     */
-    private void triggerLoadFonts() {
-        progressMonitor = new ProgressMonitor(CreateText.this, "Loading fonts", "", 0, 100);
-        progressMonitor.setProgress(0);
-        task = new CreateText.Task();
-        task.addPropertyChangeListener(this);
-        task.execute();
-    }
-
-    /**
-     * Loading fonts
-     */
-    private boolean loadFonts() {
-        try {
-            // Get an array of all font names
-            String[] fontNames = parent.getParentView().getAvailableFonts();
-
-            // Calculate 1% of font loading
-            float onePercent = 99f / (fontNames.length);
-            float progress = 0f;
-
-            // Add Fonts
-            for (String font : fontNames) {
-
-                this.cbFonts.addItem(font);
-                this.cbFonts.setSelectedItem(font);
-
-                // Set font loading progression and name of font we are loading
-                loadingFont = font;
-                progress += onePercent;
-                task.setProgression((int) Math.floor(Math.min(progress, 99)));
-
-                // Show progess
-                Thread.sleep(10);
-            }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        // Done loading fonts
-        task.setProgression(Math.min(100, 100));
-        this.cbFonts.setSelectedItem(this.dss.getCurrentFont());
-        this.cbFonts.setEditable(false);
-
-        return true;
-    }
-
-    /**
-     * Progressbar for exporting a story
-     */
-    class Task extends SwingWorker<Void, Void> {
-
-        /**
-         * Set progress
-         *
-         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
-         * final protected.
-         *
-         * @param progress int current progress
-         */
-        public void setProgression(int progress) {
-            this.setProgress(progress);
-        }
-
-        /**
-         * Load fonts
-         *
-         * @return null
-         */
-        @Override
-        public Void doInBackground() {
-            if (!loadFonts()) {
-            }
-            return null;
-        }
-
-        /**
-         * This function is called when loading fonts progress is done
-         */
-        @Override
-        public void done() {
-
-            // Loading fonts is canceled by user
-            if (progressMonitor.isCanceled()) {
-                JOptionPane.showMessageDialog(
-                        CreateText.this,
-                        "Loading fonts canceled by user!",
-                        "Canceled",
-                        JOptionPane.WARNING_MESSAGE);
-            }
-        }
-    }
-
-    /**
-     * Invoked when task's progress property changes.
-     *
-     * @param pce PropertyChangeEvent
-     */
-    @Override
-    public void propertyChange(PropertyChangeEvent pce) {
-        if ("progress".equals(pce.getPropertyName())) {
-
-            // Get new progress value
-            int progress = (Integer) pce.getNewValue();
-
-            // Show progress to user
-            progressMonitor.setProgress(progress);
-            progressMonitor.setNote(String.format("<html><b>Completed %d%%.</b> <br /><br /> %s<br /></html>", progress, loadingFont));
-
-            // If user cancels the font loading
-            if (progressMonitor.isCanceled()) {
-                task.cancel(true);
-                progressMonitor.setProgress(0);
-                // Task.done() is called
-            }
-        }
     }
 }
