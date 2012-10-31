@@ -604,36 +604,43 @@ public class CreateText extends JDialog implements PropertyChangeListener {
      * Loading fonts
      */
     private boolean loadFonts() {
+        try {
+            // Obtain Font info from the current graphics environment
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
-        // Obtain Font info from the current graphics environment
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            // Get an array of all font names
+            String[] fontNames = ge.getAvailableFontFamilyNames();
 
-        // Get an array of all font names
-        String[] fontNames = ge.getAvailableFontFamilyNames();
+            // Calculate 1% of font loading
+            float onePercent = 99f / (fontNames.length);
+            float progress = 0f;
 
-        // Calculate 1% of font loading
-        float onePercent = (fontNames.length) / 100;
-        float progress = 0f;
-        
-        // Add Fonts
-        for (String font : fontNames) {
-            this.cbFonts.addItem(font);
+            // Add Fonts
+            for (String font : fontNames) {
 
-            // Set standard font from project settings
-            if (font.equals(this.dss.getCurrentFont())) {
-                this.cbFonts.setSelectedItem(font);
+                this.cbFonts.addItem(font);
+
+                // Set standard font from project settings
+                if (font.equals(this.dss.getCurrentFont())) {
+                    this.cbFonts.setSelectedItem(font);
+                }
+
+                // Set font loading progression and name of font we are loading
+                loadingFont = font;
+                progress += onePercent;
+                task.setProgression((int) Math.floor(Math.min(progress, 99)));
+                
+                // Show progess
+                Thread.sleep(10);
             }
-            
-            // Set font loading progression and name of font we are loading
-            loadingFont = font;
-            progress += onePercent;
-            task.setProgression((int) Math.floor(Math.min(progress, 99)));
+        } catch (InterruptedException ex) {
+            Logger.getLogger(CreateText.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         // Done loading fonts
         task.setProgression(Math.min(100, 100));
         this.cbFonts.setEditable(false);
-        
+
         return true;
     }
 
@@ -661,7 +668,8 @@ public class CreateText extends JDialog implements PropertyChangeListener {
          */
         @Override
         public Void doInBackground() {
-            loadFonts();
+            if (!loadFonts()) {
+            }
             return null;
         }
 
