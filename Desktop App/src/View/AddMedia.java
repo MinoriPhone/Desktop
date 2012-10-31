@@ -53,6 +53,7 @@ public final class AddMedia extends JDialog {
     private int callFrom;
     private View.Map map;
     private boolean changeLink;
+    private Main parent;
 
     /**
      * Creates form addMedia
@@ -67,6 +68,7 @@ public final class AddMedia extends JDialog {
         initComponents();
 
         // Set variables
+        this.parent = parent;
         this.map = map;
         this.link = link;
         this.closedBySave = false;
@@ -219,6 +221,7 @@ public final class AddMedia extends JDialog {
         initComponents();
 
         // Set variables
+        this.parent = parent;
         this.prevLinks = prevLinks;
         this.map = map;
         this.closedBySave = false;
@@ -334,6 +337,15 @@ public final class AddMedia extends JDialog {
         });
     }
 
+    /**
+     * Returns the parent of this view
+     * 
+     * @return Main
+     */
+    public Main getParentView() {
+        return this.parent;
+    }
+    
     /**
      * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
