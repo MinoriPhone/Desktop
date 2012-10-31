@@ -38,7 +38,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 
 /**
  * Popup Window for adding media to a link
@@ -63,8 +62,7 @@ public final class AddMedia extends JDialog {
     /**
      * Creates form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of
-     * this window
+     * @param parent JFrame The Main window of this application is the parent of this window
      * @param map Instance of Class View.Map
      * @param link Link The Link we are creating
      */
@@ -154,6 +152,7 @@ public final class AddMedia extends JDialog {
 
         // MediaItems
         for (MediaItem mItem : link.getMediaItems()) {
+            
             // Add selected file to list
             if (mItem != null) {
                 if (mItem instanceof Video) {
@@ -235,10 +234,8 @@ public final class AddMedia extends JDialog {
      *
      * Creates form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of
-     * this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can
-     * connect this Link to
+     * @param parent JFrame The Main window of this application is the parent of this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can connect this Link to
      * @param link Link The Link we are creating
      * @param callFrom int if int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
@@ -296,9 +293,6 @@ public final class AddMedia extends JDialog {
             this.lRouteName2 = new JLabel("");
             pRouteName.add(this.lRouteName2, BorderLayout.CENTER);
         }
-
-        // Generate JTable so we can add MediaItems to it
-        //generateTable();
 
         // Add window listener to this window
         this.addWindowListener(new WindowAdapter() {
@@ -363,7 +357,6 @@ public final class AddMedia extends JDialog {
                         if (!found) {
                             routeNames.add(routeName);
                         }
-
                     }
                 }
                 routeName = "";
@@ -382,18 +375,17 @@ public final class AddMedia extends JDialog {
 
     /**
      * Returns the parent of this view
-     * 
+     *
      * @return Main
      */
     public Main getParentView() {
         return this.parent;
     }
-    
+
     /**
      * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
@@ -403,11 +395,9 @@ public final class AddMedia extends JDialog {
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from
-     * the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
-     * Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
      */
     public void removeItem(MediaItem mediaItem, int row) {
         this.addedItems.remove(mediaItem);
@@ -417,8 +407,7 @@ public final class AddMedia extends JDialog {
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will
-     * be in the right order!
+     * Get all added media items. If we closed the window, then the items will be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -497,7 +486,7 @@ public final class AddMedia extends JDialog {
         this.tAddedMedia.setDragEnabled(true);
         this.tAddedMedia.setTransferHandler(new TableTransferHandler());
 
-        this.tAddedMedia.setDefaultRenderer(Object.class, new MyTableCellRender());
+        this.tAddedMedia.setDefaultRenderer(Object.class, new AddMediaTableCellRender());
 
         // Add JScrollPane to AddedMedia JPanel
         this.pAddedMedia.add(spAddedMedia, BorderLayout.CENTER);
@@ -546,9 +535,15 @@ public final class AddMedia extends JDialog {
         this.tableModel.removeRow(row);
     }
 
-    class MyTableCellRender extends DefaultTableCellRenderer {
+    /**
+     * DefaultTableCellRenderer for the AddMedia table
+     */
+    class AddMediaTableCellRender extends DefaultTableCellRenderer {
 
-        public MyTableCellRender() {
+        /**
+         * Constructor
+         */
+        public AddMediaTableCellRender() {
             setOpaque(true);
         }
 
@@ -556,26 +551,23 @@ public final class AddMedia extends JDialog {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             /*MediaItem item = getAddedItemByFilenameAndAbsPath(String.valueOf(tAddedMedia.getModel().getValueAt(row, 1)), String.valueOf(tAddedMedia.getModel().getValueAt(row, 0)));
             if (item.isCorrupt()) {
-                setForeground(Color.red);
-                if (isSelected) {
-                    setBackground(Color.lightGray);
-                } else {
-                    setBackground(Color.white);
-                }
-                setForeground(Color.red);
-            } else {*/
-                setForeground(Color.black);
+                setForeground(Color.RED);
                 if (isSelected) {
                     setBackground(Color.LIGHT_GRAY);
                 } else {
-                    setBackground(Color.white);
+                    setBackground(Color.WHITE);
                 }
-
-            //}
-
+                setForeground(Color.RED);
+            } else {
+                setForeground(Color.BLACK);
+                if (isSelected) {
+                    setBackground(Color.LIGHT_GRAY);
+                } else {
+                    setBackground(Color.WHITE);
+                }
+            }
             setFocusable(true);
-
-            setText(value.toString());
+            setText(value.toString());*/
             return this;
         }
     }
@@ -781,25 +773,32 @@ public final class AddMedia extends JDialog {
             // Get selected MediaItem by path of the File that the user selected
             MediaItem mItem = f.getMediaItemFromFile(j.getSelectedFile().getAbsolutePath().toString());
 
-            // Show message dialog for .mov files
-            if (j.getSelectedFile().getName().endsWith(".mov")) {
-                
-                JOptionPane.showMessageDialog(null,
-                        "Note that files with in the .mov format are slower to load than other video formats.",
-                        ".mov files",
-                        JOptionPane.WARNING_MESSAGE);
-            }
-            
-            // Add selected file to list
-            if (mItem != null) {
-                if (mItem instanceof Video) {
-                    this.addItem((Video) mItem);
-                } else if (mItem instanceof Model.Image) {
-                    this.addItem((Model.Image) mItem);
-                    enterDuration(mItem, this.tableModel.getRowCount() - 1);
-                } else if (mItem instanceof Text) {
-                    this.addItem((Text) mItem);
-                    enterDuration(mItem, this.tableModel.getRowCount() - 1);
+            if (getAddedItemByFilenameAndAbsPath(mItem.getFileName(), mItem.getAbsolutePath()) != null) {
+
+                JOptionPane.showMessageDialog(this, "The media is already added.");
+
+            } else {
+
+                // Show message dialog for .mov files
+                if (j.getSelectedFile().getName().endsWith(".mov")) {
+
+                    JOptionPane.showMessageDialog(null,
+                            "Note that files with in the .mov format are slower to load than other video formats.",
+                            ".mov files",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+
+                // Add selected file to list
+                if (mItem != null) {
+                    if (mItem instanceof Video) {
+                        this.addItem((Video) mItem);
+                    } else if (mItem instanceof Model.Image) {
+                        this.addItem((Model.Image) mItem);
+                        enterDuration(mItem, this.tableModel.getRowCount() - 1);
+                    } else if (mItem instanceof Text) {
+                        this.addItem((Text) mItem);
+                        enterDuration(mItem, this.tableModel.getRowCount() - 1);
+                    }
                 }
             }
         } else if (dialog == JFileChooser.CANCEL_OPTION) {
@@ -849,6 +848,7 @@ public final class AddMedia extends JDialog {
                         // Add this link to the selected previous link (so this is the next link for that previous link)
                         for (Object object : objArray) {
                             Link prevLink = (Link) object;
+
                             // If user selected more than one previous link, we have to make 2 new links instead of using the same one
                             prevLink.addLink(this.link);
                         }
@@ -998,7 +998,7 @@ public final class AddMedia extends JDialog {
 }
 
 /*
- * StringTransferHandler.java is used by the 1.4 ExtendedDnDDemo.java example.
+ * StringTransferHandler.java is used by the TableTransferHandler.
  */
 abstract class StringTransferHandler extends TransferHandler {
 
