@@ -53,11 +53,13 @@ public final class AddMedia extends JDialog {
     private int callFrom;
     private View.Map map;
     private boolean changeLink;
+    private JLabel lRouteName2;
 
     /**
      * Creates form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of this window
+     * @param parent JFrame The Main window of this application is the parent of
+     * this window
      * @param map Instance of Class View.Map
      * @param link Link The Link we are creating
      */
@@ -72,7 +74,6 @@ public final class AddMedia extends JDialog {
         this.closedBySave = false;
         this.callFrom = (link.getP1() == null) ? 1 : 0;
         this.tfRouteName.setEditable(false);
-        this.tfRouteName.setText(map.getStory().getRouteForLink(link).getName());
         this.tfLinkName.setText(link.getName());
         this.changeLink = true;
         this.addedItems = new ArrayList<MediaItem>();
@@ -97,29 +98,50 @@ public final class AddMedia extends JDialog {
 
             // Set title and route
             this.lTitle.setText("Startnode Properties");
+            String tfRouteNameText = "";
+            ArrayList<Route> routes = map.getStory().getRoutesForLink(link);
+            for (Route route : routes) {
+                if (!tfRouteNameText.equals("")) {
+                    tfRouteNameText += ", " + route.getName();
+                } else {
+                    tfRouteNameText += route.getName();
+                }
+            }
 
+            this.tfRouteName.setText(tfRouteNameText);
             // Enable routename and disable prev links
             this.tfRouteName.setEditable(true);
             this.lLinks.setEnabled(false);
 
         } // User is NOT creating a startnode, but a new link
         else {
-            this.prevLinks = new ArrayList<Link>();
-            this.prevLinks.add(map.getStory().getParentFromLink(this.link));
+            this.prevLinks = map.getStory().getParentsFromLink(this.link);
+            ArrayList<String> routeNames = new ArrayList<String>();
+            boolean found = false;
+            String routeName = "";
+            for (Link l : this.prevLinks) {
+                ArrayList<Route> routes = map.getStory().getRoutesForLink(l);
+                for (Route route : routes) {
+                    routeName = route.getName();
+                    for (String string : routeNames) {
+                        if (string.equals(routeName)) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        routeNames.add(routeName);
+                    }
 
-            // Check if this link has twins and add their parent to the list
-            Link twin = this.link.getTwin();
-            while (twin != null) {
-                this.prevLinks.add(map.getStory().getParentFromLink(twin));
-                twin = this.link.getTwin();
+                }
             }
-
-            // Check if there is a link that has this link as a twin
-            twin = map.getStory().getTwins(this.link);
-            while (twin != null) {
-                this.prevLinks.add(map.getStory().getParentFromLink(twin));
-                twin = map.getStory().getTwins(twin);
+            routeName = "";
+            for (String string : routeNames) {
+                if (!routeName.equals("")) {
+                    routeName += ", ";
+                }
+                routeName += string;
             }
+            this.tfRouteName.setText(routeName);
             this.lLinks.setListData(this.prevLinks.toArray());
             this.lLinks.setEnabled(false);
         }
@@ -188,8 +210,8 @@ public final class AddMedia extends JDialog {
                 String tfRouteNameText = "";
                 for (Object obj : objArray) {
                     Link link = (Link) obj;
-                    Route route = map.getStory().getRouteForLink(link);
-                    if (route != null) {
+                    ArrayList<Route> routes = map.getStory().getRoutesForLink(link);
+                    for (Route route : routes) {
                         if (!tfRouteNameText.equals("")) {
                             tfRouteNameText += ", " + route.getName();
                         } else {
@@ -207,8 +229,10 @@ public final class AddMedia extends JDialog {
      *
      * Creates form addMedia
      *
-     * @param parent JFrame The Main window of this application is the parent of this window
-     * @param prevLinks ArrayList<Link> List with all the previous Link we can connect this Link to
+     * @param parent JFrame The Main window of this application is the parent of
+     * this window
+     * @param prevLinks ArrayList<Link> List with all the previous Link we can
+     * connect this Link to
      * @param link Link The Link we are creating
      * @param callFrom int if int = 1, we are creating a startnode (Link)
      * @param routeName String Name of the Route we are adding Links to
@@ -262,6 +286,8 @@ public final class AddMedia extends JDialog {
 
             // Set previous links in list
             this.lLinks.setListData(this.prevLinks.toArray());
+            this.lRouteName2 = new JLabel("");
+            pRouteName.add(this.lRouteName2, BorderLayout.CENTER);
         }
 
         // Generate JTable so we can add MediaItems to it
@@ -314,30 +340,45 @@ public final class AddMedia extends JDialog {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 Object[] objArray = lLinks.getSelectedValues();
-                String tfRouteNameText = "";
+                ArrayList<String> routeNames = new ArrayList<String>();
+                boolean found = false;
+                String routeName = "";
                 for (Object obj : objArray) {
                     Link link = (Link) obj;
-                    Route route = map.getStory().getRouteForLink(link);
-                    if (route != null) {
-                        if (!tfRouteNameText.equals("")) {
-                            tfRouteNameText += ", " + route.getName();
-                        } else {
-                            tfRouteNameText += route.getName();
+                    ArrayList<Route> routes = map.getStory().getRoutesForLink(link);
+                    for (Route route : routes) {
+                        routeName = route.getName();
+                        for (String string : routeNames) {
+                            if (string.equals(routeName)) {
+                                found = true;
+                            }
                         }
+                        if (!found) {
+                            routeNames.add(routeName);
+                        }
+
                     }
+                }
+                routeName = "";
+                for (String string : routeNames) {
+                    if (!routeName.equals("")) {
+                        routeName += ", ";
+                    }
+                    routeName += string;
                 }
 
                 // Set route name as JLabel with a JLabel
-                pRouteName.add(new JLabel(tfRouteNameText), BorderLayout.CENTER);
-                pRouteName.revalidate();
+                lRouteName2.setText(routeName);
             }
         });
     }
 
     /**
-     * Adds a MediaItem to the addedItems list and the name of the MediaItem to the drag and drop list.
+     * Adds a MediaItem to the addedItems list and the name of the MediaItem to
+     * the drag and drop list.
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to add
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to add
      */
     public void addItem(MediaItem mediaItem) {
         this.addedItems.add(mediaItem);
@@ -347,19 +388,22 @@ public final class AddMedia extends JDialog {
     }
 
     /**
-     * Removes a MediaItem from the addedItems list and removes the name from the drag and drop list
+     * Removes a MediaItem from the addedItems list and removes the name from
+     * the drag and drop list
      *
-     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or Image) we want to remove
+     * @param mediaItem MediaItem The MediaItem (instance of Video, Text or
+     * Image) we want to remove
      */
     public void removeItem(MediaItem mediaItem, int row) {
         this.addedItems.remove(mediaItem);
-        
+
         // Remove from table
         removeMediaItemFromTable(row);
     }
 
     /**
-     * Get all added media items. If we closed the window, then the items will be in the right order!
+     * Get all added media items. If we closed the window, then the items will
+     * be in the right order!
      *
      * @return ArrayList<MediaItem>
      */
@@ -746,13 +790,7 @@ public final class AddMedia extends JDialog {
                         for (Object object : objArray) {
                             Link prevLink = (Link) object;
                             // If user selected more than one previous link, we have to make 2 new links instead of using the same one
-                            if (objArray.length > 1) {
-                                // Make a new link so the link won't be saved twice.
-                                Link newLink = new Link(this.link, map.getStory().getLinkCounter());
-                                prevLink.addLink(newLink);
-                            } else {
-                                prevLink.addLink(this.link);
-                            }
+                            prevLink.addLink(this.link);
                         }
                         // Refresh routes list (treeview)
                         map.getStory().repaint();
@@ -796,6 +834,10 @@ public final class AddMedia extends JDialog {
                 }
 
                 // Set this link variables
+                ArrayList<Route> routes = map.getStory().getRoutesForLink(this.link);
+                for (Route route : routes) {
+                    route.setName(tfRouteName.getText().trim());
+                }
                 this.link.setName(linkName);
                 this.link.setItems(mediaItems);
 
@@ -826,18 +868,18 @@ public final class AddMedia extends JDialog {
 
     private void bDeleteItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDeleteItemActionPerformed
         /* Delete selected media item that is previously added */
-        
+
         // Get selected row
         int row = tAddedMedia.getSelectedRow();
-        
+
         // If a row is selected
         if (row > -1) {
-            
+
             // Get clicked MediaItem (row)
             MediaItem item = getAddedItemByFilenameAndAbsPath(
                     String.valueOf(this.tAddedMedia.getModel().getValueAt(this.tAddedMedia.getSelectedRow(), 1)),
                     String.valueOf(this.tAddedMedia.getModel().getValueAt(this.tAddedMedia.getSelectedRow(), 0)));
-            
+
             // and remove from table and added media item list
             this.removeItem(item, row);
 
