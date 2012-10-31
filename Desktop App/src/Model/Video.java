@@ -12,6 +12,7 @@ public class Video implements MediaItem {
     private String absPath;
     private int showDurationInSeconds = -1;
     private Link shortcut;
+    private Boolean isCorrupt;
 
     /**
      * Constructor
@@ -29,6 +30,7 @@ public class Video implements MediaItem {
     public Video(String fileName, String absPath) {
         this.fileName = fileName;
         this.absPath = absPath;
+        this.isCorrupt = false;
     }
 
     /**
@@ -74,11 +76,11 @@ public class Video implements MediaItem {
     public String printXML(boolean XMLProject) {
         String XMLString = "";
         XMLString += "<video>\r\n";
-        
+
         if (shortcut != null) {
             XMLString += "<shortcut>" + this.shortcut.getId() + "</shortcut>\r\n";
         }
-        
+
         if (XMLProject) {
             XMLString += "<filename>" + this.absPath + this.fileName + "</filename>\r\n";
         } else {
@@ -116,5 +118,15 @@ public class Video implements MediaItem {
     @Override
     public Link getShortcut() {
         return shortcut;
+    }
+    
+    @Override
+    public Boolean isCorrupt() {
+        return this.isCorrupt;
+    }    
+
+    @Override
+    public void setCorrupt(Boolean corrupt) {
+        this.isCorrupt = corrupt;
     }
 }

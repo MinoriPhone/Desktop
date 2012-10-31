@@ -38,7 +38,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 
-
 /**
  * Panel containing the Map
  */
@@ -209,6 +208,15 @@ public class Map extends JPanel {
     }
 
     /**
+     * Set Story
+     *
+     * @param story The new story
+     */
+    public void setStory(Story story) {
+        this.story = story;
+    }
+
+    /**
      * Get buttonNodeClicked
      *
      * @return boolean
@@ -305,6 +313,7 @@ public class Map extends JPanel {
         return nodeOnMouse;
     }
 }
+
 /**
  * Class containing all listeners for the Map.
  */

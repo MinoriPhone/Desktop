@@ -5,8 +5,7 @@ import Plugins.jxmap.swingx.mapviewer.GeoPosition;
 import java.awt.Color;
 
 /**
- * The node is a spot which can be placed on a map. You can say that a spot
- * represents a location.
+ * The node is a spot which can be placed on a map. You can say that a spot represents a location.
  */
 public class Node extends DefaultWaypoint {
 
