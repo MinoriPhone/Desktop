@@ -58,6 +58,7 @@ public final class AddMedia extends JDialog {
     private View.Map map;
     private boolean changeLink;
     private JLabel lRouteName2;
+    private Main parent;
 
     /**
      * Creates form addMedia
