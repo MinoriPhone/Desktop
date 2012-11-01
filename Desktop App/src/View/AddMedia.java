@@ -153,7 +153,7 @@ public final class AddMedia extends JDialog {
         // MediaItems
         for (MediaItem mItem : link.getMediaItems()) {
             
-            // Add selected file to list
+            // Add file to list
             if (mItem != null) {
                 if (mItem instanceof Video) {
                     this.addItem((Video) mItem);
@@ -367,7 +367,7 @@ public final class AddMedia extends JDialog {
                     routeName += string;
                 }
 
-                // Set route name as JLabel with a JLabel
+                // Reset route name
                 lRouteName2.setText(routeName);
             }
         });
@@ -1050,7 +1050,7 @@ abstract class StringTransferHandler extends TransferHandler {
 }
 
 /*
- * TableTransferHandler.java is used by the 1.4 ExtendedDnDDemo.java example.
+ * A handler to transfer items in a list to another location.
  */
 class TableTransferHandler extends StringTransferHandler {
 
