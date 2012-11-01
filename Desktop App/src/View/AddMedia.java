@@ -97,6 +97,11 @@ public final class AddMedia extends JDialog {
         // Center the window
         this.setLocation(x, y);
 
+        // Set Main icon
+        java.net.URL url = ClassLoader.getSystemResource("View/Images/72x72.png");
+        java.awt.Image img = tk.createImage(url);
+        this.setIconImage(img);
+
         // User is creating a startnode and not a Link
         if (this.callFrom == 1) {
 
@@ -695,7 +700,7 @@ public final class AddMedia extends JDialog {
                                 .add(pMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(pAddedMedia, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .add(tfLinkName)
-                                    .add(jScrollPane1)
+                                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
                                     .add(pMainLayout.createSequentialGroup()
                                         .add(bBrowse)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
