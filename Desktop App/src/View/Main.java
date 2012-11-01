@@ -148,7 +148,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             "Arial",
             "Arial Black",
             "Comic Sans MS",
-            "Courier New",            
+            "Courier New",
             "Georgia",
             "Impact",
             "Lucida Console",
