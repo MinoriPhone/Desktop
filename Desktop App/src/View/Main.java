@@ -49,9 +49,6 @@ import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
-/**
- * The Main screen of the application
- */
 public class Main extends JFrame implements PropertyChangeListener {
 
     // Variables
@@ -112,7 +109,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
         // Add Map
         map = new Map(story, this);
-        panelRoutes.addStory(story);
+        panelRoutes.createStoryTree(story);
         pMain.add(this.map, BorderLayout.CENTER);
 
         // Add accelerators
@@ -145,11 +142,16 @@ public class Main extends JFrame implements PropertyChangeListener {
 
     /**
      * Get all available fonts
+     *
+     * @return String[] all the availible fonts
      */
     public String[] getAvailableFonts() {
         return this.availableFonts;
     }
 
+    /**
+     * Check if something was changed before closing
+     */
     private void checkChangeBeforeClose() {
         if (story.isSomethingChanged()) {
 
@@ -171,6 +173,11 @@ public class Main extends JFrame implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Trigger the progress task
+     *
+     * @param taskOption TaskOptions The enumeration for the option
+     */
     private void triggerProgressTask(TaskOptions taskOption) {
         if (taskOption == TaskOptions.EXPORT) {
             progressMonitor = new ProgressMonitor(Main.this, "Exporting iStory..", "", 0, 100);
@@ -198,10 +205,20 @@ public class Main extends JFrame implements PropertyChangeListener {
         return defaultStoryName;
     }
 
+    /**
+     * Get the routes panel
+     *
+     * @return Routes the routes panel
+     */
     public Routes getPanelRoutes() {
         return panelRoutes;
     }
 
+    /**
+     * Get the current document style settings
+     *
+     * @return DocumentStyleSettings the current document style settings
+     */
     public DocumentStyleSettings getDocumentStyleSettings() {
         return this.dss;
     }
@@ -438,6 +455,7 @@ public class Main extends JFrame implements PropertyChangeListener {
     }//GEN-LAST:event_miExportActionPerformed
 
     private void miOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miOpenActionPerformed
+        // Check if something has been changed before opening a new story
         if (story.isSomethingChanged()) {
             // Show save confirm window
             int n = JOptionPane.showConfirmDialog(null,
@@ -642,7 +660,7 @@ public class Main extends JFrame implements PropertyChangeListener {
             if (!storyName.equals("")) {
                 story = new Story(storyName, panelRoutes, this);
                 map.Clear(story);
-                panelRoutes.addStory(story);
+                panelRoutes.createStoryTree(story);
                 panelRoutes.refreshList(story.getRoutes());
 
                 this.setTitle(storyName + " - iStory designer " + Application.getVersion());
@@ -709,9 +727,9 @@ public class Main extends JFrame implements PropertyChangeListener {
     }
 
     /**
-     * TODO
+     * Save the current story
      *
-     * @return boolean
+     * @return boolean true is the save was a succes
      */
     private boolean saveStory() {
 
@@ -731,7 +749,6 @@ public class Main extends JFrame implements PropertyChangeListener {
         if (dialog == JFileChooser.APPROVE_OPTION) {
 
             try {
-
                 String XMLcontent = this.story.printXML(XMLProject);
                 this.story.setPrinted(false);
                 // Add no linked nodes at the end
@@ -794,11 +811,9 @@ public class Main extends JFrame implements PropertyChangeListener {
      *
      * @return true if all the corrupt files were fixed / false if not
      */
-    private Boolean verifyValidExport() {
-
+    private boolean verifyValidExport() {
 
         for (Link link : story.getAllLinks()) {
-
             // Check if there are any links with no media item
             if (link.getMediaItems().isEmpty()) {
                 JOptionPane.showMessageDialog(null,
@@ -849,17 +864,18 @@ public class Main extends JFrame implements PropertyChangeListener {
     }
 
     /**
-     * TODO
+     * Export the current story
      *
-     * @return boolean
+     * @return boolean true if the story was successfully exported
      */
     private boolean exportStory() {
 
+        // Check for any corrupt files
         if (!verifyValidExport()) {
             return false;
         }
 
-        float progress = 0f;
+        float progress;
         boolean XMLProject = false; // make a proj file
 
         JFileChooser j = new JFileChooser();
@@ -994,10 +1010,10 @@ public class Main extends JFrame implements PropertyChangeListener {
                     }
                 }
                 this.story.setPrinted(false);
-///////////
-// XML
-///////////
-// Create an XML-file
+                ///////////
+                // XML
+                ///////////
+                // Create an XML-file
                 String filenameWithPath = fileName.replace(".iStory", "") + ".xml";
                 File XMLfile = new File(filenameWithPath);
                 String filename = j.getName(XMLfile);
@@ -1111,6 +1127,18 @@ public class Main extends JFrame implements PropertyChangeListener {
         return false;
     }
 
+    /**
+     * The stream writer for handling the progeression
+     *
+     * @param in InputStream the inputStream
+     * @param out OutputStream the OutputStream
+     * @param progress float the current progress
+     * @param percent float the percent to add to the current progress
+     * @param maxBufferSize int the maximum bytes to write each time
+     *
+     * @return float the current progress
+     * @throws IOException any input output exception
+     */
     public float copyInputStream(InputStream in, OutputStream out, float progress, float percent, int maxBufferSize)
             throws IOException {
         byte[] buffer = new byte[maxBufferSize];
@@ -1127,9 +1155,16 @@ public class Main extends JFrame implements PropertyChangeListener {
         return progress;
     }
 
+    /**
+     * Import the current story
+     *
+     * @return boolean true if the import was succesfully imported
+     * @throws IOException any import or output exceptions
+     */
     public boolean importStory() throws IOException {
         float progress = 10f;
 
+        // Select an import file
         JFileChooser j = new JFileChooser();
         j.setAcceptAllFileFilterUsed(false);
         j.setDialogTitle("Select an iStory file to import");
@@ -1143,7 +1178,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         if (dialog == JFileChooser.APPROVE_OPTION) {
 
             try {
-
+                // Select a place to store the story files in
                 JFileChooser importLocationChooser = new JFileChooser();
                 importLocationChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 importLocationChooser.setDialogTitle("Select a location to store the files");
@@ -1328,10 +1363,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                     System.err.println("Error: " + e.getMessage());
                 }
 
-
-
                 return true;
-
 
             } catch (IOException ex) {
                 Logger.getLogger(Main.class
@@ -1389,8 +1421,8 @@ public class Main extends JFrame implements PropertyChangeListener {
         /**
          * Export story
          *
-         * @return null
-         * @throws InterruptedException
+         * @return null if everything is done
+         * @throws InterruptedException any exception
          */
         @Override
         public Void doInBackground() throws IOException {

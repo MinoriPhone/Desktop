@@ -46,7 +46,9 @@ public class CreateText extends JDialog {
     private DocumentStyleSettings dss;
 
     /**
-     * Creates new form CreateText
+     * Create a new Create Text dialog
+     *
+     * @param parent AddMedia the current parent
      */
     public CreateText(AddMedia parent) {
         super(parent, true);
@@ -547,7 +549,7 @@ public class CreateText extends JDialog {
      *
      * @param s String we want to escape
      *
-     * @return String
+     * @return String the escaped HTML
      */
     public static String escapeHTML(String s) {
         StringBuilder sb = new StringBuilder();

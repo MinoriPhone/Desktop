@@ -27,13 +27,14 @@ public class ProjectSettings extends JDialog {
     private Color tempFontColor;
 
     /**
-     * Constructor
+     * Create a new projectsettings dialog
      *
-     * Creates new form ProjectSettings with parameters
+     * @param main Main the main component
+     * @param map Map the map component
      */
     public ProjectSettings(Main main, Map map) {
         super(main, true);
-        
+
         initComponents();
 
         // Set variables
@@ -53,6 +54,7 @@ public class ProjectSettings extends JDialog {
         } else if (this.main.getDocumentStyleSettings().getCurrentFontStyle() == 2) {
             this.cbFontStyle.setSelectedItem("Italic");
         }
+
         this.cbFontSize.setSelectedItem(this.main.getDocumentStyleSettings().getCurrentFontSize());
 
         // Get the size of the screen
@@ -332,6 +334,7 @@ public class ProjectSettings extends JDialog {
 
     private void bSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveActionPerformed
 
+        // Set a new story name. If it is set to an empty string, it will set the default name
         if (!tfStoryName.getText().equals("")) {
             this.map.getStory().setName(tfStoryName.getText());
         } else {
