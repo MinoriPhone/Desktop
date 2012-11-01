@@ -12,9 +12,6 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-/**
- * Paints a link
- */
 public class LinkPainter implements Painter<JXMapViewer> {
 
     // Variables
@@ -34,64 +31,62 @@ public class LinkPainter implements Painter<JXMapViewer> {
     }
 
     /**
-     * TODO
+     * Add a Link to this painter
      *
-     * @param link
+     * @param link Link
      */
     public void addLink(Link link) {
         this.links.add(link);
     }
 
     /**
-     * TODO
-     *
-     * @param link
+     * Clear all links this painter knows
      */
     public void clearLinks() {
         this.links.clear();
     }
 
     /**
-     * TODO
+     * Get the last Link this painter knows
      *
-     * @return
+     * @return Link
      */
     public Link getLastLink() {
         return links.get(links.size() - 1);
     }
 
     /**
-     * TODO
+     * Remove last Link the painter knows
      */
     public void removeLastLink() {
         links.remove(links.size() - 1);
     }
 
     /**
-     * TODO
+     * Return the Point2D mouse position
      *
-     * @return
+     * @return Point2D
      */
     public Point2D getMousePos() {
         return mousePos;
     }
 
     /**
-     * TODO
+     * Set the Point2D mouse position
      *
-     * @param mousePos
+     * @param mousePos Point2D
      */
     public void setMousePos(Point2D mousePos) {
         this.mousePos = mousePos;
     }
 
     /**
-     * TODO
+     * Override the painter. Paints all known Links
      *
-     * @param g
-     * @param map
-     * @param w
-     * @param h
+     * @param g Graphics2D
+     * @param map JXMapViewer
+     * @param w int
+     * @param h int
      */
     @Override
     public void paint(Graphics2D g, JXMapViewer map, int w, int h) {
@@ -107,17 +102,17 @@ public class LinkPainter implements Painter<JXMapViewer> {
 
         // do the drawing
         g.setStroke(new BasicStroke(4));
-
         drawLink(g, map);
 
+        // Dispose the Graphics2D
         g.dispose();
     }
 
     /**
-     * TODO
+     * Paint a Link
      *
-     * @param g
-     * @param map
+     * @param g Graphics2D
+     * @param map JXMapViewer
      */
     private void drawLink(Graphics2D g, JXMapViewer map) {
         for (Link link : links) {
@@ -131,10 +126,11 @@ public class LinkPainter implements Painter<JXMapViewer> {
     }
 
     /**
-     * TODO 
-     * 
-     * @param mapViewer
-     * @return 
+     * Get all Links that intersect with the current mouse position
+     *
+     * @param mapViewer JXMapViewer
+     *
+     * @return ArrayList<Link>
      */
     public ArrayList<Link> intersects(JXMapViewer mapViewer) {
         ArrayList<Link> clickedLinkArray = new ArrayList<Link>();

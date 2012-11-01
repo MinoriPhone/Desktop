@@ -1,8 +1,5 @@
 package Model;
 
-/**
- * The Route an user is able to make during the Story. A Route holds all the Links between different Nodes (positions).
- */
 public class Route {
 
     // Variables
@@ -11,13 +8,9 @@ public class Route {
 
     /**
      * Constructor
-     *
-     * @param name String Name of the Route
-     * @param startLink Link Startlink of the Route
      */
     public Route() {
     }
-
 
     /**
      * Overload Constructor
@@ -68,7 +61,11 @@ public class Route {
     }
 
     /**
-     * Print XML
+     * Get XML
+     *
+     * @param XMLProject boolean Used to define difference between shortcut or not
+     *
+     * @return String
      */
     public String printXML(boolean XMLProject) {
         String XMLString = "";
@@ -79,12 +76,15 @@ public class Route {
         XMLString += "</route.link>\r\n";
         XMLString += "</route>\r\n";
         return XMLString;
-
     }
 
+    /**
+     * Get the Name of the Route
+     *
+     * @return String
+     */
     @Override
     public String toString() {
         return this.getName();
     }
-       
 }

@@ -5,9 +5,6 @@ import View.Routes;
 import java.io.File;
 import java.util.ArrayList;
 
-/**
- * A Story that the user is going to watch. This class holds all the different Routes an user can make.
- */
 public class Story {
 
     // Variables
@@ -102,7 +99,6 @@ public class Story {
 
     /**
      * Create a new empty Route and add Route to the Routelist
-     *
      */
     public void newEmptyRoute() {
         Route route = new Route();
@@ -112,7 +108,9 @@ public class Story {
     /**
      * Get a Link with the correct Endnode
      *
-     * @param endNode the Node which the Link has as an end
+     * @param endNode Node The Node which the Link has as an end
+     *
+     * @return Link
      */
     public Link getLinkForEndNode(Node endNode) {
         Link currentLink;
@@ -128,12 +126,13 @@ public class Story {
     /**
      * Get the startLink for this node
      *
-     * @param endNode the Node which the Link has as a start
+     * @param endNode Node The Node which the Link has as a start
+     *
+     * @return Link
      */
     public Link getStartLinkForNode(Node endNode) {
         for (Route route : routes) {
-            if(route.getStartLink().getP2().equals(endNode))
-            {
+            if (route.getStartLink().getP2().equals(endNode)) {
                 return route.getStartLink();
             }
         }
@@ -143,7 +142,9 @@ public class Story {
     /**
      * Get previous links for this given Node
      *
-     * @param startNode the Node which the user just clicked for creating a Link
+     * @param startNode Node The Node which the user just clicked for creating a Link
+     *
+     * @return ArrayList<Link>
      */
     public ArrayList<Link> getPreviousLinksForStartNode(Node startNode) {
         ArrayList<Link> prevLinks = new ArrayList<Link>();
@@ -154,7 +155,11 @@ public class Story {
     }
 
     /**
-     * Print XML
+     * Get XML
+     *
+     * @param XMLProject boolean Used to define difference between shortcut or not
+     *
+     * @return String
      */
     public String printXML(boolean XMLProject) {
         String XMLString = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n";
@@ -178,7 +183,9 @@ public class Story {
     }
 
     /**
-     * Print XML
+     * Set the boolean for already printed or not
+     *
+     * @param printed boolean
      */
     public void setPrinted(boolean printed) {
         for (Route route : this.routes) {
@@ -190,6 +197,8 @@ public class Story {
      * Get all routes that are part of a Node
      *
      * @param node Node
+     *
+     * @return ArrayList<Route>
      */
     public ArrayList<Route> getRoutesFromNode(Node node) {
         ArrayList<Route> r = new ArrayList<Route>();
@@ -206,7 +215,9 @@ public class Story {
     /**
      * Get all route for link
      *
-     * @param node Node
+     * @param link Link
+     *
+     * @return ArrayList<Route>
      */
     public ArrayList<Route> getRoutesForLink(Link link) {
         // Get all routes that are part of the given Node
@@ -234,7 +245,9 @@ public class Story {
     }
 
     /**
-     * Get all media items
+     * Get all Links for Story
+     *
+     * @return ArrayList<Link>
      */
     public ArrayList<Link> getAllLinks() {
         ArrayList<Link> allLinks = new ArrayList<Link>();
@@ -245,7 +258,8 @@ public class Story {
     }
 
     /**
-     * TODO
+     * Indicates whether something for this Story has been changed by the user. If true, a astrix will be shown in the titlebar before
+     * the title name
      *
      * @return boolean
      */
@@ -254,9 +268,9 @@ public class Story {
     }
 
     /**
-     * TODO
+     * Set true if the user changed the Story or false if not
      *
-     * @param somethingChanged
+     * @param somethingChanged boolean
      */
     public void setSomethingChanged(boolean somethingChanged) {
         this.somethingChanged = somethingChanged;
@@ -276,25 +290,34 @@ public class Story {
     /**
      * Returns the Link Counter
      *
-     * @return the current linkCounter incremented with 1
+     * @return long The current linkCounter incremented with 1
      */
     public long getLinkCounter() {
         linkCounter++;
         return linkCounter;
     }
-    
+
     /**
      * Set the linkcounter manually
      *
+     * @param linkCounter long
      */
     public void setLinkCounter(long linkCounter) {
         this.linkCounter = linkCounter;
     }
-    
-    public void repaint(){
+
+    /**
+     * Repaints the routesPanel
+     */
+    public void repaint() {
         routesPanel.refreshList(routes);
     }
 
+    /**
+     * Get the name of the Story
+     *
+     * @return String
+     */
     @Override
     public String toString() {
         return this.getName();

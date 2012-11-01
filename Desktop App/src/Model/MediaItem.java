@@ -61,12 +61,21 @@ public interface MediaItem {
     public Link getShortcut();
 
     /**
-     * Print to XML
-     *
+     * Get XML
      */
     public String printXML(boolean XMLProject);
 
+    /**
+     * Indicates if this Text object is corrupt. Is true if the path to file doesn't exists anymore
+     *
+     * @return boolean
+     */
     public boolean isCorrupt();
-    
+
+    /**
+     * Set if this Text object is corrupt or not. Is true if the path to file doesn't exists anymore
+     *
+     * @param corrupt boolean
+     */
     public void setCorrupt(boolean corrupt);
 }

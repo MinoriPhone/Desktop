@@ -2,9 +2,6 @@ package Model;
 
 import javax.swing.JFileChooser;
 
-/**
- * Creates a new FileChooser Dialog Window
- */
 public class FileChooser {
 
     // Variables

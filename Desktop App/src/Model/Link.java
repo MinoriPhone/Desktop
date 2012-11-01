@@ -6,9 +6,6 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-/**
- * A Link between two Nodes. A Route consists of multiple Links.
- */
 public class Link {
 
     // Variables
@@ -23,10 +20,19 @@ public class Link {
 
     /**
      * Constructor
+     */
+    public Link() {
+        this.links = new ArrayList<Link>();
+        this.mediaItems = new ArrayList<MediaItem>();
+        this.color = Color.RED;
+    }
+
+    /**
+     * Overload constructor (1)
      *
-     * @param name String
-     * @param p1 Node
-     * @param p2 Node
+     * @param name String Name of the Link
+     * @param p1 Node First Node
+     * @param p2 Node Second Node
      */
     public Link(String name, Node p1, Node p2, long id) {
         this.name = name;
@@ -39,21 +45,10 @@ public class Link {
     }
 
     /**
-     * Constructor
+     * Overload constructor (2)
      *
-     */
-    public Link() {
-        this.links = new ArrayList<Link>();
-        this.mediaItems = new ArrayList<MediaItem>();
-        this.color = Color.RED;
-    }
-
-    /**
-     * Constructor
-     *
-     * @param name String
-     * @param p1 Node
-     * @param p2 Node
+     * @param link Link
+     * @param id long
      */
     public Link(Link link, long id) {
         this.name = link.getName();
@@ -188,6 +183,10 @@ public class Link {
 
     /**
      * Print XML
+     *
+     * @param XMLProject boolean
+     *
+     * @return String
      */
     public String printXML(boolean XMLProject) {
         String XMLString = "";
@@ -226,7 +225,9 @@ public class Link {
     }
 
     /**
-     * set Printed boolean
+     * Set all printed boolean
+     *
+     * @param printed boolean
      */
     public void setAllPrinted(boolean printed) {
         this.printed = printed;
@@ -236,19 +237,30 @@ public class Link {
     }
 
     /**
-     * set Printed boolean
+     * Set printed boolean
+     *
+     * @param printed boolean
      */
     public void setPrinted(boolean printed) {
         this.printed = printed;
     }
 
     /**
-     * get Printed boolean
+     * Get printed boolean
+     *
+     * @return boolean
      */
     public boolean getPrinted() {
         return this.printed;
     }
 
+    /**
+     * Get Link for given endNode
+     *
+     * @param endNode Node
+     *
+     * @return Link
+     */
     public Link getLinkForEndNode(Node endNode) {
         if (this.getP2().equals(endNode)) {
             return this;
@@ -264,11 +276,12 @@ public class Link {
     }
 
     /**
-     * TODO
+     * Get all previous Links for given endNode
      *
-     * @param node
-     * @param prevLinks
-     * @return
+     * @param node Node
+     * @param prevLinks ArrayList<Link>
+     *
+     * @return ArrayList<Link>
      */
     public ArrayList<Link> getPrevLinksForNode(Node node, ArrayList<Link> prevLinks) {
         boolean found = false;
@@ -292,6 +305,7 @@ public class Link {
      * Get routes that are part of this given Node
      *
      * @param node Node
+     *
      * @return boolean
      */
     public boolean getRoutesFromNode(Node node) {
@@ -306,7 +320,11 @@ public class Link {
     }
 
     /**
-     * Get all media items
+     * Get all Links for a Story
+     *
+     * @param allLinks ArrayList<Link>
+     *
+     * @return ArrayList<Link>
      */
     public ArrayList<Link> getAllLinks(ArrayList<Link> allLinks) {
         allLinks.add(this);
@@ -317,14 +335,24 @@ public class Link {
     }
 
     /**
-     * Get all lines
+     * Get line-drawing (red line) with arrow
+     *
+     * @param map JXMapViewer
+     * @param mousePos Point2D
+     *
+     * @return ArrayList<Line2D.Double>
      */
     public ArrayList<Line2D.Double> getLines(JXMapViewer map, Point2D mousePos) {
         ArrayList<Line2D.Double> lines = new ArrayList<Line2D.Double>();
         if (p1 != null) {
-            Point2D pt1;
-            Point2D pt2;
+
+            // Initialize variables
+            Point2D pt1 = null;
+            Point2D pt2 = null;
+            Point2D middle = null;
             double length = 10;
+
+            // Set pt1 and pt2
             if (p2 == null && p1 != null) {
                 pt1 = map.getTileFactory().geoToPixel(p1.getGeoposition(), map.getZoom());
                 pt2 = map.getTileFactory().geoToPixel(map.convertPointToGeoPosition(mousePos), map.getZoom());
@@ -332,10 +360,12 @@ public class Link {
                 pt1 = map.getTileFactory().geoToPixel(p1.getGeoposition(), map.getZoom());
                 pt2 = map.getTileFactory().geoToPixel(p2.getGeoposition(), map.getZoom());
             }
+
+            // Get red line
             Line2D.Double line = new Line2D.Double((int) pt1.getX(), (int) pt1.getY(), (int) pt2.getX(), (int) pt2.getY());
             lines.add(line);
 
-            Point2D middle;
+            // Set middle point
             if (pt1.getX() == pt2.getX()) {
                 middle = new Point2D.Double(pt1.getX(), (pt1.getY() + pt2.getY()) / 2);
             } else if (pt1.getY() == pt2.getY()) {
@@ -344,12 +374,15 @@ public class Link {
                 middle = new Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
             }
 
+            // Get length of Line
             double difX = (double) pt1.getX() - (double) pt2.getX();
             double difY = (double) pt1.getY() - (double) pt2.getY();
 
-            Point2D arrowLineY;
-            Point2D arrowLineX;
+            // Initialize variables
+            Point2D arrowLineX = null;
+            Point2D arrowLineY = null;
 
+            // Calculate angle for drawing red arrow
             if (difY == 0) {
                 double deltaX = Math.sqrt((length * length) / 2);
                 if (difX < 0) {
@@ -360,9 +393,7 @@ public class Link {
                 arrowLineY = new Point2D.Double(middle.getX() + deltaY, middle.getY() - deltaX);
             } else {
                 double angle = Math.atan(difX / difY);
-
                 double arrowAngle = angle - 95;
-
                 double deltaX = length * Math.sin(arrowAngle);
                 double deltaY = length * Math.cos(arrowAngle);
 
@@ -374,20 +405,26 @@ public class Link {
                     arrowLineY = new Point2D.Double(middle.getX() - deltaX, middle.getY() - deltaY);
                 }
             }
+
+            // Get red arrow
             Line2D.Double pijltje1 = new Line2D.Double((int) middle.getX(), (int) middle.getY(), (int) arrowLineY.getX(), (int) arrowLineY.getY());
-            lines.add(pijltje1);
             Line2D.Double pijltje2 = new Line2D.Double((int) middle.getX(), (int) middle.getY(), (int) arrowLineX.getX(), (int) arrowLineX.getY());
+            lines.add(pijltje1);
             lines.add(pijltje2);
         }
+
+        // Return red line + arrow
         return lines;
     }
 
     /**
-     * Get all route for link
+     * Return true if the given Link is part of a Route
      *
-     * @param node Node
+     * @param link Link
+     *
+     * @return boolean
      */
-    public Boolean getRouteForLink(Link link) {
+    public boolean getRouteForLink(Link link) {
         if (this.equals(link)) {
             return true;
         } else {
@@ -433,7 +470,7 @@ public class Link {
     }
 
     /**
-     * Return name of this Link
+     * Return the name of this Link
      */
     @Override
     public String toString() {

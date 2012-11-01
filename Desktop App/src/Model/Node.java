@@ -4,11 +4,9 @@ import Plugins.jxmap.swingx.mapviewer.DefaultWaypoint;
 import Plugins.jxmap.swingx.mapviewer.GeoPosition;
 import java.awt.Color;
 
-/**
- * The node is a spot which can be placed on a map. You can say that a spot represents a location.
- */
 public class Node extends DefaultWaypoint {
 
+    // Variables
     private Color color = Color.BLUE;
     private String label;
     private Double radius;
@@ -25,9 +23,9 @@ public class Node extends DefaultWaypoint {
     }
 
     /**
-     * Constructor with geolocation
+     * Overload constructor with geolocation
      *
-     * @param geoposition The jxMapView geoposition
+     * @param geoposition GeoPosition The jxMapView geoposition
      */
     public Node(GeoPosition geoposition) {
         super(geoposition); // Creates a waypoint with the geoposition           
@@ -35,58 +33,74 @@ public class Node extends DefaultWaypoint {
     }
 
     /**
+     * Call the function Geoposition() of the parent (DefaultWaypoint)
      *
-     * @return
+     * @return GeoPosition
      */
     public GeoPosition getGeoposition() {
         return super.getPosition();
     }
 
     /**
+     * Call the function setGeoposition(..) of the parent (DefaultWaypoint)
      *
-     * @param geoposition
+     * @param geoposition GeoPosition
      */
     public void setGeoposition(GeoPosition geoposition) {
         super.setPosition(geoposition);
     }
 
     /**
+     * Get the label of a Node (if exists)
      *
-     * @return color
+     * @note A startNode has a 'S'
+     *
+     * @return String
      */
     public String getLabel() {
         return label;
     }
 
     /**
+     * Set the label of a Node
      *
-     * @param label
+     * @param label String
      */
     public void setLabel(String label) {
         this.label = label;
     }
 
     /**
+     * Get the color of a Node
      *
-     * @return color
+     * @return color Color
      */
     public Color getColor() {
         return color;
     }
 
     /**
+     * Set the Color of a Node
      *
-     * @param color
+     * @param color Color
      */
     public void setColor(Color color) {
         this.color = color;
     }
 
+    /**
+     * Set variables for a startNode
+     */
     public void setStart() {
         this.color = Color.GREEN;
         this.label = "S";
     }
 
+    /**
+     * Returns true if the given Node is a startNode
+     *
+     * @return boolean
+     */
     public Boolean getStart() {
         if (this.color == Color.GREEN && this.label.equals("S")) {
             return true;
@@ -95,15 +109,20 @@ public class Node extends DefaultWaypoint {
         }
     }
 
-    public void setEnd() {
-        this.color = Color.RED;
-        this.label = "E";
-    }
-
+    /**
+     * Get the current radius of a Node
+     *
+     * @return double
+     */
     public Double getRadius() {
         return radius;
     }
 
+    /**
+     * Set the current radius of a Node
+     *
+     * @param radius Double
+     */
     public void setRadius(Double radius) {
         if (radius <= 500) {
             this.radius = radius;
@@ -113,8 +132,9 @@ public class Node extends DefaultWaypoint {
     }
 
     /**
+     * Show the current GPS-location of a Node
      *
-     * @return
+     * @return String
      */
     @Override
     public String toString() {
@@ -122,7 +142,11 @@ public class Node extends DefaultWaypoint {
     }
 
     /**
-     * Print XML
+     * Get XML
+     *
+     * @param XMLProject boolean Used to define difference between shortcut or not
+     *
+     * @return String
      */
     public String printXML(boolean XMLProject) {
         String XMLString = "";

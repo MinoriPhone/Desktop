@@ -1,10 +1,5 @@
 package Model;
 
-/**
- * Instance of MediaItem
- *
- * This is an object of Text. Users kan link a Text-object to a certain Link object
- */
 public class Text implements MediaItem {
 
     // Variables
@@ -80,6 +75,13 @@ public class Text implements MediaItem {
         }
     }
 
+    /**
+     * Get XML
+     *
+     * @param XMLProject boolean Used to define difference between shortcut or not
+     *
+     * @return String
+     */
     @Override
     public String printXML(boolean XMLProject) {
         String XMLString = "";
@@ -121,21 +123,41 @@ public class Text implements MediaItem {
         this.absPath = absPath;
     }
 
+    /**
+     * Set whether this Text object is a shortcut to a Link or not
+     *
+     * @param isShortcut Link
+     */
     @Override
     public void setShortcut(Link isShortcut) {
         this.shortcut = isShortcut;
     }
 
+    /**
+     * Get shortcut for this Link
+     *
+     * @return Link
+     */
     @Override
     public Link getShortcut() {
         return this.shortcut;
     }
 
+    /**
+     * Indicates if this Text object is corrupt. Is true if the path to file doesn't exists anymore
+     *
+     * @return boolean
+     */
     @Override
     public boolean isCorrupt() {
         return this.isCorrupt;
     }
 
+    /**
+     * Set if this Text object is corrupt or not. Is true if the path to file doesn't exists anymore
+     *
+     * @param corrupt boolean
+     */
     @Override
     public void setCorrupt(boolean corrupt) {
         this.isCorrupt = corrupt;

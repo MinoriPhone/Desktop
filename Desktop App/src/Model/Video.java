@@ -1,10 +1,5 @@
 package Model;
 
-/**
- * Instance of MediaItem
- *
- * This is an object of Video. Users kan link a Video-object to a certain Link object
- */
 public class Video implements MediaItem {
 
     // Variables
@@ -16,7 +11,6 @@ public class Video implements MediaItem {
 
     /**
      * Constructor
-     *
      */
     public Video() {
     }
@@ -72,6 +66,13 @@ public class Video implements MediaItem {
     public void setShowDurationInSeconds(int showDurationInSeconds) {
     }
 
+    /**
+     * Get XML
+     *
+     * @param XMLProject boolean Used to define difference between shortcut or not
+     *
+     * @return String
+     */
     @Override
     public String printXML(boolean XMLProject) {
         String XMLString = "";
@@ -110,21 +111,41 @@ public class Video implements MediaItem {
         this.absPath = absPath;
     }
 
+    /**
+     * Set whether this Text object is a shortcut to a Link or not
+     *
+     * @param isShortcut Link
+     */
     @Override
     public void setShortcut(Link shortcut) {
         this.shortcut = shortcut;
     }
 
+    /**
+     * Get shortcut for this Link
+     *
+     * @return Link
+     */
     @Override
     public Link getShortcut() {
         return shortcut;
     }
-    
+
+    /**
+     * Indicates if this Text object is corrupt. Is true if the path to file doesn't exists anymore
+     *
+     * @return boolean
+     */
     @Override
     public boolean isCorrupt() {
         return this.isCorrupt;
-    }    
+    }
 
+    /**
+     * Set if this Text object is corrupt or not. Is true if the path to file doesn't exists anymore
+     *
+     * @param corrupt boolean
+     */
     @Override
     public void setCorrupt(boolean corrupt) {
         this.isCorrupt = corrupt;

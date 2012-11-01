@@ -29,7 +29,7 @@ public class CustomDefaultTableModel extends DefaultTableModel {
      *
      * @param row int
      * @param column int
-     * 
+     *
      * @return super.getValueAt(row, column);
      */
     @Override
@@ -42,7 +42,7 @@ public class CustomDefaultTableModel extends DefaultTableModel {
      *
      * @param row int
      * @param column int
-     * 
+     *
      * @return false
      */
     @Override

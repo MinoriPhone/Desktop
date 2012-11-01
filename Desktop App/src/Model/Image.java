@@ -80,15 +80,22 @@ public class Image implements MediaItem {
         }
     }
 
+    /**
+     * Get XML
+     *
+     * @param XMLProject boolean Used to define difference between shortcut or not
+     *
+     * @return String
+     */
     @Override
     public String printXML(boolean XMLProject) {
         String XMLString = "";
         XMLString += "<image>\r\n";
-        
+
         if (shortcut != null) {
             XMLString += "<shortcut>" + this.shortcut.getId() + "</shortcut>\r\n";
         }
-        
+
         if (XMLProject) {
             XMLString += "<filename>" + this.absPath + this.fileName + "</filename>\r\n";
         } else {
@@ -120,21 +127,41 @@ public class Image implements MediaItem {
         this.absPath = absPath;
     }
 
+    /**
+     * Set whether this Text object is a shortcut to a Link or not
+     *
+     * @param isShortcut Link
+     */
     @Override
     public void setShortcut(Link isShortcut) {
         this.shortcut = isShortcut;
     }
 
+    /**
+     * Get shortcut for this Link
+     *
+     * @return Link
+     */
     @Override
     public Link getShortcut() {
         return this.shortcut;
     }
 
+    /**
+     * Indicates if this Text object is corrupt. Is true if the path to file doesn't exists anymore
+     *
+     * @return boolean
+     */
     @Override
     public boolean isCorrupt() {
         return this.isCorrupt;
     }
 
+    /**
+     * Set if this Text object is corrupt or not. Is true if the path to file doesn't exists anymore
+     *
+     * @param corrupt boolean
+     */
     @Override
     public void setCorrupt(boolean corrupt) {
         this.isCorrupt = corrupt;

@@ -1,8 +1,5 @@
 package Model;
 
-/**
- * Get the filename or extension of a filepath
- */
 public class Filename {
 
     // Variables

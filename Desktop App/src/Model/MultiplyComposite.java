@@ -8,31 +8,52 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 
-/**
- * Multiplies two images
- *
- * @author Martin Steiger
- */
 public class MultiplyComposite implements Composite {
 
     /**
      * The default implementation
      */
-    public static final MultiplyComposite Default = new MultiplyComposite();
+    public static final MultiplyComposite DEFAULT = new MultiplyComposite();
 
+    /**
+     * Constructor
+     *
+     * @note This class is ment to be Singleton
+     */
     private MultiplyComposite() {
-        // empty
     }
 
+    /**
+     * Override CompositeContext()
+     *
+     * Create a Node with a given color
+     *
+     * @param srcColorModel ColorModel
+     * @param dstColorModel ColorModel
+     * @param hints RenderingHints
+     *
+     * @return CompositeContext interface
+     */
     @Override
     public CompositeContext createContext(ColorModel srcColorModel, ColorModel dstColorModel, RenderingHints hints) {
         return new CompositeContext() {
+            /**
+             * Composes the two source Raster objects and places the result in the destination WritableRaster.
+             *
+             * @note The destination can be the same object as either the first or second source.
+             * @note dstIn and dstOut must be compatible with the dstColorModel passed to the createContext method of the Composite
+             * interface.
+             *
+             * @param src Raster
+             * @param dstIn Raster
+             * @param dstOut WritableRaster
+             */
             @Override
             public void compose(Raster src, Raster dstIn, WritableRaster dstOut) {
                 if (src.getSampleModel().getDataType() != DataBuffer.TYPE_INT
                         || dstIn.getSampleModel().getDataType() != DataBuffer.TYPE_INT
                         || dstOut.getSampleModel().getDataType() != DataBuffer.TYPE_INT) {
-                    throw new IllegalStateException("Source and destination must store pixels as INT.");
+                    throw new IllegalStateException("Source and destination must store pixels as an int.");
                 }
 
                 int width = Math.min(src.getWidth(), dstIn.getWidth());
@@ -80,9 +101,11 @@ public class MultiplyComposite implements Composite {
                 }
             }
 
+            /**
+             * No need to implement this!
+             */
             @Override
             public void dispose() {
-                // empty
             }
         };
     }

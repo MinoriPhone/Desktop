@@ -1,12 +1,9 @@
 package Model;
 
-/**
- * Meta data of this Desktop Application
- */
 public class Application {
 
     // Variables
-    private static double version = 0.7;
+    private static double version = 0.9;
 
     /**
      * Get the current version of this application
