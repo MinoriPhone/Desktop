@@ -75,6 +75,11 @@ public class CreateText extends JDialog {
         // Center this window
         this.setLocation(x, y);
 
+        // Set Main icon
+        java.net.URL url = ClassLoader.getSystemResource("View/Images/72x72.png");
+        java.awt.Image img = tk.createImage(url);
+        this.setIconImage(img);
+
         // Initialize standard font variables
         this.currentFont = this.dss.getCurrentFont();
         this.currentFontStyle = this.dss.getCurrentFontStyle();
@@ -352,7 +357,6 @@ public class CreateText extends JDialog {
         // Create document
         exportToHTML();
     }//GEN-LAST:event_bSaveActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bColorChooser;
     private javax.swing.JButton bSave;
@@ -392,7 +396,14 @@ public class CreateText extends JDialog {
         this.cbFontStyle.addItem("Plain");
         this.cbFontStyle.addItem("Bold");
         this.cbFontStyle.addItem("Italic");
-        this.cbFontStyle.setSelectedItem(this.dss.getCurrentFontStyle());
+        if (this.dss.getCurrentFontStyle() == 0) {
+            this.cbFontStyle.setSelectedItem("Plain");
+        } else if (this.dss.getCurrentFontStyle() == 1) {
+            this.cbFontStyle.setSelectedItem("Bold");
+        } else if (this.dss.getCurrentFontStyle() == 2) {
+            this.cbFontStyle.setSelectedItem("Italic");
+        }
+
         this.cbFontStyle.setEditable(false);
 
         // Add Font sizes

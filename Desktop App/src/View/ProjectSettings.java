@@ -10,13 +10,13 @@ import java.awt.Toolkit;
 import java.io.File;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 
 /**
  * Sets the projectsettings of the application
  */
-public class ProjectSettings extends JFrame {
+public class ProjectSettings extends JDialog {
 
     // Variables
     private Map map;
@@ -32,6 +32,8 @@ public class ProjectSettings extends JFrame {
      * Creates new form ProjectSettings with parameters
      */
     public ProjectSettings(Main main, Map map) {
+        super(main, true);
+        
         initComponents();
 
         // Set variables
@@ -43,7 +45,14 @@ public class ProjectSettings extends JFrame {
 
         // Set standard font, style and size from given project settings
         this.cbFonts.setSelectedItem(this.main.getDocumentStyleSettings().getCurrentFont());
-        this.cbFontStyle.setSelectedItem(this.main.getDocumentStyleSettings().getCurrentFontStyle());
+
+        if (this.main.getDocumentStyleSettings().getCurrentFontStyle() == 0) {
+            this.cbFontStyle.setSelectedItem("Plain");
+        } else if (this.main.getDocumentStyleSettings().getCurrentFontStyle() == 1) {
+            this.cbFontStyle.setSelectedItem("Bold");
+        } else if (this.main.getDocumentStyleSettings().getCurrentFontStyle() == 2) {
+            this.cbFontStyle.setSelectedItem("Italic");
+        }
         this.cbFontSize.setSelectedItem(this.main.getDocumentStyleSettings().getCurrentFontSize());
 
         // Get the size of the screen
@@ -56,6 +65,11 @@ public class ProjectSettings extends JFrame {
 
         // Center the window
         this.setLocation(x, y);
+
+        // Set Main icon
+        java.net.URL url = ClassLoader.getSystemResource("View/Images/72x72.png");
+        java.awt.Image img = tk.createImage(url);
+        this.setIconImage(img);
 
         // Set the storyname
         tfStoryName.setText(map.getStory().getName());
@@ -326,9 +340,9 @@ public class ProjectSettings extends JFrame {
 
         // Add an astrix if the story has been changed
         if (map.getStory().isSomethingChanged()) {
-            main.setTitle("*" + tfStoryName.getText() + " - iStory designer " + Application.getVersion());
+            main.setTitle("*" + this.map.getStory().getName() + " - iStory designer " + Application.getVersion());
         } else {
-            main.setTitle(tfStoryName.getText() + " - iStory designer " + Application.getVersion());
+            main.setTitle(this.map.getStory().getName() + " - iStory designer " + Application.getVersion());
         }
 
         // Save mediaitem text settings

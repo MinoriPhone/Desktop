@@ -3,17 +3,19 @@ package View;
 import Model.Application;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 
 /**
  * Frame containing all meta data of the application
  */
-public class About extends JFrame {
+public class About extends JDialog {
 
     /**
      * Creates new form About
      */
-    public About() {
+    public About(Main main) {
+        super(main, true);
+        
         initComponents();
 
         // Get the size of the screen
@@ -26,6 +28,11 @@ public class About extends JFrame {
 
         // Center the window
         this.setLocation(x, y);
+
+        // Set Main icon
+        java.net.URL url = ClassLoader.getSystemResource("View/Images/72x72.png");
+        java.awt.Image img = tk.createImage(url);
+        this.setIconImage(img);
 
         // Set meta data application
         lVersionCode.setText(String.valueOf(Application.getVersion()));

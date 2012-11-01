@@ -91,6 +91,11 @@ public class Main extends JFrame implements PropertyChangeListener {
         // Center the window
         this.setLocation(x, y);
 
+        // Set Main icon
+        java.net.URL url = ClassLoader.getSystemResource("View/Images/72x72.png");
+        java.awt.Image img = tk.createImage(url);
+        this.setIconImage(img);
+
         // Set the exportMediaItem for the export
         exportMediaItems = new HashMap<MediaItem, Link>();
 
@@ -228,6 +233,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         miAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setMinimumSize(new java.awt.Dimension(1024, 768));
         setName("fMain"); // NOI18N
 
@@ -389,7 +395,7 @@ public class Main extends JFrame implements PropertyChangeListener {
 
     private void miAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAboutActionPerformed
         // Show about window
-        About about = new About();
+        About about = new About(this);
         about.setVisible(true);
     }//GEN-LAST:event_miAboutActionPerformed
     private void bNodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bNodeActionPerformed
@@ -1371,9 +1377,8 @@ public class Main extends JFrame implements PropertyChangeListener {
         /**
          * Set progress
          *
-         * Own implementation of setProgress() because we need to set the
-         * progress outside SwingWorker. The function setProgress() is final
-         * protected.
+         * Own implementation of setProgress() because we need to set the progress outside SwingWorker. The function setProgress() is
+         * final protected.
          *
          * @param progress int current progress
          */
