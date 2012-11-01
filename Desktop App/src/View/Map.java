@@ -31,20 +31,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 
-/**
- * Panel containing the Map
- */
 public class Map extends JPanel {
 
     // Variables
-    private static final Logger LOGGER = Logger.getLogger(Map.class.getName());
     public JXMapViewer mapViewer;
     private WaypointPainter<Node> waypointPainter;
     private LinkPainter linkPainter;
@@ -81,7 +76,7 @@ public class Map extends JPanel {
         mapViewer.setTileFactory(tileFactory);
 
         // Set the GEO position + Zoom
-        GeoPosition zHHS = new GeoPosition(52.051194, 4.475518);
+        GeoPosition zHHS = new GeoPosition(52.051194, 4.475518); // Poition of The Hague University of Applied Sciences
         mapViewer.setZoom(0);
         mapViewer.setAddressLocation(zHHS);
 
@@ -118,8 +113,10 @@ public class Map extends JPanel {
         mapViewer.repaint();
     }
 
-    /* Clear this map and all nodes and links that are painted on it and init it with a new story.
-     * 
+    /**
+     * Clear this map and all nodes and links that are painted on it and init it with a new story.
+     *
+     * @param newStory Story the new story
      */
     public void Clear(Story newStory) {
         nodes.clear();
@@ -140,9 +137,9 @@ public class Map extends JPanel {
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Add Node to the mapViewer
+     * Add a node to the mapViewer
      *
-     * @param node Node The Node we want to add to the mapViewer
+     * @param node Node The Node which will be added to the mapViewer
      */
     public void addNode(Node node) {
         nodes.add(node);
@@ -156,7 +153,7 @@ public class Map extends JPanel {
     /**
      * Add Link to the mapViewer
      *
-     * @param link Link The Link we want to add to the mapViewer
+     * @param link Link The Link which will be added to the mapViewer
      */
     public void addLink(Link link) {
         linkPainter.addLink(link);
@@ -167,9 +164,7 @@ public class Map extends JPanel {
     }
 
     /**
-     * Add Link to the mapViewer
-     *
-     * @param link Link The Link we want to add to the mapViewer
+     * Remove the last link from the MapViewer
      */
     public void removeLastLink() {
         linkPainter.removeLastLink();
@@ -182,7 +177,7 @@ public class Map extends JPanel {
     /**
      * Delete Node from the mapViewer
      *
-     * @param node Node The Node we want to delete from the mapViewer
+     * @param node Node The Node which will be deleted from the mapViewer
      */
     public void deleteNode(Node node) {
         nodes.remove(node);
@@ -197,7 +192,8 @@ public class Map extends JPanel {
      * Get Node at a certain Point2D
      *
      * @param point Point2D
-     * @return Node
+     *
+     * @return Node the node which is placed at the point. NULL if no nNode were found at the point
      */
     public Node getNodeAtCoord(Point2D point) {
         for (Node node : nodes) {
@@ -214,7 +210,7 @@ public class Map extends JPanel {
     /**
      * Get Story
      *
-     * @return Story
+     * @return Story the story
      */
     public Story getStory() {
         return story;
@@ -232,16 +228,16 @@ public class Map extends JPanel {
     /**
      * Get buttonNodeClicked
      *
-     * @return boolean
+     * @return boolean true if the Node button is clicked
      */
     public boolean isButtonNodeClicked() {
         return buttonNodeClicked;
     }
 
     /**
-     * Get buttonNodeClicked
+     * Set the button clicked
      *
-     * @return boolean
+     * @param buttonNodeClicked boolean true if the button is clicked
      */
     public void setButtonNodeClicked(boolean buttonNodeClicked) {
         this.buttonNodeClicked = buttonNodeClicked;
@@ -250,16 +246,16 @@ public class Map extends JPanel {
     /**
      * Get buttonLinkClicked
      *
-     * @return boolean
+     * @return boolean true is the Button link is clicked
      */
     public boolean isButtonLinkClicked() {
         return buttonLinkClicked;
     }
 
     /**
-     * Get buttonLinkClicked
+     * Set buttonLinkClicked
      *
-     * @return boolean
+     * @param buttonLinkClicked boolean true if the button link is clicked
      */
     public void setButtonLinkClicked(boolean buttonLinkClicked) {
         this.buttonLinkClicked = buttonLinkClicked;
@@ -268,7 +264,7 @@ public class Map extends JPanel {
     /**
      * Get buttonStartClicked
      *
-     * @return boolean
+     * @return boolean true if the button start is clicked
      */
     public boolean isButtonStartClicked() {
         return buttonStartClicked;
@@ -277,7 +273,7 @@ public class Map extends JPanel {
     /**
      * Set buttonStartClicked
      *
-     * @param buttonStartClicked boolean
+     * @param buttonStartClicked boolean true if the button start is clicked
      */
     public void setButtonStartClicked(boolean buttonStartClicked) {
         this.buttonStartClicked = buttonStartClicked;
@@ -286,7 +282,7 @@ public class Map extends JPanel {
     /**
      * Get isLinkOnMouse
      *
-     * @return boolean
+     * @return boolean true if the link is on the mouse
      */
     public boolean isLinkOnMouse() {
         return linkOnMouse;
@@ -295,12 +291,17 @@ public class Map extends JPanel {
     /**
      * Set linkOnMouse
      *
-     * @param linkOnMouse boolean
+     * @param linkOnMouse boolean true if the link is on the mouse
      */
     public void setLinkOnMouse(boolean linkOnMouse) {
         this.linkOnMouse = linkOnMouse;
     }
 
+    /**
+     * Print the XML code
+     *
+     * @return String the XML code
+     */
     public String printNodeXML() {
         String xmlString = "";
         xmlString += "<!-- These are extra nodes (which are not linked)  -->\r\n";
@@ -317,12 +318,20 @@ public class Map extends JPanel {
         return xmlString;
     }
 
-    void setNodeOnMouse() {
+    /**
+     * Set a new node on the mouse
+     */
+    public void setNodeOnMouse() {
         nodeOnMouse = new Node(85.02070774312594, -140.625); //Position outside map (invisible)
         addNode(nodeOnMouse);
     }
 
-    Node getNodeOnMouse() {
+    /**
+     * Get the node which is on the mouse
+     *
+     * @return the node which is on the mouse
+     */
+    public Node getNodeOnMouse() {
         return nodeOnMouse;
     }
 }
@@ -333,7 +342,6 @@ public class Map extends JPanel {
 class MapListeners extends MouseInputAdapter {
 
     // Variables
-    private static final Logger LOGGER = Logger.getLogger(Map.class.getName());
     private Point prev;
     private JXMapViewer mapViewer;
     private Map map;
@@ -342,9 +350,12 @@ class MapListeners extends MouseInputAdapter {
     private Main main;
 
     /**
-     * Constructor
+     * Create a new listener for the map
      *
-     * @param mapViewer JXMapViewer The map
+     * @param mapViewer JXMapViewer a navigation plugin for the map
+     * @param map Map the map component
+     * @param linkPainter LinkPainter the linkpainter which paints the links
+     * @param main Main main component
      */
     public MapListeners(JXMapViewer mapViewer, Map map, LinkPainter linkPainter, Main main) {
         this.mapViewer = mapViewer;
@@ -356,7 +367,7 @@ class MapListeners extends MouseInputAdapter {
     /**
      * Mouse clicked event
      *
-     * @param evt MouseEvent
+     * @param evt MouseEvent the event which triggered the function
      */
     @Override
     public void mouseClicked(final MouseEvent evt) {
@@ -370,14 +381,6 @@ class MapListeners extends MouseInputAdapter {
         // Place Node
         if (map.isButtonNodeClicked()) {
 
-            // Get GEO Position where we want to place the node
-            //GeoPosition geopos = mapViewer.convertPointToGeoPosition(coord);
-
-            // Add Node to Map
-            //map.addNode(new Node(geopos));
-
-            // Repaint Map
-            //mapViewer.repaint();
             map.setButtonNodeClicked(false);
             mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
@@ -429,7 +432,7 @@ class MapListeners extends MouseInputAdapter {
 
                     // Delete possible previous links that are already chosen
                     ArrayList<Link> prevLinksForP2 = this.map.getStory().getPreviousLinksForStartNode(link.getP2());
-                    boolean found = false;
+                    boolean found;
                     for (Link prevP2 : prevLinksForP2) {
                         found = false;
                         for (Link prevP1 : prevLinks) {
@@ -581,17 +584,18 @@ class MapListeners extends MouseInputAdapter {
     /**
      * Mouse pressed event
      *
-     * @param evt MouseEvent
+     * @param evt MouseEvent the event which triggered the function
      */
     @Override
     public void mousePressed(MouseEvent evt) {
+        // Saves the current click position
         prev = evt.getPoint();
     }
 
     /**
      * Mouse dragged event
      *
-     * @param evt MouseEvent
+     * @param evt MouseEvent the event which triggered the function
      */
     @Override
     public void mouseDragged(MouseEvent evt) {
@@ -662,7 +666,7 @@ class MapListeners extends MouseInputAdapter {
     /**
      * Mouse released event
      *
-     * @param evt MouseEvent
+     * @param evt MouseEvent the event which triggered the function
      */
     @Override
     public void mouseReleased(MouseEvent evt) {
@@ -678,7 +682,7 @@ class MapListeners extends MouseInputAdapter {
     /**
      * Mouse entered event
      *
-     * @param evt MouseEvent
+     * @param evt MouseEvent the event which triggered the function
      */
     @Override
     public void mouseEntered(MouseEvent e) {
@@ -720,9 +724,9 @@ class MapListeners extends MouseInputAdapter {
     }
 
     /**
-     * TODO
+     * Opens a mediadialog when a link is clicked
      *
-     * @param link
+     * @param link Link the current clicked link
      */
     private void openMediaDialogByLinkClick(Link link) {
 
@@ -733,9 +737,7 @@ class MapListeners extends MouseInputAdapter {
         // Add window listener to the popup dialog window, so we
         // can get the added MediaItems in the right order
         popup.addWindowListener(new WindowAdapter() {
-            /**
-             * Window closed event
-             */
+            //  Window closed event
             @Override
             public void windowClosed(WindowEvent we) {
 
@@ -763,9 +765,10 @@ class MapListeners extends MouseInputAdapter {
     /**
      * Open AddMedia Dialog
      *
-     * @param node
-     * @param prevLinks
-     * @param startOrLink
+     * @param node Node the clicked Node
+     * @param prevLinks ArrayList<Link> All the previous links
+     * @param startOrLink int if 0, the source is a start if 1 = the source is a link
+     * @param currentLink The current link
      */
     private void openAddMediaDialog(Node node, ArrayList<Link> prevLinks, final int startOrLink, Link currentLink) {
         if (startOrLink != 1 || !node.getStart()) {
