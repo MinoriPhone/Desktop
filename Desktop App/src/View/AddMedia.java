@@ -39,9 +39,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-/**
- * Popup Window for adding media to a link
- */
 public final class AddMedia extends JDialog {
 
     // Variables

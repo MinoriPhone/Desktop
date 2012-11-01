@@ -51,7 +51,7 @@
                       </Group>
                       <Component id="lLogo" alignment="0" min="-2" pref="275" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="14" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -70,7 +70,7 @@
                       <Component id="lCreators" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lNames" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="21" max="32767" attributes="0"/>
+                  <EmptySpace pref="26" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

@@ -5,19 +5,16 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JDialog;
 
-/**
- * Frame containing all meta data of the application
- */
 public class About extends JDialog {
 
     /**
-     * Create a About dialog 
-     * 
+     * Create a About dialog
+     *
      * @param main Main parent component
      */
     public About(Main main) {
         super(main, true);
-        
+
         initComponents();
 
         // Get the size of the screen
