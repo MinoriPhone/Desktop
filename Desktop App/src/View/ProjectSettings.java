@@ -13,9 +13,6 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 
-/**
- * Sets the projectsettings of the application
- */
 public class ProjectSettings extends JDialog {
 
     // Variables
