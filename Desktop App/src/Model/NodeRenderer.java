@@ -57,7 +57,7 @@ public class NodeRenderer implements WaypointRenderer<Node> {
 
         Graphics2D graphics = imgOut.createGraphics();
         graphics.drawImage(loadImg, 0, 0, null);
-        graphics.setComposite(MultiplyComposite.DEFAULT);
+        graphics.setComposite(MultiplyComposite.Default);
         graphics.drawImage(imgColor, 0, 0, null);
         graphics.dispose();
 

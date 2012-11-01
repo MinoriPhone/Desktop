@@ -13,7 +13,7 @@ public class MultiplyComposite implements Composite {
     /**
      * The default implementation
      */
-    public static final MultiplyComposite DEFAULT = new MultiplyComposite();
+    public static final MultiplyComposite Default = new MultiplyComposite();
 
     /**
      * Constructor
