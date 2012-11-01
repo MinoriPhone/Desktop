@@ -93,11 +93,8 @@ public class ProjectSettings extends JDialog {
      */
     private void setupChoosableFontProperties() {
 
-        // Obtain Font info from the current graphics environment
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-
         // Get an array of all font names
-        String[] fontNames = ge.getAvailableFontFamilyNames();
+        String[] fontNames = this.main.getAvailableFonts();
 
         // Add Fonts
         for (String font : fontNames) {

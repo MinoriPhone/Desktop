@@ -135,9 +135,6 @@ public class Main extends JFrame implements PropertyChangeListener {
         // Revalidate JPanels
         this.pack();
 
-        // Obtain Font info from the current graphics environment and get all font names
-        this.ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        this.availableFonts = ge.getAvailableFontFamilyNames();
     }
 
     /**
@@ -146,7 +143,22 @@ public class Main extends JFrame implements PropertyChangeListener {
      * @return String[] all the availible fonts
      */
     public String[] getAvailableFonts() {
-        return this.availableFonts;
+
+        String[] fonts = new String[]{
+            "Arial",
+            "Arial Black",
+            "Comic Sans MS",
+            "Courier New",            
+            "Georgia",
+            "Impact",
+            "Lucida Console",
+            "Times New Roman",
+            "Tahoma",
+            "Trebuchet MS",
+            "Verdana"
+        };
+
+        return fonts;
     }
 
     /**
