@@ -157,8 +157,8 @@ public final class AddMedia extends JDialog {
 
         // MediaItems
         for (MediaItem mItem : link.getMediaItems()) {
-            
-            // Add file to list
+
+            // Add selected file to list
             if (mItem != null) {
                 if (mItem instanceof Video) {
                     this.addItem((Video) mItem);
