@@ -11,7 +11,9 @@ import javax.swing.JDialog;
 public class About extends JDialog {
 
     /**
-     * Creates new form About
+     * Create a About dialog 
+     * 
+     * @param main Main parent component
      */
     public About(Main main) {
         super(main, true);
