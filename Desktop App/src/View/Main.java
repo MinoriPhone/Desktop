@@ -172,7 +172,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                     "You made one or several changes to the current story.\n"
                     + "Do you want to save this before closing the program?\n",
                     "Save?",
-                    JOptionPane.YES_NO_CANCEL_OPTION);
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
 
             if (n == JOptionPane.YES_OPTION) {
                 close = true;
@@ -474,7 +475,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                     "You made one or several changes to the current story.\n"
                     + "Do you want to save this before opening one?\n",
                     "Save?",
-                    JOptionPane.YES_NO_CANCEL_OPTION);
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
 
             if (n == JOptionPane.YES_OPTION) {
                 // saveStory returns false if the user cancels
@@ -491,6 +493,7 @@ public class Main extends JFrame implements PropertyChangeListener {
         j.addChoosableFileFilter(new ExtensionFileFilter(
                 new String[]{".proj"}, // Extensions we accept
                 "Project files (*.proj)"));
+        j.setAcceptAllFileFilterUsed(false);
 
         int dialog = j.showOpenDialog(this);
 
@@ -573,8 +576,17 @@ public class Main extends JFrame implements PropertyChangeListener {
                             tempMediaItem.setFileName(file.getName());
                         } else {
 
+                            JOptionPane.showMessageDialog(null,
+                                    "There are one or more corrupt files in this project. \nSelect these files before the export can proceed.",
+                                    "Corrupt file(s) found",
+                                    JOptionPane.WARNING_MESSAGE);
+
                             // Browse for any corrupt file
                             JFileChooser corruptFileChooser = new JFileChooser();
+                            corruptFileChooser.setFileFilter(new ExtensionFileFilter(
+                                    new String[]{".RTF", ".TXT", ".HTM", ".HTML", ".JPG", ".JPEG", ".PNG", ".BMP", ".M4V", ".MOV", ".MP4"},
+                                    "All supported files"));
+                            corruptFileChooser.setAcceptAllFileFilterUsed(false);
                             corruptFileChooser.setDialogTitle("Find the corrupt file");
                             corruptFileChooser.setFileFilter(new FileFilter() {
                                 @Override
@@ -656,7 +668,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                     "You made one or several changes to the current story.\n"
                     + "Do you want to save this before starting a new one?\n",
                     "Save?",
-                    JOptionPane.YES_NO_CANCEL_OPTION);
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
 
             if (n == JOptionPane.YES_OPTION) {
                 // saveStory returns false if the user cancels
@@ -690,7 +703,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                     "You made one or several changes to the current story.\n"
                     + "Do you want to save this before importing a new one?\n",
                     "Save?",
-                    JOptionPane.YES_NO_CANCEL_OPTION);
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
 
             if (n == JOptionPane.YES_OPTION) {
                 // saveStory returns false if the user cancels
@@ -745,16 +759,16 @@ public class Main extends JFrame implements PropertyChangeListener {
      */
     private boolean saveStory() {
 
-        if (!verifyValidExport()) {
-            return false;
-        }
-
         boolean XMLProject = true; // make a proj file
 
         JFileChooser j = new JFileChooser();
         //j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         j.setSelectedFile(new File(map.getStory().getName()));
         j.setDialogTitle("Select a location to save the project");
+        j.setAcceptAllFileFilterUsed(false);
+        j.setFileFilter(new ExtensionFileFilter(
+                                    new String[]{".PROJ"},
+                                    "*.iStory.proj"));
         int dialog = j.showSaveDialog(this);
 
         // Catch actions of the File Chooser Dialog Window
@@ -788,7 +802,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                             "There is already a file with the same name in the selected folder. \n "
                             + "Do you want to overwrite this file?",
                             "File already exists",
-                            JOptionPane.YES_NO_CANCEL_OPTION);
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
                     if (option == JOptionPane.YES_OPTION) {
                         projectFile.delete();
                     } else if (option == JOptionPane.NO_OPTION) {
@@ -839,8 +854,18 @@ public class Main extends JFrame implements PropertyChangeListener {
 
                 // Check for corrupt items
                 if (mediaItem.isCorrupt()) {
+
+                    JOptionPane.showMessageDialog(null,
+                            "There are one or more corrupt files in this project. \nSelect these files before the export can proceed.",
+                            "Corrupt file(s) found",
+                            JOptionPane.WARNING_MESSAGE);
+
                     // Browse for any corrupt file
                     JFileChooser corruptFileChooser = new JFileChooser();
+                    corruptFileChooser.setFileFilter(new ExtensionFileFilter(
+                            new String[]{".RTF", ".TXT", ".HTM", ".HTML", ".JPG", ".JPEG", ".PNG", ".BMP", ".M4V", ".MOV", ".MP4"},
+                            "All supported files"));
+                    corruptFileChooser.setAcceptAllFileFilterUsed(false);
                     corruptFileChooser.setDialogTitle("Find the corrupt file");
                     corruptFileChooser.setFileFilter(new FileFilter() {
                         @Override
@@ -926,7 +951,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                             "There is already a file with the same name in the selected folder. \n "
                             + "Do you want to overwrite this file?",
                             "File already exists",
-                            JOptionPane.YES_NO_CANCEL_OPTION);
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
                     if (option == JOptionPane.YES_OPTION) {
                         File deletedFile = new File(fileName);
                         deletedFile.delete();
@@ -971,7 +997,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                                             Main.this,
                                             "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
                                             "Could not delete iStory file",
-                                            JOptionPane.WARNING_MESSAGE);
+                                            JOptionPane.ERROR_MESSAGE);
                                 }
                                 return false;
                             }
@@ -1100,7 +1126,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                                                         Main.this,
                                                         "The corrupt iStory file could not be deleted. You have to delete it manualy at: '" + fileName + "'",
                                                         "Could not delete iStory file",
-                                                        JOptionPane.WARNING_MESSAGE);
+                                                        JOptionPane.ERROR_MESSAGE);
                                             }
                                             exportMediaItems.clear();
                                             return false;
@@ -1209,7 +1235,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                                 "There is already a story folder with the same name in the selected folder. \n "
                                 + "Do you want to overwrite this folder?",
                                 "File already exists",
-                                JOptionPane.YES_NO_CANCEL_OPTION);
+                                JOptionPane.YES_NO_CANCEL_OPTION,
+                                JOptionPane.WARNING_MESSAGE);
                         if (option == JOptionPane.YES_OPTION) {
                             folder.delete();
                         } else if (option == JOptionPane.NO_OPTION) {
@@ -1478,7 +1505,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                             Main.this,
                             "Exporting canceled by user!",
                             "Canceled",
-                            JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.ERROR_MESSAGE);
                 } // Export succeeded
                 else if (task.isDone() && task.getProgress() == 100) {
                     JOptionPane.showMessageDialog(
@@ -1497,7 +1524,7 @@ public class Main extends JFrame implements PropertyChangeListener {
                             Main.this,
                             "Importing canceled by user!",
                             "Canceled",
-                            JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.ERROR_MESSAGE);
                 } // Export succeeded
                 else if (task.isDone() && task.getProgress() == 100) {
                     JOptionPane.showMessageDialog(
