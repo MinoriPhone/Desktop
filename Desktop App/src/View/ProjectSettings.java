@@ -205,7 +205,7 @@ public class ProjectSettings extends JDialog {
 
         pStorySettingsLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {tfStoryImage, tfStoryName});
 
-        pTextSettings.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "   Media item Text settings   ", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 13))); // NOI18N
+        pTextSettings.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "   Default Text settings   ", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 13))); // NOI18N
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -268,7 +268,7 @@ public class ProjectSettings extends JDialog {
                     .addComponent(cbFontStyle, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbFontSize, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bColorChooser))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(163, Short.MAX_VALUE))
         );
         pTextSettingsLayout.setVerticalGroup(
             pTextSettingsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
