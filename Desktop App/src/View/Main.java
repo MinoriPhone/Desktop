@@ -1325,6 +1325,8 @@ public class Main extends JFrame implements PropertyChangeListener {
                             map.Clear(story);
                         } else if (strLine.contains("<story.name>") && strLine.contains("</story.name>")) {
                             story.setName(strLine.substring("<story.name>".length(), strLine.length() - "</story.name>".length()));
+                        } else if (strLine.contains("<story.image>") && strLine.contains("</story.image>")) {
+                            story.setImage(new File(pad + strLine.substring("<story.image>".length(), strLine.length() - "</story.image>".length())));
                         } else if (strLine.contains("<route>")) {
                             story.newEmptyRoute();
                         } else if (strLine.contains("<route.name>") && strLine.contains("</route.name>")) {
